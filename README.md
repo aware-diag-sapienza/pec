@@ -1,1 +1,1 @@
-# progressive-ensemble-clustering
+# Progressive Ensemble Clustering
