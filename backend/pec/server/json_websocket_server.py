@@ -37,10 +37,10 @@ class JsonWebSocketServer:
 
 
     def __fnNewClient(self, client, server):
-        pass
+        print(f"Client connected: {client}")
     
     def __fnClientLeft(self, client, server):
-        pass
+        print(f"Client disconnected: {client}")
 
     def __fnMmessageReceived(self, client, server, message):
         self.__recievedCounter += 1

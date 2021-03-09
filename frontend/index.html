@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body> 
+
+  <script src="./PECServer.js"></script>
+  <script>
+
+    async function test(){
+      /* Per prima cosa avvio la connessione col server. Torna una promise. */ 
+      const server = await PECServer('ws://localhost:6789')
+
+      /* 
+      Lista dei dataset presenti sul server, con nome e dettagli. 
+      K ancora è fisso a 0, va sistemato.
+      Ritorna una promise.
+      */
+      const list = await server.getDatasetsInfo()
+      console.log(list)
+
+      /* 
+      Dataset con matrice dei dati e proiezioni già calcolate (PCA, tsne).
+      Le dimensioni x e y delle proiezioni sono già in [0,1] così si velocizza il disegno, non serve calcolare min e max. 
+      I dataset si identificano con il loro nome.
+      Ritorna una promise.
+      */
+      const dataset = await server.getDataset('glass')
+      console.log(dataset)
+      
+      
+      /* 
+      Clustering Job Asincrono. Va prima creato, torna una promise. 
+      job.results è la lista di tutti i risultati parziali ricevuti
+      job.onPartialResult(callback) serve a settare una callback che viene chiamata quando arrivano i risultati
+      job.jobId è univoco e puù essere usato per gestire la visualizzazione dei risultati di più job contemporanei
+      */
+      var dname = 'glass'
+      var k = 3
+      var r = 8
+      var seed = 0
+      var type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
+      
+      const job = await server.createAsyncJob(dname, type, k, r, seed)
+
+      /*
+      una volta creato il job, posso assegnare una callback per i risultati parziali
+      result.isLast dice se è l'ultimo
+      tutti i timestamp sono in SECONDI
+      le iterazioni partono da 0
+      c'è ancora un problema sul risultato di iterazione 0 che da eccezione e quindi non viene notificata (la prima iterazione che arriva è la 1)
+      */
+      job.onPartialResult(result => {
+        console.log(result)
+      })
+
+      //avvio il job
+      job.start()
+      
+      // non funziona ancora lo stop
+      //job.stop()
+    
+    
+    }
+    
+      test()
+  </script>
+
+</body>
+</html>
