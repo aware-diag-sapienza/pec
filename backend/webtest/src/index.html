@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="shortcut icon" href="favicon.ico">
+  
+  <title><%= htmlWebpackPlugin.options.title %></title>
+</head>
+<body> 
+  <!-- navbar -->
+  <nav class="navbar navbar-expand-lg ml-auto navbar-dark bg-dark">
+    <a class="navbar-brand" href="#"><%= htmlWebpackPlugin.options.title %></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <input id="input-upload" type="file"/>
+          <a class="nav-link" href="#" id="link-upload"><i class="fas fa-upload"></i> Upload</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#"><i class="fas fa-download"></i> Download</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-cog"></i> Settings
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">Action</a>
+            <a class="dropdown-item" href="#">Another action</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a>
+          </div>
+        </li>
+        <form class="form-inline my-2 my-lg-0">
+        <input class="form-control form-control-sm mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-sm btn-outline-info my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+  <!-- ./navbar -->
+
+  <!-- main -->
+  <main>
+    <div class="container">
+      
+      <div class="row" style="margin: 1em;">
+        <div class="col-6">
+          <button id="b-datasetsInfo" class="btn btn-sm btn-primary">Datasets Info</button>
+        </div>
+        <div class="col-6">
+          <p id="p-datasetsInfo"></p>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row" style="margin: 1em;">
+        <div class="col-6">
+          <button id="b-dataset" class="btn btn-sm btn-primary">Dataset</button>
+        </div>
+        <div class="col-6">
+          <p id="p-dataset"></p>
+        </div>
+      </div>
+
+
+      <hr>
+
+      <div class="row" style="margin: 1em;">
+        <div class="col-6">
+          <button id="b-ajob" class="btn btn-sm btn-primary">New ASYNC Clustering Job</button>
+        </div>
+        <div class="col-6">
+          <p id="p-ajob"></p>
+        </div>
+      </div>
+
+      <div class="row" style="margin: 1em;">
+        <div class="col-6">
+          <div class="row" style="margin: 1em;"><button id="b-astart" class="btn btn-sm btn-success">Start</button></div>
+          <div class="row" style="margin: 1em;"><button id="b-astop" class="btn btn-sm btn-danger">Stop</button></div>
+        </div>
+        <div class="col-6">
+          <p id="p-clusteringResults"></p>
+        </div>
+      </div>
+
+
+      <hr>
+
+      <div class="row" style="margin: 1em;">
+        <div class="col-6">
+          <button id="b-sjob" class="btn btn-sm btn-primary">New SYNC Clustering Job</button>
+        </div>
+        <div class="col-6">
+          <p id="p-sjob"></p>
+        </div>
+      </div>
+
+      <div class="row" style="margin: 1em;">
+        <div class="col-6">
+          <div class="row" style="margin: 1em;"><button id="b-sstart" class="btn btn-sm btn-success">Start</button></div>
+          <div class="row" style="margin: 1em;"><button id="b-sstop" class="btn btn-sm btn-danger">Stop</button></div>
+        </div>
+        <div class="col-6">
+          <p id="p-clusteringResults"></p>
+        </div>
+      </div>
+
+      
+  
+  
+  </div>
+    
+
+  </main>
+  <!-- ./main -->
+
+  
+
+</body>
+</html>

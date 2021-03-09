@@ -1,0 +1,5 @@
+data/
+temp/
+new/
+*.zip
+*__old
