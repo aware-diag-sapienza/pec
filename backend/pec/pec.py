@@ -9,7 +9,7 @@ from pathlib import Path
 from multiprocessing import SimpleQueue, Lock
 from sklearn.utils import check_random_state
 
-from .utils import SharedArray, TimeManager, best_labels_dtype
+from .utils import SharedArray, TimeManager, best_labels_dtype, ProgressiveResultMetrics
 from .clustering import ProgressiveKMeansRun, InertiaBased_ProgressiveKMeansRun
 from .decision import InertiaBased_ProgressiveDecisionWorker, HGPA_ProgressiveDecisionWorker, MCLA_ProgressiveDecisionWorker
 from .metrics import ClusteringMetrics
@@ -69,7 +69,10 @@ class ProgressiveEnsembleClustering:
         self.__clustering_runs_ack_queue_arr = [SimpleQueue() for _ in range(self.n_runs)]
         self.__clustering_runs_lock_arr = [Lock() for _ in range(self.n_runs)]
         self.__partial_results_queue = SimpleQueue()
-
+        
+        
+        self.__prevResult = None #previous partial result
+        self.__metricsHistory = []
         '''
         self.__result_csv = None
         self.__result_hdf5 = None
@@ -254,10 +257,15 @@ class ProgressiveEnsembleClustering:
             result.job_id = self.job_id
             result.info.timestamp = self.__time_manager.timestamp(round_digits=4) #update timestamp of result. original timestamp is when the result was generated, but some delay can appear when is recieved here
             self.__active = not result.info.is_last
+            result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory)
             # pause the time manager. the time used by on_partial_result is out of timestamp count
             self.__time_manager.pause()
             self.__resultsFileWriter.save(result)
             self.on_partial_result(result)
+            
+            self.__prevResult = result
+            self.__metricsHistory.append(result.metrics)
+            
             self.__time_manager.resume()
         ###
         ### process completed
@@ -266,6 +274,62 @@ class ProgressiveEnsembleClustering:
         self.on_end()
         self.__clean()
         if self.verbose: print(f"[{self.__class__.__name__}] terminated.")
+
+    def __computeResultMetrics(self, currentResult, prevResult, history):
+        fn_inertia = lambda labels, data: ClusteringMetrics.inertia(data, labels)
+        fn_calinsky = lambda labels, data: ClusteringMetrics.calinsky_harabaz_score(data, labels)
+        fn_dbindex = lambda labels, data: ClusteringMetrics.davies_bouldin_index(data, labels)
+        fn_dunnindex = lambda labels, data: ClusteringMetrics.dunn_index(data, labels)
+
+        labelsMetrics = {
+            "inertia": ClusteringMetrics.inertia(self.data, currentResult.labels),
+            "dbIndex": ClusteringMetrics.davies_bouldin_index(self.data, currentResult.labels),
+            "dunnIndex": ClusteringMetrics.dunn_index(self.data, currentResult.labels),
+            "calinskyHarabasz": ClusteringMetrics.calinsky_harabaz_score(self.data, currentResult.labels),
+            "adjustedRandScore": np.ones(self.n_runs, dtype=float),
+            "adjustedMutualInfoScore": np.ones(self.n_runs, dtype=float)
+        }
+        partitionsMetrics = {
+            "inertia": np.apply_along_axis(fn_inertia, 1, currentResult.partitions, self.data),
+            "dbIndex": np.apply_along_axis(fn_dbindex, 1, currentResult.partitions, self.data),
+            "dunnIndex": np.apply_along_axis(fn_dunnindex, 1, currentResult.partitions, self.data),
+            "calinskyHarabasz": np.apply_along_axis(fn_calinsky, 1, currentResult.partitions, self.data),
+            "adjustedRandScore": np.ones((self.n_runs, self.n_runs), dtype=float),
+            "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float)
+        }
+        for i in range(self.n_runs):
+            labelsMetrics["adjustedRandScore"][i] = ClusteringMetrics.adjusted_rand_score(currentResult.partitions[i], currentResult.labels)
+            labelsMetrics["adjustedMutualInfoScore"][i] = ClusteringMetrics.adjusted_mutual_info_score(currentResult.partitions[i], currentResult.labels)
+            for j in range(self.n_runs):
+                partitionsMetrics["adjustedRandScore"][i,j] = ClusteringMetrics.adjusted_rand_score(currentResult.partitions[i], currentResult.partitions[j])
+                partitionsMetrics["adjustedMutualInfoScore"][i,j] = ClusteringMetrics.adjusted_mutual_info_score(currentResult.partitions[i], currentResult.partitions[j])
+        
+        def fn_min_labelsMetricHistory(m): return np.min([h.labelsMetrics[m] for h in history])
+        def fn_max_labelsMetricHistory(m): return np.max([h.labelsMetrics[m] for h in history])
+        def gradient(m): return progessiveMetrics[m] - history[-1].progessiveMetrics[m]
+        firstIteration = prevResult is None
+        progessiveMetrics = {
+            "labelsStability": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else (currentResult.labels == prevResult.labels).astype(int),
+            "inertia_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("inertia") - labelsMetrics["inertia"]) / fn_max_labelsMetricHistory("inertia"),
+            "dbIndex_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("dbIndex") - labelsMetrics["dbIndex"]) / fn_max_labelsMetricHistory("dbIndex"),
+            "dunnIndex_improvement": 0 if firstIteration else (labelsMetrics["dunnIndex"] - fn_min_labelsMetricHistory("dunnIndex")) / fn_min_labelsMetricHistory("dunnIndex"),
+            "calinskyHarabasz_improvement": 0 if firstIteration else (labelsMetrics["calinskyHarabasz"] - fn_min_labelsMetricHistory("calinskyHarabasz")) / fn_min_labelsMetricHistory("calinskyHarabasz"),
+            
+            "adjustedRandScore": 0 if firstIteration else ClusteringMetrics.adjusted_rand_score(currentResult.labels, prevResult.labels),
+            "adjustedMutualInfoScore": 0 if firstIteration else ClusteringMetrics.adjusted_mutual_info_score(currentResult.labels, prevResult.labels)
+        }
+        # compute gradients
+        for key in list(progessiveMetrics.keys()):
+            if key == "labelsStability": continue
+            if prevResult is not None: progessiveMetrics[f"{key}Gradient"] = gradient(key)
+
+        
+            
+
+        
+        
+        currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progessiveMetrics=progessiveMetrics)
+        return currentResult
 
 
 

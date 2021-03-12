@@ -18,93 +18,63 @@ class ProgressiveResult(Bunch):
 
     labels : numpy array with clustering labels
     """
-    def __init__(self, info, labels, partitions):
-        super().__init__(job_id="", info=info, labels=labels, partitions=partitions)
+    def __init__(self, info, labels, partitions, metrics={}):
+        super().__init__(job_id="", info=info, labels=labels, partitions=partitions, metrics=metrics)
         
-
+###
+###
+###
 class ProgressiveResultInfo(Bunch):
     """ ProgressiveResultInfo """
     def __init__(self,
         timestamp=None,
         iteration=None,
         is_last=False,
-
         n_clusters=None,
-        completed_runs=None,
+        n_runs = None,
+
         best_run=None,
-        
+        completed_runs=None,
         runs_iterations=None,
         completed_runs_status=None,
-
+        
         waiting_time = 0,
         decision_time = 0,
-        inertia_time = 0,
-        ars_time = 0,
-        ami_time = 0,
 
-        avg_run_iteration_duration=0,
-        var_run_iteration_duration=0,
-        avg_run_iteration_supplemental_time=0,
-        var_run_iteration_supplemental_time=0,
-        
-        runs_inertia=None,
-        decision_ars=None,
-        decision_ami=None,
-        runs_ars_matrix=None,
-        runs_ami_matrix=None,
-
-        inertia=0,
-        inertia_gradient=0,
-        inertia_improvement=0,
-        inertia_improvement_gradient=0,
-
-        ars=0,
-        ars_gradient=0,
-        ami=0,
-        ami_gradient=0,
+        run_iteration_duration_avg=0,
+        run_iteration_duration_median=0,
+        run_iteration_duration_var=0
         ):
         
         super().__init__(
             timestamp=round(timestamp,_ROUND_TIME),
             iteration=iteration,
             is_last=is_last,
-
             n_clusters=n_clusters,
+            n_runs=n_runs,
+
+            best_run=best_run,
             completed_runs=completed_runs,
-            best_run=0,
-            
             runs_iterations="-".join(list(map(lambda i: str(i).zfill(3), runs_iterations))),
             completed_runs_status="-".join(list(map(lambda s: "t" if s else "f", completed_runs_status))),
             
             waiting_time=round(waiting_time, _ROUND_TIME),
             decision_time=round(decision_time, _ROUND_TIME),
-            inertia_time = round(inertia_time, _ROUND_TIME),
-            ars_time = round(ars_time, _ROUND_TIME),
-            ami_time = round(ami_time, _ROUND_TIME),
 
-            avg_run_iteration_duration=round(avg_run_iteration_duration, _ROUND_TIME),
-            var_run_iteration_duration=var_run_iteration_duration,
-            avg_run_iteration_supplemental_time=round(avg_run_iteration_supplemental_time, _ROUND_TIME),
-            var_run_iteration_supplemental_time=var_run_iteration_supplemental_time,
-            
-            runs_inertia=array_to_string(runs_inertia),
-            decision_ars = array_to_string(decision_ars),
-            decision_ami = array_to_string(decision_ami),
-            runs_ars_matrix = matrix_to_string(runs_ars_matrix),
-            runs_ami_matrix = matrix_to_string(runs_ami_matrix),
-
-            inertia=round(inertia, _ROUND_METRIC),
-            inertia_gradient=round(inertia_gradient, _ROUND_METRIC),
-            inertia_improvement=round(inertia_improvement, _ROUND_METRIC),
-            inertia_improvement_gradient=round(inertia_improvement_gradient, _ROUND_METRIC),
-
-            ars=ars,
-            ars_gradient=ars_gradient,
-            ami=ami,
-            ami_gradient=ami_gradient
+            run_iteration_duration_avg=round(run_iteration_duration_avg, _ROUND_TIME),
+            run_iteration_duration_median=round(run_iteration_duration_median, _ROUND_TIME),
+            run_iteration_duration_var=run_iteration_duration_var
         )
-
-
+###
+###
+###
+class ProgressiveResultMetrics(Bunch):
+    """ ProgressiveResultMetrics """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+###
+###
+###
 class SharedArray(Bunch):
     def __init__(self, name, shape, dtype):
         super().__init__(name=name, shape=shape, dtype=dtype)
