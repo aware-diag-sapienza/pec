@@ -2,11 +2,9 @@ import os
 import time
 import numpy as np
 from multiprocessing import Process
-from sklearn.utils import Bunch, check_random_state
 
-from ..utils import best_labels_dtype, ProgressiveResult
+from ..utils import best_labels_dtype
 from ..events import IterationResultEvent, Ack
-from ..metrics import ClusteringMetrics
 from .__sklearn_kmeans import KMeans
 
 
@@ -41,18 +39,12 @@ class InertiaBased_ProgressiveKMeansRun(Process):
             labels = r.labels.astype(self.labels_dtype)
             partitions[self.id,:] = labels
 
-            timestamp_before_metric = time.time()
-            inertia = ClusteringMetrics.inertia(data, labels)
-            timestamp_after_metric = time.time()
-            
             it_event = IterationResultEvent(
                 timestamp = time.time() - self.start_time,
                 run_id = self.id,
                 iteration = r.iteration,
                 iteration_duration = r.duration,
-                is_last = r.is_last,
-                supplemental_time = timestamp_after_metric - timestamp_before_metric,
-                inertia = inertia
+                is_last = r.is_last
             )
             self.results_queue.put(it_event)
             if not r.is_last:

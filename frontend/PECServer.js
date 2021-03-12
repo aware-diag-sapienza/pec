@@ -224,11 +224,12 @@ class PECPartialResult {
 
     // convert string to array or matrix
     this.info.completed_runs_status = this.info.completed_runs_status.split('-').map(d => d === 't')
-    this.info.decision_ami = this.info.decision_ami.split('::').map(d => parseFloat(d))
-    this.info.decision_ars = this.info.decision_ars.split('::').map(d => parseFloat(d))
-    this.info.runs_inertia = this.info.runs_inertia.split('::').map(d => parseFloat(d))
+    
+    //this.info.decision_ami = this.info.decision_ami.split('::').map(d => parseFloat(d))
+    //this.info.decision_ars = this.info.decision_ars.split('::').map(d => parseFloat(d))
+    //this.info.runs_inertia = this.info.runs_inertia.split('::').map(d => parseFloat(d))
     this.info.runs_iterations = this.info.runs_iterations.split('-').map(d => parseInt(d))
-    this.info.runs_ami_matrix = this.info.runs_ami_matrix.split('||').map(row => row.split('::').map(d => parseFloat(d)))
-    this.info.runs_ars_matrix = this.info.runs_ars_matrix.split('||').map(row => row.split('::').map(d => parseFloat(d)))
+    //this.info.runs_ami_matrix = this.info.runs_ami_matrix.split('||').map(row => row.split('::').map(d => parseFloat(d)))
+    //this.info.runs_ars_matrix = this.info.runs_ars_matrix.split('||').map(row => row.split('::').map(d => parseFloat(d)))
   }
 }

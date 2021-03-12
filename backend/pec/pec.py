@@ -314,8 +314,9 @@ class ProgressiveEnsembleClustering:
             "dbIndex_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("dbIndex") - labelsMetrics["dbIndex"]) / fn_max_labelsMetricHistory("dbIndex"),
             "dunnIndex_improvement": 0 if firstIteration else (labelsMetrics["dunnIndex"] - fn_min_labelsMetricHistory("dunnIndex")) / fn_min_labelsMetricHistory("dunnIndex"),
             "calinskyHarabasz_improvement": 0 if firstIteration else (labelsMetrics["calinskyHarabasz"] - fn_min_labelsMetricHistory("calinskyHarabasz")) / fn_min_labelsMetricHistory("calinskyHarabasz"),
-            "adjustedRandScore_improvement": 0 if firstIteration else (labelsMetrics["adjustedRandScore"] - fn_min_labelsMetricHistory("adjustedRandScore")) / fn_min_labelsMetricHistory("adjustedRandScore"),
-            "adjustedMutualInfoScore_improvement": 0 if firstIteration else (labelsMetrics["adjustedMutualInfoScore"] - fn_min_labelsMetricHistory("adjustedMutualInfoScore")) / fn_min_labelsMetricHistory("adjustedMutualInfoScore"),
+            
+            "adjustedRandScore": 0 if firstIteration else ClusteringMetrics.adjusted_rand_score(currentResult.labels, prevResult.labels),
+            "adjustedMutualInfoScore": 0 if firstIteration else ClusteringMetrics.adjusted_mutual_info_score(currentResult.labels, prevResult.labels)
         }
         # compute gradients
         for key in list(progessiveMetrics.keys()):
