@@ -126,58 +126,25 @@ system.timelinepartitions = (function() {
     } 
 
     this.setData = (data) => {
-        this.lastObj = data[0]
+        
         this.data = data
-        this.segmentedData = []
-        this.segmentData(data)
+        
 
-        console.log('TIMELINE DATA',data,this.segmentData,this.lastObj)
+        console.log('TIMELINE DATA',this.data)
     }
 
-    this.segmentData = (data) => {
-        const ret = []
-        for (let i=0; i<data.length; i++) {
-          if(i == 0) ret.push([data[i], data[i]]);
-          else ret.push([data[i-1], data[i]]);
-        }
-        this.segmentedData = ret
-    }
-     
+    
     this.updateData = (obj,data_matrix) => {
         this.lastObj = obj
         this.data = this.data.concat(obj)
-        this.segmentData(this.data)
-        //[X GIORGIO] aggiungo qui il passaggio dell'oggetto essendo labels. 
-        that.updateVerticalLines(obj,data_matrix)
-        
         this.render()
-        //updateRendering()
+        
     }
 
-    /*this.updateVerticalLines = () => {
-        this.verticalLines.map(d => {
-            if(!d.draw) {
-                let response = this.data.filter(g => g[d.name] === true)
-                if(response.length>0){
-                    d["draw"] = true
-                    d["iteration"] = response[0].iteration
-                }
-            }
-        })
-    }*/
+   
     
     this.updateVerticalLines = (obj,data_matrix) => {
-        /*for(let i=0; i<verticalLines.length; i++){
-            if(!verticalLines[i].draw) {
-                if(Math.abs(+this.lastObj[this.attibuteToCompareWithValue1]) <= verticalLines[i].threshold || Math.abs(this.lastObj[+this.attibuteToCompareWithValue2]) <= verticalLines[i].threshold){   
-                    verticalLines[i]["draw"] = true
-                    verticalLines[i]["iteration"] = this.lastObj.iteration
-                    //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels);
-                }
-            }
-        }
-        }*/
+        
         verticalLines.map(d => {
             if(!d.draw) {
                 if(Math.abs(this.lastObj[this.attibuteToCompareWithValue1]) <= d.threshold || Math.abs(this.lastObj[this.attibuteToCompareWithValue2]) <= d.threshold){   
@@ -353,7 +320,8 @@ system.timelinepartitions = (function() {
       
 
       for( let i = 0; i < array_inertia.length; i++){
-        
+
+        console.log('....',array_inertia)
         //let partitios_inertia = array_inertia[i].split('::')
         for( let j = 0; j < array_inertia[0].length; j++){
           let single_object = [];
@@ -377,7 +345,7 @@ system.timelinepartitions = (function() {
 
         that.div.select("g.gLineChart")
             .selectAll('rect.rect-partition')
-            .data(parse_intertia_runs(this.data.map(d=>d.runs_inertia)))
+            .data(parse_intertia_runs(this.data.map(d=> {console.log(d); return d.partitionsMetrics.inertia})))
             .each()
             .join(
                 enter => enter
@@ -402,29 +370,6 @@ system.timelinepartitions = (function() {
                         .remove()
                     )
                 )
-
-        
-        that.div.select("g.gLineChart")
-            .selectAll('path.lineLineChart')
-            .data(that.segmentedData)
-            .join(
-                enter => enter
-                    .append('path')
-                    .attr('class', 'lineLineChart')
-                    .attr('d', d => that.line(d)),
-                update => update
-                .call(update => update
-                    .transition()
-                    .duration(0)
-                    //.style("stroke", 'red')
-                ),
-                exit => exit
-                .call(exit => exit
-                    .transition()
-                    .duration(0)
-                    .remove()
-                )
-            )  
     }
 
     return this;

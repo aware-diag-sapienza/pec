@@ -161,40 +161,28 @@ function readResult(it_res){
     d3.select('#id-metrics').style('display','block')
         
         if(it_res.iteration == 1){
+                console.log('RISULTATO',it_res)
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res.info]) 
                 linechart1.render()
-                timelinePartitions.setData([it_res.info]) 
+                timelinePartitions.setData([it_res.metrics]) 
                 timelinePartitions.render()
                 updateTable(it_res.info)
                 system.matrixAdjacency.adjacency(partitions,it_res.info.runs_ars_matrix,it_res.info.runs_ami_matrix);
         }else{
                 linechart1.updateData(it_res.info,it_res.info)
-                timelinePartitions.updateData(it_res.info,it_res.info)
+                timelinePartitions.updateData(it_res.metrics,it_res.metrics)
                 updateTable(it_res.info)
                 system.scatterplot.updateScatterplot(false,it_res.labels);
                 system.matrixAdjacency.updateMatrix(partitions,it_res.info.runs_ars_matrix,it_res.info.runs_ami_matrix);
         }
-
-            //console.log('timestamp0', timestamp0, 'actual_timestamp',actual_timestamp , 'delta',(actual_timestamp - timestamp0)*500)
 
             if (it_res.is_last){
                 ITERAZIONE_PER_MATRICE = ITERAZIONE_PER_MATRICE
             } else{
                 ITERAZIONE_PER_MATRICE +=1
             }
-            //if(it_res.is_last == false) {
-            //    $('#finalTh').html("Current IT");
-            //    readFile(iteration+1)
-            //}else{
-            //    $('#finalTh').html("Final IT");
-            //}
-            //    swap_timestamp = actual_timestamp
             
-            //}, (actual_timestamp - timestamp0)*500)
-
-            
-        //});
 }
 
 function visualizeMetricsFunction(){
@@ -221,8 +209,6 @@ function updateTable(obj){
             $('#ineE').html(arrotondaNumero(obj.inertia));
         }
     }
-
-
 
     $('#chC').html(arrotondaNumero(obj.calinsky_harabaz));
     $('#dbC').html(arrotondaNumero(obj.db_index));
