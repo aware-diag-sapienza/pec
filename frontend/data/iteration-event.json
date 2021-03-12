@@ -1,0 +1,18 @@
+{ //evento generato a ogni iterazione
+  "event": "iteration",
+  "jobId": "asdfghjkl",
+  
+  "timestamp": 0.0, //secondi
+  "iteration": 0, //numero iterazione, parte da 0
+  "inertia": 0.00, // [0, +inf]
+  "inertiaImprovement": 0.00, // [0, +inf]
+  "inertiaImprovementGradient": 0.00, // [0, +inf]
+  "labels": [], // array di n labels con valori in [0, k-1], generate dal consenso
+  "partitionsSimilarity": [[]], // matrice di similarità tra partizioni (r+1)*(r+1), valori in [0, 1]. La partizione a indice r è quella generata dal consenso.
+  "bestPartition": 5, // id della partizione migliore [0,r-1] nel caso di best-inertia, altrimenti null
+
+  "earlyTerminationStrict": false, // boolean, dice se sono arrivato a early termination
+  "earlyTerminationSlow": false, 
+  "earlyTerminationMedium": false, 
+  "earlyTerminationFast": false, 
+}

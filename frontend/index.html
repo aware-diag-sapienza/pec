@@ -1,71 +1,319 @@
 <!DOCTYPE html>
-<html lang="en">
+<meta charset="UTF-8">
+<html>
+
 <head>
-  <meta charset="UTF-8">
-</head>
-<body> 
-
-  <script src="./PECServer.js"></script>
-  <script>
-
-    async function test(){
-      /* Per prima cosa avvio la connessione col server. Torna una promise. */ 
-      const server = await PECServer('ws://localhost:6789')
-
-      /* 
-      Lista dei dataset presenti sul server, con nome e dettagli. 
-      K ancora è fisso a 0, va sistemato.
-      Ritorna una promise.
-      */
-      const list = await server.getDatasetsInfo()
-      console.log(list)
-
-      /* 
-      Dataset con matrice dei dati e proiezioni già calcolate (PCA, tsne).
-      Le dimensioni x e y delle proiezioni sono già in [0,1] così si velocizza il disegno, non serve calcolare min e max. 
-      I dataset si identificano con il loro nome.
-      Ritorna una promise.
-      */
-      const dataset = await server.getDataset('glass')
-      console.log(dataset)
-      
-      
-      /* 
-      Clustering Job Asincrono. Va prima creato, torna una promise. 
-      job.results è la lista di tutti i risultati parziali ricevuti
-      job.onPartialResult(callback) serve a settare una callback che viene chiamata quando arrivano i risultati
-      job.jobId è univoco e puù essere usato per gestire la visualizzazione dei risultati di più job contemporanei
-      */
-      var dname = 'glass'
-      var k = 3
-      var r = 8
-      var seed = 0
-      var type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
-      
-      const job = await server.createAsyncJob(dname, type, k, r, seed)
-
-      /*
-      una volta creato il job, posso assegnare una callback per i risultati parziali
-      result.isLast dice se è l'ultimo
-      tutti i timestamp sono in SECONDI
-      le iterazioni partono da 0
-      c'è ancora un problema sul risultato di iterazione 0 che da eccezione e quindi non viene notificata (la prima iterazione che arriva è la 1)
-      */
-      job.onPartialResult(result => {
-        console.log(result)
-      })
-
-      //avvio il job
-      job.start()
-      
-      // non funziona ancora lo stop
-      //job.stop()
+    <title>Progressive Ensemble Clustering</title>
+    <link rel="stylesheet" type="text/css" href="./web/css/style.css" />
+    <link rel="stylesheet" href="./web/css/vendor/font-awesome-4.7.0/css/font-awesome.min.css">
     
-    
-    }
-    
-      test()
-  </script>
 
+    <!-- CSS -->
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">-->
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+  </head>
+
+<body>
+
+
+    <div class="grid-container">
+      <div class="item-navbar">
+        <img src="pec.png" width="113" height="40" />
+        
+        <label>Dataset</label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-dataset" onchange="onChangeInputParameter()">dataset</select>
+        </div>
+        <label>Technique</label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-technique" onchange="onChangeInputParameter()"></select>
+        </div>
+        <label>Cluster</label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-cluster" onchange="onChangeInputParameter()"></select>
+        </div>
+        <label>Partitions</label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-partitions" onchange="onChangeInputParameter()"></select>
+        </div> 
+        <div class="select-button">
+        <button id="clean-button" type="button" class="btn btn-circle" onclick="resetSelects()"><i class="fa fa-undo" aria-hidden="true"></i></button>
+        </div>
+
+        <div class="select-button">
+          <div class="btn-group me-2" role="group" aria-label="First group">
+          <button id="start-button" type="button" class="btn btn-outline-dark" onclick="startSelects()"><i class="fa fa-play" aria-hidden="true"></i>
+          </button>
+          <button id="pause-button" type="button" class="btn btn-outline-dark" onclick="pauseSelects()"><i class="fa fa-pause" aria-hidden="true"></i>
+          </button>
+          <button id="stop-button" type="button" class="btn btn-outline-dark" onclick="stopSelects()"><i class="fa fa-stop" aria-hidden="true"></i>
+          </button>   </div>
+        </div>
+        
+        
+
+        <!--<nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="">PEC</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            DATASET:
+            <li class="nav-item">
+              <select class="form-select form-select-sm" id="select-dataset"></select></li>
+            TECHNIQUE:
+            <li class="nav-item">
+              <select class="form-select form-select-sm" id="select-technique"></select></li>
+              CLUSTERS: 
+              <li class="nav-item">
+                
+                <select class="form-select form-select-sm" id="select-cluster">
+                  
+                </select></li>
+                PARTITIONS:
+                <li class="nav-item">
+                  <select class="form-select form-select-sm" id="select-partitions">
+                    
+                  </select></li>
+          </ul>
+          <button type="button" class="btn btn-outline-info" onclick="resetSelects()"><i class="fa fa-undo" aria-hidden="true"></i></button>
+
+          <button type="button" class="btn btn-outline-dark" onclick="startSelects()"><i class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          <button type="button" class="btn btn-outline-dark" onclick="startSelects()"><i class="fa fa-pause" aria-hidden="true"></i>
+            </button>
+          <button type="button" class="btn btn-outline-dark" onclick="startSelects()"><i class="fa fa-stop" aria-hidden="true"></i>
+            </button>
+      </nav>-->
+    </div>
+      <div class="item-iteration" id ='iteration-info' >
+        <div id="iteration-label">
+          <button type="button" id="runButton" class="btn btn-outline-info" onclick="startIterations()" style="display: none;">
+            <i class="fa fa-fast-forward"></i>RUN</button> <label></label></div>
+      </div>
+      <div class="item-dropdown-metrics">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="button-metric" onclick="visualizeMetricsFunction()">METRICS</button>
+        <div class="metrics-dropdown">
+        <table class="table table-hover" id="table-metrics">
+          <thead>
+            <tr>
+              <th scope="col">Metric</th>
+              <th scope="col">Early Termination</th>
+              <th id="finalTh" scope="col">Current IT</th>
+              <th scope="col">	&#916; </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Calinsky Harabaz</th>
+              <td id="chE">-</td>
+              <td id="chC">--</td>
+              <td id="chP">--</td>
+            </tr>
+            <tr>
+              <th scope="row">DB Index</th>
+              <td id="dbE">-</td>
+              <td id="dbC">--</td>
+              <td id="dbP">--</td>
+            </tr>
+            <tr>
+              <th scope="row">Dunn Index</th>
+              <td id="diE">-</td>
+              <td id="diC">--</td>
+              <td id="diP">--</td>
+            </tr>
+            <tr>
+              <th scope="row">Inertia</th>
+              <td id="ineE">-</td>
+              <td id="ineC">--</td>
+              <td id="ineP">--</td>
+            </tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="item-history" id="listhistory"></div>
+      <div class="item-scatterplot-1 scatter" id="id-scatterplot-1"></div>
+      <div class="item-matrix-1" id ="id-matrix-1"></div>  
+      <div class="item-linechart-1" id="linechart_inertia" ></div>
+      <div class="item-timeline-partitions" id="timeline-partitions" ></div>
+      <div class="item-information"><p id='information-info'></p></div>
+      <div class="item-scatterplot-2 scatter" id="id-scatterplot-2"></div>
+      <div class="item-matrix-2" id ="id-matrix-2"><!--<svg id="my_dataviz3" height=700 width=300></svg>--></div>
+      <div class="item-metrics" id ="id-metrics">
+        
+        
+      </div> 
+         
+
+
+
+        <!--<div class="item-tabbar">-->
+          <!-- inserimento tab per le configurations -->
+
+              <!--<ul class="nav nav-tabs" role="tablist">
+                  <li class="nav-item"><a class="nav-link active" id="early-termination-fast" data-toggle="tab" href="#early-termination-fast-configuration" role="tab" aria-controls="early-termination-fast-configuration"  aria-selected="false">Early Termination Fast</a></li>
+                  <li class="nav-item"><a class="nav-link disabled" id="early-termination-medium" data-toggle="tab" href="#early-termination-medium-configuration" role="tab" aria-controls="early-termination-medium-configuration"  aria-selected="false">Early Termination Medium</a></li>
+                  <li class="nav-item"><a class="nav-link disabled" id="early-termination-slow" data-toggle="tab" href="#early-termination-slow-configuration" role="tab" aria-controls="early-termination-slow-configuration"  aria-selected="false">Early Termination Slow</a></li>
+                  <li class="nav-item"><a class="nav-link disabled" id="early-termination-strict" data-toggle="tab" href="#early-termination-strict-configuration" role="tab" aria-controls="early-termination-strict-configuration"  aria-selected="false">Early Termination Strict</a></li>
+                  
+                  <li class="nav-item"><a class="nav-link disabled" id="early-termination-medium" data-toggle="tab" href="#effectiveness-error-configurations" role="tab" aria-controls="effectiveness-error-configurations" aria-selected="false">Early Termination Medium</a></li>
+                  <li class="nav-item"><a class="nav-link disabled" id="effectiveness-error-tab" data-toggle="tab" href="#effectiveness-error-configurations" role="tab" aria-controls="effectiveness-error-configurations" aria-selected="false">Early Termination Medium</a></li>
+                  <li class="nav-item"><a class="nav-link disabled" id="effectiveness-error-tab" data-toggle="tab" href="#effectiveness-error-configurations" role="tab" aria-controls="effectiveness-error-configurations" aria-selected="false">Early Termination Medium</a></li>-->
+                  <!--<li class="nav-item"><a class="nav-link" id="pos-hr2-tab" data-toggle="tab" href="#estimation-error-configurations" role="tab" aria-controls="estimation-error-configurations" aria-selected="false">Radviz Estimation Error</a></li>
+                  <li class="nav-item"><a class="nav-link" id="pos-hr3-tab" data-toggle="tab" href="#error-dv-configurations" role="tab" aria-controls="error-dv-configurations" aria-selected="false">Error DV</a></li>
+                  <li class="nav-item"><a class="nav-link" id="pos-hr4-tab" data-toggle="tab" href="#error-vv-configurations" role="tab" aria-controls="error-vv-configurations" aria-selected="false" aria-disabled="true" tabindex="-1">Error VV</a></li>-->
+              <!--</ul>-->
+          <!--</div>-->
+          <!--<div class="tab-content item-configuration" id="configurations-content">
+              <div class="tab-metrics-canvas tab-pane p-4 fade show active" id="early-termination-fast-configuration" role="tabpanel" aria-labelledby="early-termination-fast">
+                
+              </div>
+              <div class="tab-metrics-canvas tab-pane p-4 fade " id="early-termination-medium-configuration" role="tabpanel" aria-labelledby="early-termination-medium"></div>
+              <div class="tab-metrics-canvas tab-pane p-4 fade " id="early-termination-slow-configuration" role="tabpanel" aria-labelledby="early-termination-slow"></div>
+              <div class="tab-metrics-canvas tab-pane p-4 fade " id="early-termination-strict-configuration" role="tabpanel" aria-labelledby="early-termination-strict"></div>
+              
+              
+          </div>-->
+      
 </body>
+
+
+<!-- jQuery and JS bundle w/ Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.14.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tsne"></script>
+<script src="https://unpkg.com/konva@^4.0.3/konva.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>-->
+<!-- JavaScript Bundle with Popper -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+
+
+
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.1.0/d3-legend.js"></script>
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
+<script src="https://unpkg.com/popper.js@1"></script>
+<script src="https://unpkg.com/tippy.js@5"></script>
+
+<script src="./web/js/matrix-adjacency.js"></script>
+<script src="./web/js/matrix-fixed.js"></script>
+<script src="./web/js/scatterplot.js"></script>
+<script src="./web/js/scatterplotFixed.js"></script>
+<script src="./web/js/linechart.js"></script>
+<script src="./web/js/timelinePartitions.js"></script>
+<script src="./web/js/initialization.js"></script>
+<script src="./web/js/generationNavBar.js"></script>
+<script src="./web/js/main.js"></script>
+<script src="./PECServer.js"></script>
+
+
+
+<script>
+
+    let SERVER;
+    let LIST;
+    let DATASET_SELECTED;
+    
+    
+    async function test(){
+      console.log('inizio a connettermi')
+      SERVER = await PECServer('ws://localhost:6789')
+      LIST = await SERVER.getDatasetsInfo();
+      console.log(LIST)
+      updateSelects(LIST);
+    }
+
+    test();
+
+    tippy('#select-dataset', {
+        delay: 300,
+        content: 'Select the dataset',
+    });
+
+    tippy('#button-metric', {
+        delay: 300,
+        content: 'Click to show/hide metrics table',
+    });
+
+    tippy('#select-technique', {
+        delay: 300,
+        content: 'Select the technique',
+    });
+
+    tippy('#select-cluster', {
+        delay: 300,
+        content: 'Select the number of clusters',
+    });
+
+    tippy('#select-partitions', {
+        delay: 300,
+        content: 'Select the number of partitions',
+    });
+
+    tippy('#clean-button', {
+        delay: 300,
+        content: 'Clean the all',
+    });
+
+    tippy('#start-button', {
+        delay: 300,
+        content: 'Start the computation',
+    });
+
+    tippy('#pause-button', {
+        delay: 300,
+        content: 'Pause the computation',
+    });
+
+    tippy('#stop-button', {
+        delay: 300,
+        content: 'Stop the computation',
+    });
+
+    tippy('#runButton', {
+        delay: 300,
+        content: 'Run the progression',
+    });
+
+  
+/*
+// select the svg area
+var SVG = d3.select("#my_dataviz3")
+
+// create a list of keys
+var keys = [0,1, 2, 3, 4,5, 6,7,8,9, 10, 11, 12, 13, 14,15,16,17,18, 19,20]
+
+// Usually you have a color scale in your chart already
+var color = ['#3366cc', '#dc3912','#ff9900','#109618','#d6616b','#990099','#0099c6','#dd4477','#66aa00','#b82e2e','#17becf','#bcbd22','#9467bd','#8c564b','#e377c2','#759EF1','#FFD40B','#52DA2E','#0ED1E3','#0C292B','#697374']
+
+// Add one dot in the legend for each name.
+var size = 10
+SVG.selectAll("mydots")
+  .data(keys)
+  .enter()
+  .append("rect")
+    .attr("x", 30)
+    .attr("y", function(d,i){ return 30 + i*(size+5)}) // 30 is where the first dot appears. 25 is the distance between dots
+    .attr("width", size)
+    .attr("height", size)
+    .style("fill", function(d){ return color[d]})
+
+// Add one dot in the legend for each name.
+SVG.selectAll("mylabels")
+  .data(keys)
+  .enter()
+  .append("text")
+    .attr("x", 30 + size*1.2)
+    .attr("y", function(d,i){ return 30 + i*(size+5) + (size/2)}) // 30 is where the first dot appears. 25 is the distance between dots
+    .style("fill", function(d){ return color[d]})
+    .text(function(d){ return d})
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle")*/
+</script>
+
+
 </html>

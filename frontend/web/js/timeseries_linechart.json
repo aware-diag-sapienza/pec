@@ -1,0 +1,272 @@
+[
+  { 
+    "event": "iteration",
+    "jobId": "asdfghjkl",
+    
+    "timestamp": 0.3, 
+    "iteration": 0, 
+    "inertia": 2000.00, 
+    "inertiaImprovement": 0.00, 
+    "inertiaImprovementGradient": 0.00, 
+    "labels": [], 
+    "partitionsSimilarity": [[]], 
+    "bestPartition": 5, 
+
+    "earlyTerminationStrict": false, 
+    "earlyTerminationSlow": false, 
+    "earlyTerminationMedium": false, 
+    "earlyTerminationFast": false
+  },
+  { 
+    "event": "iteration",
+    "jobId": "asdfghjkl",
+    
+    "timestamp": 0.3, 
+    "iteration": 1, 
+    "inertia": 1000.00, 
+    "inertiaImprovement": 0.00, 
+    "inertiaImprovementGradient": 0.00, 
+    "labels": [], 
+    "partitionsSimilarity": [[]], 
+    "bestPartition": 5, 
+
+    "earlyTerminationStrict": false,
+    "earlyTerminationSlow": false, 
+    "earlyTerminationMedium": false, 
+    "earlyTerminationFast": false
+  },
+  { 
+    "event": "iteration",
+    "jobId": "asdfghjkl",
+    
+    "timestamp": 0.10, 
+    "iteration": 2, 
+    "inertia": 800.00, 
+    "inertiaImprovement": 0.00, 
+    "inertiaImprovementGradient": 0.00, 
+    "labels": [], 
+    "partitionsSimilarity": [[]], 
+    "bestPartition": 5, 
+
+    "earlyTerminationStrict": false, 
+    "earlyTerminationSlow": false, 
+    "earlyTerminationMedium": false, 
+    "earlyTerminationFast": false 
+  },
+  { 
+    "event": "iteration",
+    "jobId": "asdfghjkl",
+    
+    "timestamp": 0.10, 
+    "iteration": 3, 
+    "inertia": 800.00, 
+    "inertiaImprovement": 0.00, 
+    "inertiaImprovementGradient": 0.00, 
+    "labels": [], 
+    "partitionsSimilarity": [[]], 
+    "bestPartition": 5, 
+
+    "earlyTerminationStrict": false, 
+    "earlyTerminationSlow": false, 
+    "earlyTerminationMedium": false, 
+    "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 4, 
+      "inertia": 800.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": false, 
+      "earlyTerminationMedium": false, 
+      "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 5, 
+      "inertia": 800.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": false, 
+      "earlyTerminationMedium": false, 
+      "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 6, 
+      "inertia": 800.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": false, 
+      "earlyTerminationMedium": false, 
+      "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 7, 
+      "inertia": 800.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": false, 
+      "earlyTerminationMedium": false, 
+      "earlyTerminationFast": true 
+  },
+  { 
+    "event": "iteration",
+    "jobId": "asdfghjkl",
+    
+    "timestamp": 0.10, 
+    "iteration": 8, 
+    "inertia": 200.00, 
+    "inertiaImprovement": 0.00, 
+    "inertiaImprovementGradient": 0.00, 
+    "labels": [], 
+    "partitionsSimilarity": [[]], 
+    "bestPartition": 5, 
+
+    "earlyTerminationStrict": false, 
+    "earlyTerminationSlow": false, 
+    "earlyTerminationMedium": true, 
+    "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 9, 
+      "inertia": 200.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": false, 
+      "earlyTerminationMedium": true, 
+      "earlyTerminationFast": true 
+  },
+  { 
+    "event": "iteration",
+    "jobId": "asdfghjkl",
+    
+    "timestamp": 0.10, 
+    "iteration": 10, 
+    "inertia": 150.00, 
+    "inertiaImprovement": 0.00, 
+    "inertiaImprovementGradient": 0.00, 
+    "labels": [], 
+    "partitionsSimilarity": [[]], 
+    "bestPartition": 5, 
+
+    "earlyTerminationStrict": false, 
+    "earlyTerminationSlow": true, 
+    "earlyTerminationMedium": true, 
+    "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 11, 
+      "inertia": 120.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": true, 
+      "earlyTerminationMedium": true, 
+      "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 12, 
+      "inertia": 100.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": true, 
+      "earlyTerminationMedium": true, 
+      "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 13, 
+      "inertia": 150.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+  
+      "earlyTerminationStrict": false, 
+      "earlyTerminationSlow": true, 
+      "earlyTerminationMedium": true, 
+      "earlyTerminationFast": true 
+  },
+  { 
+      "event": "iteration",
+      "jobId": "asdfghjkl",
+      
+      "timestamp": 0.10, 
+      "iteration": 14, 
+      "inertia": 150.00, 
+      "inertiaImprovement": 0.00, 
+      "inertiaImprovementGradient": 0.00, 
+      "labels": [], 
+      "partitionsSimilarity": [[]], 
+      "bestPartition": 5, 
+
+      "earlyTerminationStrict": true, 
+      "earlyTerminationSlow": true, 
+      "earlyTerminationMedium": true, 
+      "earlyTerminationFast": true 
+  }
+]

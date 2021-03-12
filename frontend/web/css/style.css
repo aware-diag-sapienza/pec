@@ -1,0 +1,189 @@
+body {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: 0;
+    overflow: hidden;
+    color: black;
+    font: 10px sans-serif;
+}
+
+  
+  .grid-container > div {
+    background-color: #fff;
+
+  }
+
+  .item-information {
+    grid-area: information;
+  }
+  .item-iteration {
+    grid-area: iteration;
+  }
+
+  .item-history {
+    grid-area: history;
+  }
+
+  .item-scatterplot-1 {
+    grid-area: scatterplot-1;
+  }
+  .item-matrix-1 {
+    grid-area: matrix-1;
+  }
+  .item-linechart-1 {
+    grid-area: linechart-1;
+  }
+
+  .item-scatterplot-2 {
+    grid-area: scatterplot-2;
+
+  }
+  .item-matrix-2 {
+    grid-area: matrix-2;
+  }
+
+  .item-metrics {
+    display:none;
+    grid-area: metrics;
+  }
+  .item-timeline-partitions {
+    grid-area: partitions;
+  }
+  
+  .item-tabbar{
+    grid-area: tabbar;
+  }
+
+  .item-navbar{
+    grid-area: navigation;
+    display: flex;
+    flex-direction: row;
+    line-height: 3.5vh;
+  }
+
+  .select-menu{
+    display: flex;
+    flex-direction: column;
+    padding:5px;
+  }
+
+  .select-button{
+    line-height: 3.5vh;
+  }
+ 
+
+  .item-configuration{
+    grid-area: configuration;
+  }
+
+  .item-dropdown-metrics{
+    grid-area: dropdownmetrics;
+  }
+
+  .metrics-dropdown{
+    background-color: white;
+    border-style: solid;
+    border-color: #6C757D;
+    float: right;
+    border-width: 0px;
+    position: relative;
+    margin-top: 10px;
+    z-index: 9;
+  }
+
+  #button-metric{
+    display:none;
+  }
+
+  #table-metrics{
+    display:none;
+  }
+
+  .grid-container{
+    display: grid;
+   
+    margin-left: 0;
+    margin-right: 0;
+    grid-template-columns: 7vw 33vw 24vw 35vw ;
+    grid-template-rows: 7vh 5vh 41vh 4vh 41vh;
+    grid-template-areas: 
+      "navigation navigation navigation navigation"
+      "iteration scatterplot-1 matrix-1 dropdownmetrics"
+      "history scatterplot-1 matrix-1 linechart-1"
+      "history information information information"
+      "history scatterplot-2 matrix-2 partitions"
+  }
+
+#iteration-info{
+  display: inline-block;
+  display: flex;
+    flex-direction: row;
+
+}
+.axisLineChart path,
+.axisLineChart line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.lineLineChart {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.legendOrdinal {
+  font-size: 10px
+}
+
+canvas{
+  padding:10px
+}
+
+
+.grid {
+  stroke: #9A8B7A;
+stroke-width: 1px; fill: #CF7D1C;
+} 
+.arc {
+  stroke: #9A8B7A;
+fill: none;
+}
+.node {    
+fill: #EBD8C1;
+stroke: #9A8B7A; 
+stroke-width: 1px;
+}
+circle.active {
+fill: #FE9922;
+}
+path.active {
+stroke: #FE9922;
+}
+circle.source {
+fill: #93C464;
+}
+circle.target {
+fill: #41A368;
+}
+
+.item-scatterplot-1 {
+  margin-left: 10px;
+}
+.item-scatterplot-2, .item-information, .item-iteration {
+  margin-left: 10px;
+}
+
+.nav-item {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+

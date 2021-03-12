@@ -1,0 +1,13 @@
+{ //evento generato allo start
+  "event": "start",
+  "jobId": "asdfghjkl", //id univoco che identifica la configurazione del clustering job, condidera (dataset, k, r, alg, method)
+  
+  "dataset": "bitcoin",
+  "alg": "k-means", // algoritmo in {"k-means", "k-means++"}
+  "method": "best-inertia", // {"best-inertia", "hgpa", ... }
+  "n": 1000, 
+  "d": 30,
+  "k": 7,
+  "r": 16,
+  "data": [[]] //matrice dei dati: n*d
+}
