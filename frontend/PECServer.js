@@ -220,6 +220,7 @@ class PECPartialResult {
     this.info = data.info
     this.labels = data.labels
     this.partitions = data.partitions
+    this.metrics = data.metrics
 
     // convert string to array or matrix
     this.info.completed_runs_status = this.info.completed_runs_status.split('-').map(d => d === 't')

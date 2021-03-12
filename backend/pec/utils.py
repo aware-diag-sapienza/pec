@@ -18,10 +18,12 @@ class ProgressiveResult(Bunch):
 
     labels : numpy array with clustering labels
     """
-    def __init__(self, info, labels, partitions):
-        super().__init__(job_id="", info=info, labels=labels, partitions=partitions)
+    def __init__(self, info, labels, partitions, metrics={}):
+        super().__init__(job_id="", info=info, labels=labels, partitions=partitions, metrics=metrics)
         
-
+###
+###
+###
 class ProgressiveResultInfo(Bunch):
     """ ProgressiveResultInfo """
     def __init__(self,
@@ -71,7 +73,7 @@ class ProgressiveResultInfo(Bunch):
 
             n_clusters=n_clusters,
             completed_runs=completed_runs,
-            best_run=0,
+            best_run=best_run,
             
             runs_iterations="-".join(list(map(lambda i: str(i).zfill(3), runs_iterations))),
             completed_runs_status="-".join(list(map(lambda s: "t" if s else "f", completed_runs_status))),
@@ -103,8 +105,16 @@ class ProgressiveResultInfo(Bunch):
             ami=ami,
             ami_gradient=ami_gradient
         )
-
-
+###
+###
+###
+class ProgressiveResultMetrics(Bunch):
+    """ ProgressiveResultMetrics """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+###
+###
+###
 class SharedArray(Bunch):
     def __init__(self, name, shape, dtype):
         super().__init__(name=name, shape=shape, dtype=dtype)
