@@ -24,7 +24,7 @@ system.linechart = (function() {
     
     // Define lines
     this.line = d3.line()
-    //this.verticalLines = []
+    this.verticalLines = []
 
     this.init = (idDiv, tech) => {
         this.div = d3.select(idDiv)
@@ -68,30 +68,20 @@ system.linechart = (function() {
               // code block
         }
 
-        verticalLines = [ 
+        this.verticalLines = [ 
             {
-                'name': 'earlyTerminationFast',
+                'name': 'fast',
                 'draw': false,
                 'iteration': null,
-                'fill': "#fdd0a2",
-                'label': 'Early Termination Fast',
-                'threshold': 0.0001
+                'fill': "#FDE725",
+                'label': 'Early Termination Fast'
             },
             {
-                'name': 'earlyTerminationMedium',
+                'name': 'slow',
                 'draw': false,
                 'iteration': null,
-                'fill': "#fdae6b",
-                'label': 'Early Termination Medium',
-                'threshold': 0.00001
-            },
-            {
-                'name': 'earlyTerminationSlow',
-                'draw': false,
-                'iteration': null,
-                'fill': "#f16913",
-                'label': 'Early Termination Slow',
-                'threshold': 0.000001
+                'fill': "#3CBB75",
+                'label': 'Early Termination Slow'
             }
         ]
 
@@ -140,33 +130,10 @@ system.linechart = (function() {
         //updateRendering()
     }
 
-    /*this.updateVerticalLines = () => {
-        this.verticalLines.map(d => {
-            if(!d.draw) {
-                let response = this.data.filter(g => g[d.name] === true)
-                if(response.length>0){
-                    d["draw"] = true
-                    d["iteration"] = response[0].iteration
-                }
-            }
-        })
-    }*/
-    
     this.updateVerticalLines = (obj,data_matrix) => {
-        /*for(let i=0; i<verticalLines.length; i++){
-            if(!verticalLines[i].draw) {
-                if(Math.abs(+this.lastObj[this.attibuteToCompareWithValue1]) <= verticalLines[i].threshold || Math.abs(this.lastObj[+this.attibuteToCompareWithValue2]) <= verticalLines[i].threshold){   
-                    verticalLines[i]["draw"] = true
-                    verticalLines[i]["iteration"] = this.lastObj.iteration
-                    //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels);
-                }
-            }
-        }
-        }*/
-        /*verticalLines.map(d => {
+        /*that.verticalLines.map(d => {
             if(!d.draw) {
-                if(Math.abs(this.lastObj[this.attibuteToCompareWithValue1]) <= d.threshold || Math.abs(this.lastObj[this.attibuteToCompareWithValue2]) <= d.threshold){   
+                if(this.lastObj['metrics']['progressiveMetrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
                     //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
@@ -174,9 +141,7 @@ system.linechart = (function() {
                     // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 
                     // ALESSIA qui update della matrice 2
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,data_matrix.runs_ars_matrix,data_matrix.runs_ami_matrix);
-                    
                 }
-
             }
         })*/
     }
@@ -294,25 +259,19 @@ system.linechart = (function() {
         const svgLegend = that.div.select("g.gLineChart")
 
         const ordinalScale = d3.scaleOrdinal()
-            .domain(verticalLines.map(d => d.label))
-            .range(verticalLines.map(d => d.fill));
+            .domain(that.verticalLines.map(d => d.label))
+            .range(that.verticalLines.map(d => d.fill));
 
         svgLegend.append("g")
             .attr("class", "legendOrdinal")
             .attr("transform", "translate(0," + (0-that.margin.top) + ")")
-            //.attr("transform", "translate(" + (that.width - that.margin.left) + ","+ that.margin.top + ")");
-
-        /*var legendOrdinal = d3.legendColor()
-            .shape("rect")
-            .shapeWidth(5)
-            .shapeHeight(5)
-            .scale(ordinalScale);*/
+            
         const legendOrdinal = d3.legendColor()
             .orient("horizontal")
             .shape("rect")
             .shapeWidth(15)
             .shapeHeight(5)
-            .shapePadding(that.width/verticalLines.length)
+            .shapePadding(that.width/that.verticalLines.length)
             .scale(ordinalScale);
             
           
@@ -322,10 +281,9 @@ system.linechart = (function() {
     }
 
     let updateRendering = () => {
-        console.log(verticalLines)
         let vv = that.div.select("g.gLineChart")
             .selectAll('line.lineVertical')
-            .data(verticalLines)
+            .data(that.verticalLines)
             .join(
                 enter => enter
                     .append("line")
@@ -342,7 +300,7 @@ system.linechart = (function() {
                         if(d.draw) return "block"
                         else return "none"
                     })
-                    .attr("data-tippy-content", d => "" + d.name + " at iteration " + d.iteration),
+                    .attr("data-tippy-content", d => "" + d.label + " at iteration " + d.iteration),
                 update => update
                     .attr('x1', d=> that.xScale(d.iteration))
                     .attr('x2', d=> that.xScale(d.iteration))
