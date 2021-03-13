@@ -26,7 +26,7 @@ function updateSelects(list_dataset){
     const datasetsArray = list_dataset.map((d)=> d.name)    
     const labelsDataset = list_dataset.map((ld)=> {
         return ld.name.charAt(0).toUpperCase() + ld.name.slice(1) +' n:'+ ld.n + ' d:'+ld.d+' [opt k='+ld.k+']'})
-    const tech = ['I-PecK','I-PecK++','HGPA-Peck','HGPA-Peck++']
+    const tech = ['I-PecK','I-PecK++','HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
     const clusters = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
     const partition = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
@@ -163,14 +163,14 @@ function readResult(it_res){
         if(it_res.iteration == 1){
                 console.log('RISULTATO',it_res)
                 timestamp0 = it_res.timestamp
-                linechart1.setData([it_res.info]) 
+                linechart1.setData([it_res]) 
                 linechart1.render()
                 timelinePartitions.setData([it_res.metrics]) 
                 timelinePartitions.render()
                 updateTable(it_res.info)
                 system.matrixAdjacency.adjacency(partitions,it_res.info.runs_ars_matrix,it_res.info.runs_ami_matrix);
         }else{
-                linechart1.updateData(it_res.info,it_res.info)
+                linechart1.updateData(it_res,it_res.info)
                 timelinePartitions.updateData(it_res.metrics,it_res.metrics)
                 updateTable(it_res.info)
                 system.scatterplot.updateScatterplot(false,it_res.labels);

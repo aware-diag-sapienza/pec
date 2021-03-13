@@ -8,9 +8,7 @@ system.linechart = (function() {
     this.lastObj = null
     this.segmentedData = []
     this.technique = null
-    this.attibuteToCompareWithValue1 = null
-    this.attibuteToCompareWithValue2 = null
-
+    
     this.divName = null
     this.margin = { top: 35, right: 30, bottom: 50, left: 60 }
     this.width = null
@@ -20,7 +18,8 @@ system.linechart = (function() {
     this.xAxis = null
     this.yAxis = null
 
-    this.attributeYAxis = null
+    this.attributeYAxisFirstLevel = null
+    this.attributeYAxisSecondLevel = null
     this.labelYAxis = null
     
     // Define lines
@@ -35,41 +34,35 @@ system.linechart = (function() {
             .remove();
 
         switch(this.technique) {
-            case 'inertia-kmeans':
-                this.attibuteToCompareWithValue1 = "inertia_improvement_gradient"
-                this.attibuteToCompareWithValue2 = "inertia_improvement_gradient"
-                this.attributeYAxis = "inertia"
+            case 'I-PecK':
+                this.attributeYAxisFirstLevel = "labelsMetrics"
+                this.attributeYAxisSecondLevel = "inertia"
                 this.labelYAxis = "inertia"
                 break;
-            case 'inertia-kmeans++':
-                this.attibuteToCompareWithValue1 = "inertia_improvement_gradient"
-                this.attibuteToCompareWithValue2 = "inertia_improvement_gradient"
-                this.attributeYAxis = "inertia"
+            case 'I-PecK++':
+                this.attributeYAxisFirstLevel = "labelsMetrics"
+                this.attributeYAxisSecondLevel = "inertia"
                 this.labelYAxis = "inertia"
                 break;
-            case 'hgpa-kmeans':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                this.labelYAxis = "ari gradient"
+            case 'HGPA-PecK':
+                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisSecondLevel = "adjustedRandScore"
+                this.labelYAxis = "adjustedRandScore"
                 break;
-            case 'hgpa-kmeans++':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                this.labelYAxis = "ari gradient"
+            case 'HGPA-PecK++':
+                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisSecondLevel = "adjustedRandScore"
+                this.labelYAxis = "adjustedRandScore"
                 break;
-            case 'mcla-kmeans':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                this.labelYAxis = "ari gradient"
+            case 'MCLA-PecK':
+                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisSecondLevel = "adjustedRandScore"
+                this.labelYAxis = "adjustedRandScore"
                 break
-            case 'mcla-kmeans++':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                this.labelYAxis = "ari gradient"
+            case 'MCLA-PecK++':
+                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisSecondLevel = "adjustedRandScore"
+                this.labelYAxis = "adjustedRandScore"
                 break;
             default:
               // code block
@@ -115,7 +108,7 @@ system.linechart = (function() {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale(Math.abs(+d[that.attributeYAxis]));
+                return that.yScale(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel][that.attributeYAxisSecondLevel]));
             });
         return that
     } 
@@ -171,7 +164,7 @@ system.linechart = (function() {
             }
         }
         }*/
-        verticalLines.map(d => {
+        /*verticalLines.map(d => {
             if(!d.draw) {
                 if(Math.abs(this.lastObj[this.attibuteToCompareWithValue1]) <= d.threshold || Math.abs(this.lastObj[this.attibuteToCompareWithValue2]) <= d.threshold){   
                     d["draw"] = true
@@ -185,7 +178,7 @@ system.linechart = (function() {
                 }
 
             }
-        })
+        })*/
     }
 
     this.render = () => {
@@ -211,7 +204,7 @@ system.linechart = (function() {
           
         // Add Y axis
         this.yScale = d3.scaleLinear()
-            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d[that.attributeYAxis]); })])
+            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel][that.attributeYAxisSecondLevel]); })])
             .range([ this.height, 0 ]);
         svg.append("g")
             .attr("class", "y axisLineChart")
