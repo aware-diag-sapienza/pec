@@ -294,7 +294,7 @@ system.timelinepartitions = (function() {
           single_object.push(+array_inertia[i][j])
           single_object.push('P'+best_run[i])// better partition
           single_object.push(array_inertia[i][best_run[i]]) // better inertia che sarebbe d[4]
-          s
+          
           parsed_array_inertia.push(single_object)
         }
         
@@ -330,25 +330,24 @@ system.timelinepartitions = (function() {
                     .attr('height',that.yScale.bandwidth())
                     .attr('fill',d=> { 
                         if(d[0]<5) {
-                            if(d[2]<this.colorScaleCell.domain()[0]){ 
-                                return 'yellow' 
-                            } else 
                             return d3.interpolateGreys(this.colorScaleCell(d[2]))
                         } else {
                             console.log(d[2],this.colorScaleCell.domain()[0]);
-                            if(d[2]<this.colorScaleCell.domain()[0]){ 
-                                return 'yellow' 
-                            } else 
                             return d3.interpolateGreens(this.colorScaleCell(d[2]))
                             }
                         })
                     .attr('stroke',(d)=> {
-                        if(d[3] === d[1]) 
-                        { return '#ff0090'};
+                        if(d[3] === d[1]) { return '#ff0090'}
+                        else if((d[2] - d[4] <= d[4]*0.01) && (d[3] !== d[1])){ 
+                            return "#ff9d47"
+                        }
                         })
-                    .attr('stroke-width',(d)=> {if(d[3] === d[1]) 
-                        { 
-                            return '1'};
+                    .attr('stroke-width',(d)=> {
+                        if(d[3] === d[1]) { 
+                            return '1'
+                        } else if((d[2] - d[4] <= d[4]*0.01) && (d[3] !== d[1])){ 
+                            return '1'
+                        }
                         })
                   ,
                 update => update
