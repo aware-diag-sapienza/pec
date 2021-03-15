@@ -103,7 +103,7 @@ system.timelinepartitions = (function() {
         // modificare qui la parte per la scala di colore della timeline
         console.log('ALESSIA',obj.iteration === 5,obj.iteration,5)
         if (obj.iteration === 5 || d3.min(obj.metrics.partitionsMetrics.inertia) < this.colorScaleCell.domain()[0]){
-            let min_range = d3.min(obj.metrics.partitionsMetrics.inertia) - (d3.min(obj.metrics.partitionsMetrics.inertia))*0.2
+            let min_range = d3.min(obj.metrics.partitionsMetrics.inertia) - (d3.min(obj.metrics.partitionsMetrics.inertia))*0.05
             let max_range = this.colorScaleCell.domain()[1]
             this.colorScaleCell = d3.scaleLinear().range([1,0]).domain([min_range,max_range])
             console.log('ALESSIA DOMINIO',this.colorScaleCell.domain())
@@ -292,8 +292,9 @@ system.timelinepartitions = (function() {
           single_object.push(i)
           single_object.push('P'+j)
           single_object.push(+array_inertia[i][j])
-          single_object.push('P'+best_run[i])
-          
+          single_object.push('P'+best_run[i])// better partition
+          single_object.push(array_inertia[i][best_run[i]]) // better inertia che sarebbe d[4]
+          s
           parsed_array_inertia.push(single_object)
         }
         
@@ -308,7 +309,12 @@ system.timelinepartitions = (function() {
 
         //parse_intertia_runs(this.data.map(d=>d.runs_inertia))
         console.log(this.data.map(d => d.info.best_run))
-
+        // DATI CELLE
+        // d[0] iteratione
+        // d[1] partizione
+        // d[2] valore inertia
+        // d[3] best run
+        // d[4] best valore inertia
         that.div.select("g.gLineChart")
             .selectAll('rect.rect-partition')
             .data(parse_intertia_runs(this.data.map(d=> d.metrics.partitionsMetrics.inertia),this.data.map(f => f.info.best_run)))
