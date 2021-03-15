@@ -60,4 +60,31 @@ class ClusteringMetrics:
     @staticmethod
     def silhouette(data, labels):
         return sklearn.metrics.silhouette_score(data, labels)
-    
+
+
+    @staticmethod
+    def simplified_silhouette(data, labels):
+        """
+        Labels is an np.array of integer from 0 to k-1.
+        """
+        n = data.shape[0]
+        d = data.shape[1]
+        k = int(np.max(labels) + 1)
+       
+       
+        unique_labels = np.lib.arraysetops.unique(labels)
+        k = unique_labels.shape[0]
+        
+        centroids = np.full((k, d), np.nan, dtype=float)
+        for i in range(k):
+            idx = np.argwhere(labels == i).flatten()
+            centroids[i] = np.mean(data[idx], axis=0) #mean point inside the cluster
+        distances = sklearn.metrics.pairwise.euclidean_distances(data, centroids) #distance of each point to all centroids
+
+        A = distances[np.arange(n), labels] #distance of each point to its cluster centroid
+        distances[np.arange(n), labels] = np.Inf #set to infinte the distance to own centroid
+        B = np.min(distances, axis=1) #distance to each point to the closer centroid (different from its own cluster)
+        M = np.maximum(A, B) #max row wise of A and B
+        S = np.sum( (B - A) / M)  / n
+        
+        return S
