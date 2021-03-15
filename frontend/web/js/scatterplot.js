@@ -257,6 +257,8 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
 
  async function generateDataForScatterplot(dataset_projection,labelIteration){
 
+  
+
   //csvUrl, sia il dataset con la proiezione
   //dataIterationURL, sia l'array con le label.
    
@@ -277,6 +279,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       })*/
       
       that.tot_rows = dataset_projection//= await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)}) // ALESSIAAAAA QUI VA IL LINK VECCHIO
+      console.log('that_rows',that.tot_rows)
       system.scatterplotFixed.tot_rows = that.tot_rows//await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)});
       let dataIteration= labelIteration//await d3.json(dataIterationURL).then((data)=> {return data})
       
@@ -288,20 +291,21 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       let first_feature = []
       let second_feature = []
      
+      console.log('that.datasetComputed',that.datasetComputed,that.first_iteration)
       
-     /*if (that.datasetComputed.indexOf(dataset)!= -1 ){
-      console.log('that.datasetComputed',that.datasetComputed)
-      that.coordData = that.tensorResultComputation[dataset]
-      system.scatterplotFixed.coordData= that.tensorResultComputation[dataset]
+      that.coordData = that.tot_rows
+      system.scatterplotFixed.coordData= that.tot_rows
       if(that.first_iteration){
 
-
+        // capire se togliere questo IF
         if (numOfFeatures == 2){
           console.log('that.tot_rows',that.tot_rows)
         for (let i = 0; i<that.tot_rows; i++) {
+
           let e = await it.next()
-    
+          
           let array0 = e.value[0]
+          console.log('arr_0',array0)
           first_feature.push(e.value[0][0])
           second_feature.push(e.value[0][1])
           xs = xs.concat(array0)
@@ -327,11 +331,9 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       } else {
       
       plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration.labels); // qui bisogna mettere il ciclo per il numero di features
-    }
+    
 
-     } else {
-       console.log('  non sono dentro al COMPUTED DATASET');
-    */ 
+     
 
    if (numOfFeatures == 2){ // I can map the dataset directly on the scatter
 
@@ -363,7 +365,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
     
     plotCoordsKonva(that.tot_rows, '#b3b3b3',true,dataIteration.labels);
     system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,dataIteration.labels);//useScale,useColor, scaleX,ScaleY
-   } /*
+   } 
    else { // I need to permorm t-SNE
     d3.select('#iteration-label').html('Running t-SNE<img src="./img/loading.gif" width= "20px"/>')
 
@@ -392,9 +394,9 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
     }
   } 
   this.first_iteration = false;
-}*/
+}
 
- }
+ //}
 
     this.createData = (csvUrl, labelCluster) => {
       system.scatterplot.reset();
@@ -402,7 +404,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
 
-      console.log('qui')
+      
       let provaTensor =  generateDataForScatterplot(csvUrl,labelCluster);
 
     }

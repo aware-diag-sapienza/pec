@@ -332,7 +332,6 @@ system.timelinepartitions = (function() {
                         if(d[0]<5) {
                             return d3.interpolateGreys(this.colorScaleCell(d[2]))
                         } else {
-                            console.log(d[2],this.colorScaleCell.domain()[0]);
                             return d3.interpolateGreens(this.colorScaleCell(d[2]))
                             }
                         })
