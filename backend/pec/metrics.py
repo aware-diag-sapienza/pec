@@ -72,8 +72,8 @@ class ClusteringMetrics:
         k = int(np.max(labels) + 1)
        
        
-        unique_labels = np.lib.arraysetops.unique(labels)
-        k = unique_labels.shape[0]
+        #unique_labels = np.lib.arraysetops.unique(labels)
+        #k = unique_labels.shape[0]
         
         centroids = np.full((k, d), np.nan, dtype=float)
         for i in range(k):
@@ -88,3 +88,34 @@ class ClusteringMetrics:
         S = np.sum( (B - A) / M)  / n
         
         return S
+
+    
+    @staticmethod
+    def clusters_stability(labels_a, labels_b):
+        n = labels_a.shape[0]
+        k = int(max(np.max(labels_a), np.max(labels_b)) + 1)
+        sym = np.full(k, 0, dtype=float)
+        for i in range(k):
+            a = np.full(n, 0, dtype=np.uint8)
+            b = np.full(n, 0, dtype=np.uint8)
+
+            idx_a = np.argwhere(labels_a == i).flatten()
+            idx_b = np.argwhere(labels_b == i).flatten()
+
+            a[idx_a] = 1
+            b[idx_b] = 1
+            sym[i] = sklearn.metrics.jaccard_score(a, b)
+
+        return sym
+
+    @staticmethod
+    def entries_stability1(labels_a, labels_b):
+        st = (labels_a == labels_b).astype(int)
+        return st
+
+    @staticmethod
+    def entries_stability2(labels_a, labels_b):
+        E = ClusteringMetrics.entries_stability1(labels_a, labels_b)
+        C = ClusteringMetrics.clusters_stability(labels_a, labels_b)[E] #cluster stability for each point
+        return E * C
+        
