@@ -61,6 +61,7 @@ system.matrixAdjacencyFixed = (function() {
     
     let updateData = () =>{
       //console.log(that.matrix)
+      console.log('sono QUI MATRICE')
       let tooltRect = d3.select(this.g)
       .selectAll("rect")
       .data(that.matrix)

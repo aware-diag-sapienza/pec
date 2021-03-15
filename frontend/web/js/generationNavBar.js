@@ -9,6 +9,8 @@ let matrix1;
 let matrix2;
 let SVG_HISTORY;
 let previous_computations = [];
+let width_rect;
+const LIMIT_IT = 100;
 
 let visualizeMetrics = false;
 
@@ -26,7 +28,7 @@ function updateSelects(list_dataset){
     const datasetsArray = list_dataset.map((d)=> d.name)    
     const labelsDataset = list_dataset.map((ld)=> {
         return ld.name.charAt(0).toUpperCase() + ld.name.slice(1) +' n:'+ ld.n + ' d:'+ld.d+' [opt k='+ld.k+']'})
-    const tech = ['I-PecK','I-PecK++','HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
+    const tech = ['I-PecK','I-PecK++']//,'HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
     const clusters = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
     const partition = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
@@ -106,6 +108,7 @@ async function startSelects(){
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         job.onPartialResult(result => {
             if (result.iteration == 1){
+                console.log('sono qui dentro ALESSIA')
                 system.scatterplot.createData(DATASET_SELECTED.projections.tsne, result.labels)
             }
 
@@ -126,7 +129,7 @@ async function startSelects(){
 }
 
 // questa non pen so che serva più
-async function startIterations(){
+/*async function startIterations(){
     console.log(dataset)
     if(dataset == $( "#select-dataset" ).val()){
         readFile(1);
@@ -139,7 +142,7 @@ async function startIterations(){
     }
 
     
-}
+}*/
 
 let timestamp0;
 
@@ -159,23 +162,29 @@ function readResult(it_res){
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
     d3.select('#button-metric').style('display','block')
     d3.select('#id-metrics').style('display','block')
-        
+        console.log('ALESSIA',it_res.iteration, it_res.iteration == 1,it_res.iteration === 1)
         if(it_res.iteration == 1){
                 console.log('RISULTATO',it_res)
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res]) 
                 linechart1.render()
-                timelinePartitions.setData([it_res.metrics]) 
-                timelinePartitions.render()
+                timelinePartitions.setData([it_res]) 
+                timelinePartitions.render(it_res.iteration)
+                console.log('ALESSIA prima di tableupdate')
                 updateTable(it_res.info)
-                system.matrixAdjacency.adjacency(partitions,it_res.info.runs_ars_matrix,it_res.info.runs_ami_matrix);
+                console.log('ALESSIA prima di adjacency')
+                system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
+                
         }else{
                 linechart1.updateData(it_res,it_res.info)
-                timelinePartitions.updateData(it_res.metrics,it_res.metrics)
+                timelinePartitions.updateData(it_res,it_res.metrics)
                 updateTable(it_res.info)
                 system.scatterplot.updateScatterplot(false,it_res.labels);
-                system.matrixAdjacency.updateMatrix(partitions,it_res.info.runs_ars_matrix,it_res.info.runs_ami_matrix);
-        }
+                system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
+                
+            }
+            updatePinHistory(it_res.iteration)
+            system.matrixAdjacency.updateBestPartition(it_res.info.best_run)
 
             if (it_res.is_last){
                 ITERAZIONE_PER_MATRICE = ITERAZIONE_PER_MATRICE
@@ -241,6 +250,8 @@ function addPinHistory() {
     let height_history = $("#listhistory").height()
     let margin_history = {top: 10, bottom:10, left:20, right:20}
 
+    
+
     if (SVG_HISTORY == undefined){
         SVG_HISTORY = d3.select("#listhistory")
             .append("svg")
@@ -255,20 +266,36 @@ function addPinHistory() {
     let tentative = previous_computations.length
 
     previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative})
-    console.log('-+-+-+-+-+-+-+-',previous_computations,dataset,technique ,cluster ,partitions, tentative)
-    
+
+    scaleHistory = d3.scaleBand()
+       
     SVG_HISTORY.selectAll(".bar-history")
         .data(previous_computations)
         .enter()
         .append('rect')
         .attr('class','bar-history')
+        .attr('id',(d) => 'background-' + d.tentative)
         .attr('x', 0)
         .attr('y', (d)=> {return (d.tentative*54)})
         .attr('width', width_history-margin_history.right)
         .attr('height', (d)=>{return 50})
         .attr('stroke', 'black')
-        .attr('fill', '#69a3b2')
+        .attr('fill', 'white')
     
+    width_rect = (width_history-margin_history.right)/LIMIT_IT
+
+    SVG_HISTORY.selectAll(".bar-history-improvement")
+        .data(previous_computations)
+        .enter()
+        .append('rect')
+        .attr('class','bar-history-improvement')
+        .attr('id',(d) => 'improvement-' + d.tentative)
+        .attr('x', 0)
+        .attr('y', (d)=> {return (d.tentative*54)})
+        .attr('width', 0)
+        .attr('height', (d)=>{return 50})
+        .attr('fill', '#ffd9b3')
+
     let text = SVG_HISTORY.selectAll(".text-history")
         .data(previous_computations)
         .enter()
@@ -295,33 +322,19 @@ function addPinHistory() {
             .attr('font-size', 'smaller')
         
         text.append("tspan")
-            .text(d => {
-                if(d.technique == 'inertia-kmeans')
-                    return 'inertia';
-                if(d.technique == 'inertia-kmeans++')
-                    return 'inertia ++';
-                if(d.technique == 'hgpa-kmeans')
-                    return 'hgpa';
-                if(d.technique == 'hgpa-kmeans++')
-                    return 'hgpa ++';
-                if(d.technique == 'mcla-kmeans')
-                    return 'mcla';
-                if(d.technique == 'mcla-kmeans++')
-                    return 'mcla ++';
-                
-                })
+            .text(d => d.technique)
             .attr("class", "tspan-technique")
             .attr("x", 0)
             .attr("dx", 10)
             .attr("dy", 12)
             .attr('font-size', 'smaller')
-        
-        
+        }
 
+function updatePinHistory(iteration){
 
+    //previous_computations.length
     
+    d3.select('#improvement-'+(previous_computations.length-1))
+        .attr('width',width_rect*iteration)
 
-
-    console.log('-+-+-+-+-+-+-+-',previous_computations,dataset,technique ,cluster ,partitions)
-    //dataset-technique-cluster-partitions
-}
+}      

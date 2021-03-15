@@ -41,7 +41,7 @@ system.matrixAdjacency = (function() {
     }
 
     this.adjacency = (partitions,decision_ars,decision_ami) => {
-      //console.log("Partition",partitions,'ARSMATRIX',decision_ars,'AMIMATRIX',decision_ami)
+      console.log('ALESSIA funzione adjacency')
       
       let runs_ars_matrix = decision_ars //data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
       let runs_ami_matrix = decision_ami //data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
@@ -61,11 +61,7 @@ system.matrixAdjacency = (function() {
         .attr("height",that.cell_size)
         .attr("x", d=> d.x*that.cell_size)
         .attr("y", d=> d.y*that.cell_size)
-        .style("fill", d => d3.interpolateBlues(d.weight))//('#4E0560')
-        //.style("fill-opacity", d=> d.weight * .2)
-        .on('mouseover', (d)=> {
-          //console.log(d.metric,'=',d.weight)
-        })
+        .style("fill", d => d3.interpolateBlues(d.weight))
         .attr("data-tippy-content", d => "" + d.id + " at row " + d.row + " end col " +d.col + " with weight " + d.weight)
         ,
         update => update
@@ -87,6 +83,7 @@ system.matrixAdjacency = (function() {
 
     this.updateMatrix = (partitions,decision_ars,decision_ami) => {
 
+      console.log('ALESSIA',decision_ars,decision_ami)
       
       let ARI = decision_ars//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
       let AMI = decision_ami//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
@@ -111,6 +108,7 @@ system.matrixAdjacency = (function() {
 
       updateData();
     };
+
 
     this.createAdjacencyMatrix = (partitions,ARI,AMI) => {
       
@@ -140,10 +138,15 @@ system.matrixAdjacency = (function() {
       this.cell_size = (d3.min([that.width,that.height])-that.margin.top)/nodes.length
       
   
+      console.log('WIDTH-WIDTH',this.width)
+      console.log('WIDTH-HEIGHT',this.height)
     let svg = this.div
     .append("svg")
     .attr("width", this.width + this.margin.left + this.margin.right)
     .attr("height", this.height +  this.margin.top + this.margin.bottom)
+
+    console.log('WIDTH-WIDTH',svg.attr('width'), this.margin.left)
+    console.log('WIDTH-HEIGHT',svg.attr('height'),this.margin.top )
 
     svg.append("g")
       .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
@@ -158,6 +161,8 @@ system.matrixAdjacency = (function() {
       .data(nodes)
       .enter()
       .append("text")
+      .attr("class","label-matrix")
+      .attr("id",d => 'row-' + d)
       .attr("x", (d,i) => i * this.cell_size + (this.cell_size/2))
       .text(d => d)
       .style("text-anchor","middle")
@@ -171,6 +176,8 @@ system.matrixAdjacency = (function() {
       .enter()
       .append("text")
       .attr("y",(d,i) => i * this.cell_size + ((this.cell_size/3)*2))
+      .attr("class","label-matrix")
+      .attr("id",d => 'col-' + d)
       .text(d => d)
       .style("text-anchor","end")
       .style("font-size","10px")  
@@ -232,13 +239,13 @@ system.matrixAdjacency = (function() {
     .append("g")
       .attr("transform","translate(" + (that.margin.left) + "," + (that.height+5) + ")")
       .append("rect")
-      .attr("width", this.cell_size*16)
+      .attr("width", this.cell_size*partitions)
       .attr("height", 5)
       .style("fill", "url(#gradient)")
       
 
     var y = d3.scaleLinear()
-      .range([this.cell_size*16, 0])
+      .range([this.cell_size*partitions, 0])
       .domain([1, 0]);
 
     var yAxis = d3.axisBottom()
@@ -257,6 +264,20 @@ system.matrixAdjacency = (function() {
       .text("axis title");
 
 }
+
+    this.updateBestPartition = (best)=>{
+      d3.selectAll('.label-matrix')
+        .style('fill','black')
+        .style('font-weight','normal')
+      
+      d3.select('#col-P'+best)
+        .style('fill','red')
+        .style('font-weight','bold')
+      d3.select('#row-P'+best)
+        .style('fill','red')
+        .style('font-weight','bold')
+      //col-P7
+    }
     
     return this;
 }).call({})

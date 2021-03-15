@@ -12,13 +12,14 @@ system.timelinepartitions = (function() {
     this.attibuteToCompareWithValue2 = null
 
     this.divName = null
-    this.margin = { top: 35, right: 30, bottom: 50, left: 60 }
+    this.margin = { top: 10, right: 30,bottom: 30, left: 60 }
     this.width = null
     this.height = null
     this.xScale = null
     this.yScale = null
     this.xAxis = null
     this.yAxis = null
+    this.colorScaleCell = null
 
     this.attributeYAxis = null
     this.labelYAxis = 'partitions'
@@ -32,51 +33,8 @@ system.timelinepartitions = (function() {
         console.log('idDiv', idDiv)
         this.technique = tech
 
-
-
         this.div.selectAll('svg')
             .remove();
-
-        switch(this.technique) {
-            case 'inertia-kmeans':
-                this.attibuteToCompareWithValue1 = "inertia_improvement_gradient"
-                this.attibuteToCompareWithValue2 = "inertia_improvement_gradient"
-                this.attributeYAxis = "inertia"
-                //this.labelYAxis = "inertia"
-                break;
-            case 'inertia-kmeans++':
-                this.attibuteToCompareWithValue1 = "inertia_improvement_gradient"
-                this.attibuteToCompareWithValue2 = "inertia_improvement_gradient"
-                this.attributeYAxis = "inertia"
-                //this.labelYAxis = "inertia"
-                break;
-            case 'hgpa-kmeans':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                //this.labelYAxis = "ari gradient"
-                break;
-            case 'hgpa-kmeans++':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                //this.labelYAxis = "ari gradient"
-                break;
-            case 'mcla-kmeans':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                //this.labelYAxis = "ari gradient"
-                break
-            case 'mcla-kmeans++':
-                this.attibuteToCompareWithValue1 = "ars_gradient"
-                this.attibuteToCompareWithValue2 = "ars_gradient"
-                this.attributeYAxis = "ars_gradient"
-                //this.labelYAxis = "ari gradient"
-                break;
-            default:
-              // code block
-        }
 
         verticalLines = [ 
             {
@@ -108,11 +66,15 @@ system.timelinepartitions = (function() {
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
         this.height = parseInt(this.div.style("height")) - this.margin.top - this.margin.bottom;
-        this.xScale = d3.scaleBand().domain([...Array(40).keys()]).range([0, this.width]).paddingInner(0.1).paddingOuter(0.1);//d3.scaleLinear().domain([0, 40]).range([0, this.width]);
-        this.yScale = d3.scaleBand().domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse()).range([this.height, 0]).paddingInner(0.1).paddingOuter(0.1);//d3.scaleLinear().range([this.height, 0]);
-        console.log('YSCALE',this.yScale, this.yScale.domain(), this.yScale.range())
+        this.xScale = d3.scaleBand().domain([...Array(40).keys()]).range([0, this.width]).paddingInner(0.2).paddingOuter(0.2);//d3.scaleLinear().domain([0, 40]).range([0, this.width]);
+        this.yScale = d3.scaleBand().domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse()).range([this.height, 0]).paddingInner(0.2).paddingOuter(0.2);//d3.scaleLinear().range([this.height, 0]);
         this.xAxis = d3.axisBottom().scale(this.xScale);
-        this.yAxis = d3.axisLeft().scale(this.yScale)//.tickFormat(d3.format("~s"));        
+        this.yAxis = d3.axisLeft().scale(this.yScale)//.tickFormat(d3.format("~s"));   
+        
+        //this.colorScaleCell= d3.scaleLinear().domain([0,1])
+        //d3.scaleThreshold()
+        //.domain([38000000, 42000000,47000000])
+        //.range(["yellow", "pink", "red", "purple"])//d3.scaleLinear().domain([0,1]).range([0,1000])
         this.line = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
@@ -126,24 +88,35 @@ system.timelinepartitions = (function() {
     } 
 
     this.setData = (data) => {
-        
         this.data = data
-        
-
-        console.log('TIMELINE DATA',this.data)
-    }
+        this.lastObj = data[0]
+        this.colorScaleCell = d3.scaleLinear()
+            .range([1,0])
+            .domain(
+                [0, d3.max(data[0].metrics.partitionsMetrics.inertia)])
+        }
 
     
     this.updateData = (obj,data_matrix) => {
         this.lastObj = obj
         this.data = this.data.concat(obj)
-        this.render()
+        // modificare qui la parte per la scala di colore della timeline
+        console.log('ALESSIA',obj.iteration === 5,obj.iteration,5)
+        if (obj.iteration === 5){
+            let min_range = (this.colorScaleCell.domain()[1]- d3.min(obj.metrics.partitionsMetrics.inertia))/10
+            let max_range = this.colorScaleCell.domain()[1]
+            this.colorScaleCell = d3.scaleLinear().range([1,0]).domain([10,max_range])
+            console.log('ALESSIA DOMINIO',this.colorScaleCell.domain())
+        }
+        this.render(obj.iteration)
         
     }
 
    
     
     this.updateVerticalLines = (obj,data_matrix) => {
+
+        // ALESSIA POI BISOGNA METTERE LA FIXED MAYRI DELL?EARLY TERMINATION.
         
         verticalLines.map(d => {
             if(!d.draw) {
@@ -162,7 +135,7 @@ system.timelinepartitions = (function() {
         })
     }
 
-    this.render = () => {
+    this.render = (it) => {
         this.div.selectAll('svg')
             .remove();
         
@@ -174,7 +147,7 @@ system.timelinepartitions = (function() {
             .attr("class", "gLineChart")
             
         if(this.data.length>40) {
-            this.xScale = d3.scaleBand().domain([...Array(this.data.length+1).keys()]).range([0, this.width]).paddingInner(0.1).paddingOuter(0.1);//d3.scaleLinear().domain([0, this.data.length]).range([0, this.width]);
+            this.xScale = d3.scaleBand().domain([...Array(this.data.length+1).keys()]).range([0, this.width]).paddingInner(0.2).paddingOuter(0.2);//d3.scaleLinear().domain([0, this.data.length]).range([0, this.width]);
             this.xAxis = d3.axisBottom().scale(this.xScale);
         }
 
@@ -189,10 +162,13 @@ system.timelinepartitions = (function() {
                 .attr("transform", "rotate(90)");
           
         // Add Y axis
-        this.yScale = d3.scaleBand().domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse()).range([this.height, 0]).paddingInner(0.1).paddingOuter(0.1);
-          //d3.scaleLinear()
-            //.domain([0, d3.max(this.data, function(d) { return Math.abs(+d[that.attributeYAxis]); })])
-            //.range([ this.height, 0 ]);
+        this.yScale = d3.scaleBand()
+            .domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse())
+            .range([this.height, 0])
+            .paddingInner(0.1)
+            .paddingOuter(0.1);
+
+
         svg.append("g")
             .attr("class", "y axisTimeline")
             .call(this.yAxis)
@@ -259,18 +235,7 @@ system.timelinepartitions = (function() {
                 .attr("transform", "translate(0," + (0-that.margin.top) + ")")
                 //.attr("transform", "translate(" + (that.width - that.margin.left) + ","+ that.margin.top + ")");
                     
-            // Force D3 to recalculate and update the line
-            svg.selectAll(".lineLineChart").attr("d", function(d) {
-                return that.line(d);
-            })   
-
-            svg.selectAll('.lineVertical')
-                .attr('x1', d=> that.xScale(d.iteration))
-                .attr('x2', d=> that.xScale(d.iteration))
-                .attr("y1", that.height)
-                .attr("y2", 0)
             
-            // Update the tick marks
             that.xAxis.ticks(Math.max(that.width / 75, 2));
             that.yAxis.ticks(Math.max(that.height / 50, 2));
         }
@@ -313,15 +278,13 @@ system.timelinepartitions = (function() {
 
     }
 
-    let parse_intertia_runs = (array_inertia) =>{
-         
+    let parse_intertia_runs = (array_inertia, best_run) =>{
+         console.log('ARRAY-INERTIA',best_run)
       let parsed_array_inertia = []
-
-      
-
       for( let i = 0; i < array_inertia.length; i++){
+        
 
-        console.log('....',array_inertia)
+        //console.log('....',array_inertia)
         //let partitios_inertia = array_inertia[i].split('::')
         for( let j = 0; j < array_inertia[0].length; j++){
           let single_object = [];
@@ -329,12 +292,14 @@ system.timelinepartitions = (function() {
           single_object.push(i)
           single_object.push('P'+j)
           single_object.push(+array_inertia[i][j])
+          single_object.push('P'+best_run[i])
+          
           parsed_array_inertia.push(single_object)
         }
         
       }
 
-      console.log(parsed_array_inertia)
+      //console.log(parsed_array_inertia)
       // this give a an array of array where each element is [iteration, partition, inertia_value]
       return parsed_array_inertia;
     }
@@ -342,20 +307,43 @@ system.timelinepartitions = (function() {
     let updateRendering = () => {
 
         //parse_intertia_runs(this.data.map(d=>d.runs_inertia))
+        console.log(this.data.map(d => d.info.best_run))
 
         that.div.select("g.gLineChart")
             .selectAll('rect.rect-partition')
-            .data(parse_intertia_runs(this.data.map(d=> {console.log(d); return d.partitionsMetrics.inertia})))
+            .data(parse_intertia_runs(this.data.map(d=> d.metrics.partitionsMetrics.inertia),this.data.map(f => f.info.best_run)))
             .each()
             .join(
                 enter => enter
                     .append("rect")
                     .attr('class', 'rect-partition')
+                    .attr('id', (d) => 'timeline-'+d[0]+'-'+d[1])
                     .attr('x', (d)=>  that.xScale(d[0]))
                     .attr('y', d=> that.yScale(d[1]))
                     .attr('width', that.xScale.bandwidth())
                     .attr('height',that.yScale.bandwidth())
-                    .attr('fill','red')
+                    .attr('fill',d=> { 
+                        if(d[0]<5) {
+                            if(d[2]<this.colorScaleCell.domain()[0]){ 
+                                return 'yellow' 
+                            } else 
+                            return d3.interpolateGreys(this.colorScaleCell(d[2]))
+                        } else {
+                            console.log(d[2],this.colorScaleCell.domain()[0]);
+                            if(d[2]<this.colorScaleCell.domain()[0]){ 
+                                return 'yellow' 
+                            } else 
+                            return d3.interpolateGreens(this.colorScaleCell(d[2]))
+                            }
+                        })
+                    .attr('stroke',(d)=> {
+                        if(d[3] === d[1]) 
+                        { return '#ff0090'};
+                        })
+                    .attr('stroke-width',(d)=> {if(d[3] === d[1]) 
+                        { 
+                            return '1'};
+                        })
                   ,
                 update => update
                   .attr('x', (d)=>  that.xScale(d[0]))
@@ -370,6 +358,7 @@ system.timelinepartitions = (function() {
                         .remove()
                     )
                 )
+            
     }
 
     return this;

@@ -331,7 +331,7 @@ system.linechart = (function() {
                 enter => enter
                     .append('path')
                     .attr('class', 'lineLineChart')
-                    .attr('d', d => that.line(d)),
+                    .attr('d', d =>  that.line(d)),
                 update => update
                 .call(update => update
                     .transition()
