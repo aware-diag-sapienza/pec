@@ -280,6 +280,7 @@ class ProgressiveEnsembleClustering:
         fn_calinsky = lambda labels, data: ClusteringMetrics.calinsky_harabaz_score(data, labels)
         fn_dbindex = lambda labels, data: ClusteringMetrics.davies_bouldin_index(data, labels)
         fn_dunnindex = lambda labels, data: ClusteringMetrics.dunn_index(data, labels)
+        fn_ssil = lambda labels, data: ClusteringMetrics.simplified_silhouette(data, labels)
 
         labelsMetrics = {
             "inertia": ClusteringMetrics.inertia(self.data, currentResult.labels),
@@ -287,7 +288,8 @@ class ProgressiveEnsembleClustering:
             "dunnIndex": ClusteringMetrics.dunn_index(self.data, currentResult.labels),
             "calinskyHarabasz": ClusteringMetrics.calinsky_harabaz_score(self.data, currentResult.labels),
             "adjustedRandScore": np.ones(self.n_runs, dtype=float),
-            "adjustedMutualInfoScore": np.ones(self.n_runs, dtype=float)
+            "adjustedMutualInfoScore": np.ones(self.n_runs, dtype=float),
+            "simplifiedSilhouette": ClusteringMetrics.simplified_silhouette(self.data, currentResult.labels)
         }
         partitionsMetrics = {
             "inertia": np.apply_along_axis(fn_inertia, 1, currentResult.partitions, self.data),
@@ -295,7 +297,8 @@ class ProgressiveEnsembleClustering:
             "dunnIndex": np.apply_along_axis(fn_dunnindex, 1, currentResult.partitions, self.data),
             "calinskyHarabasz": np.apply_along_axis(fn_calinsky, 1, currentResult.partitions, self.data),
             "adjustedRandScore": np.ones((self.n_runs, self.n_runs), dtype=float),
-            "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float)
+            "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float),
+            "simplifiedSilhouette": np.apply_along_axis(fn_ssil, 1, currentResult.partitions, self.data)
         }
         for i in range(self.n_runs):
             labelsMetrics["adjustedRandScore"][i] = ClusteringMetrics.adjusted_rand_score(currentResult.partitions[i], currentResult.labels)
@@ -323,12 +326,18 @@ class ProgressiveEnsembleClustering:
             if key == "labelsStability": continue
             if prevResult is not None: progessiveMetrics[f"{key}Gradient"] = gradient(key)
 
-        
-            
-
-        
-        
-        currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progessiveMetrics=progessiveMetrics)
+        earlyTermination = {
+            "slow": False,
+            "fast": False
+        }
+        if not firstIteration:
+            if progessiveMetrics["inertia_improvementGradient"] < 1e-4 or prevResult.metrics.earlyTermination["fast"]:
+                earlyTermination["fast"] = True
+            if progessiveMetrics["inertia_improvementGradient"] < 1e-5 or prevResult.metrics.earlyTermination["slow"]:
+                earlyTermination["slow"] = True
+   
+   
+        currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progessiveMetrics=progessiveMetrics, earlyTermination=earlyTermination)
         return currentResult
 
 
