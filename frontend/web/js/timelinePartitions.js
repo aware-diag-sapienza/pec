@@ -102,10 +102,10 @@ system.timelinepartitions = (function() {
         this.data = this.data.concat(obj)
         // modificare qui la parte per la scala di colore della timeline
         console.log('ALESSIA',obj.iteration === 5,obj.iteration,5)
-        if (obj.iteration === 5){
-            let min_range = (this.colorScaleCell.domain()[1]- d3.min(obj.metrics.partitionsMetrics.inertia))/10
+        if (obj.iteration === 5 || d3.min(obj.metrics.partitionsMetrics.inertia) < this.colorScaleCell.domain()[0]){
+            let min_range = d3.min(obj.metrics.partitionsMetrics.inertia) - (d3.min(obj.metrics.partitionsMetrics.inertia))*0.2
             let max_range = this.colorScaleCell.domain()[1]
-            this.colorScaleCell = d3.scaleLinear().range([1,0]).domain([10,max_range])
+            this.colorScaleCell = d3.scaleLinear().range([1,0]).domain([min_range,max_range])
             console.log('ALESSIA DOMINIO',this.colorScaleCell.domain())
         }
         this.render(obj.iteration)
