@@ -10,6 +10,7 @@ let matrix2;
 let SVG_HISTORY;
 let previous_computations = [];
 let width_rect;
+let USED_SEED = []
 const LIMIT_IT = 100;
 
 let visualizeMetrics = false;
@@ -71,6 +72,11 @@ function resetSelects(){
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
 }
+function getSeed(){
+    let newseed = Math.random()*(100000-1)+1;
+    
+    return Math.ceil(newseed);
+}
 
 async function startSelects(){
 
@@ -79,7 +85,9 @@ async function startSelects(){
     technique =  $( "#select-technique" ).val()
     cluster = $( "#select-cluster" ).val()
     partitions = $( "#select-partitions" ).val()
-    seed = 0
+    seed = getSeed()
+
+    console.log('SEED',seed)
 
     d3.select('#iteration-label').html('');
     d3.select('#id-metrics').style('display','none');
@@ -183,7 +191,7 @@ function readResult(it_res){
                 system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 
             }
-            updatePinHistory(it_res.iteration)
+            updatePinHistory(it_res.iteration,it_res.isLast)
             system.matrixAdjacency.updateBestPartition(it_res.info.best_run)
 
             if (it_res.is_last){
@@ -265,7 +273,7 @@ function addPinHistory() {
 
     let tentative = previous_computations.length
 
-    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative})
+    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed})
 
     scaleHistory = d3.scaleBand()
        
@@ -330,11 +338,15 @@ function addPinHistory() {
             .attr('font-size', 'smaller')
         }
 
-function updatePinHistory(iteration){
+function updatePinHistory(iteration,isLast){
 
     //previous_computations.length
-    
-    d3.select('#improvement-'+(previous_computations.length-1))
+    if(isLast){
+        d3.select('#improvement-'+(previous_computations.length-1))
+        .attr('width',width_rect*LIMIT_IT)
+    } else {
+        d3.select('#improvement-'+(previous_computations.length-1))
         .attr('width',width_rect*iteration)
+    }
 
 }      
