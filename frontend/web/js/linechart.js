@@ -33,40 +33,7 @@ system.linechart = (function() {
         this.div.selectAll('svg')
             .remove();
 
-        switch(this.technique) {
-            case 'I-PecK':
-                this.attributeYAxisFirstLevel = "labelsMetrics"
-                this.attributeYAxisSecondLevel = "inertia"
-                this.labelYAxis = "inertia"
-                break;
-            case 'I-PecK++':
-                this.attributeYAxisFirstLevel = "labelsMetrics"
-                this.attributeYAxisSecondLevel = "inertia"
-                this.labelYAxis = "inertia"
-                break;
-            case 'HGPA-PecK':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
-                this.attributeYAxisSecondLevel = "adjustedRandScore"
-                this.labelYAxis = "adjustedRandScore"
-                break;
-            case 'HGPA-PecK++':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
-                this.attributeYAxisSecondLevel = "adjustedRandScore"
-                this.labelYAxis = "adjustedRandScore"
-                break;
-            case 'MCLA-PecK':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
-                this.attributeYAxisSecondLevel = "adjustedRandScore"
-                this.labelYAxis = "adjustedRandScore"
-                break
-            case 'MCLA-PecK++':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
-                this.attributeYAxisSecondLevel = "adjustedRandScore"
-                this.labelYAxis = "adjustedRandScore"
-                break;
-            default:
-              // code block
-        }
+        this.computeYAxisVariable()
 
         verticalLines = [ 
             {
@@ -102,6 +69,60 @@ system.linechart = (function() {
             });
         return that
     } 
+
+    this.computeYAxisVariable = () => {
+        if(variableYAxisLinechart == "default"){
+            switch(this.technique) {
+                case 'I-PecK':
+                    this.attributeYAxisFirstLevel = "labelsMetrics"
+                    this.attributeYAxisSecondLevel = "inertia"
+                    this.labelYAxis = "inertia"
+                    break;
+                case 'I-PecK++':
+                    this.attributeYAxisFirstLevel = "labelsMetrics"
+                    this.attributeYAxisSecondLevel = "inertia"
+                    this.labelYAxis = "inertia"
+                    break;
+                case 'HGPA-PecK':
+                    this.attributeYAxisFirstLevel = "progressiveMetrics"
+                    this.attributeYAxisSecondLevel = "adjustedRandScore"
+                    this.labelYAxis = "adjustedRandScore"
+                    break;
+                case 'HGPA-PecK++':
+                    this.attributeYAxisFirstLevel = "progressiveMetrics"
+                    this.attributeYAxisSecondLevel = "adjustedRandScore"
+                    this.labelYAxis = "adjustedRandScore"
+                    break;
+                case 'MCLA-PecK':
+                    this.attributeYAxisFirstLevel = "progressiveMetrics"
+                    this.attributeYAxisSecondLevel = "adjustedRandScore"
+                    this.labelYAxis = "adjustedRandScore"
+                    break
+                case 'MCLA-PecK++':
+                    this.attributeYAxisFirstLevel = "progressiveMetrics"
+                    this.attributeYAxisSecondLevel = "adjustedRandScore"
+                    this.labelYAxis = "adjustedRandScore"
+                    break;
+                default:
+                  // code block
+            }
+        }else if(variableYAxisLinechart == "simplifiedSilhouette"){
+            this.attributeYAxisFirstLevel = "labelsMetrics"
+            this.attributeYAxisSecondLevel = "simplifiedSilhouette"
+            this.labelYAxis = "simplifiedSilhouette"
+        }
+        else if(variableYAxisLinechart == "globalStability"){
+            this.attributeYAxisFirstLevel = "labelsMetrics"
+            this.attributeYAxisSecondLevel = "simplifiedSilhouette"
+            this.labelYAxis = "simplifiedSilhouette"
+        }
+        
+    }
+
+    this.updateYAxisVariable = () => {
+        this.computeYAxisVariable()
+        this.render()
+    }
 
     this.setData = (data) => {
         this.lastObj = data[0]

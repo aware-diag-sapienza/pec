@@ -84,6 +84,8 @@ body {
 
   .item-dropdown-metrics{
     grid-area: dropdownmetrics;
+    display: flex;
+    flex-direction: row;
   }
 
   .metrics-dropdown{
