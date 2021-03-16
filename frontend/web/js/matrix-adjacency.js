@@ -41,8 +41,6 @@ system.matrixAdjacency = (function() {
     }
 
     this.adjacency = (partitions,decision_ars,decision_ami) => {
-      console.log('ALESSIA funzione adjacency')
-      
       let runs_ars_matrix = decision_ars //data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
       let runs_ami_matrix = decision_ami //data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
         system.matrixAdjacency.createAdjacencyMatrix(partitions,runs_ars_matrix,runs_ami_matrix)
@@ -83,8 +81,6 @@ system.matrixAdjacency = (function() {
 
     this.updateMatrix = (partitions,decision_ars,decision_ami) => {
 
-      console.log('ALESSIA',decision_ars,decision_ami)
-      
       let ARI = decision_ars//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
       let AMI = decision_ami//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
       this.matrix = []

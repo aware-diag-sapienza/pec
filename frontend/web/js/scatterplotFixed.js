@@ -42,6 +42,7 @@ system.scatterplotFixed = (function() {
     d3.selectAll('.scatter')
       .style('border-style', 'solid')
       .style('border-width', '0px')
+      .style('border','grey')
 
   }
 

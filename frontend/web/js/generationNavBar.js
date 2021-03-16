@@ -270,7 +270,7 @@ function addPinHistory() {
         .attr('class','bar-history')
         .attr('id',(d) => 'background-' + d.tentative)
         .attr('x', 0)
-        .attr('y', (d)=> {return (d.tentative*54)})
+        .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', width_history-margin_history.right)
         .attr('height', height_pin)
         .attr('stroke', 'black')
