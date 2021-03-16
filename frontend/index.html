@@ -95,6 +95,14 @@
             <i class="fa fa-fast-forward"></i>RUN</button> <label></label></div>
       </div>
       <div class="item-dropdown-metrics">
+        <label>Linechart metric </label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-variableYAxis-linechart" onchange="onChangeVariableYAxisLinechart()">
+            <option value="default">intertia/adjustedRandScore</option>
+            <option value="simplifiedSilhouette">simplified Silhouette</option>
+            <option value="globalStability">global stability</option>
+          </select>
+        </div>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="button-metric" onclick="visualizeMetricsFunction()">METRICS</button>
         <div class="metrics-dropdown">
         <table class="table table-hover" id="table-metrics">

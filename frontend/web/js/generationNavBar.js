@@ -24,6 +24,13 @@ function onChangeInputParameter(){
     d3.select('#iteration-label').html('');
 }
 
+let variableYAxisLinechart = "default"
+$('#select-variableYAxis-linechart').val(variableYAxisLinechart);
+function onChangeVariableYAxisLinechart(){
+    variableYAxisLinechart = $( "#select-variableYAxis-linechart" ).val()
+    linechart1.updateYAxisVariable()
+}
+
 function updateSelects(list_dataset){
 
     const datasetsArray = list_dataset.map((d)=> d.name)    
