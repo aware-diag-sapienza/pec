@@ -131,19 +131,19 @@ system.linechart = (function() {
     }
 
     this.updateVerticalLines = (obj,data_matrix) => {
-        /*that.verticalLines.map(d => {
+        that.verticalLines.map(d => {
             if(!d.draw) {
-                if(this.lastObj['metrics']['progressiveMetrics']['earlyTermination'][d.name]){ 
+                if(this.lastObj['metrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
                     //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.final_ars);
+                    //system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.final_ars);
                     // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 
                     // ALESSIA qui update della matrice 2
-                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,data_matrix.runs_ars_matrix,data_matrix.runs_ami_matrix);
+                    //system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,data_matrix.runs_ars_matrix,data_matrix.runs_ami_matrix);
                 }
             }
-        })*/
+        })
     }
 
     this.render = () => {
