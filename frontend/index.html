@@ -39,7 +39,7 @@
         </div> 
         <label>Projection</label>
         <div class="select-menu">
-          <select class="form-select form-select-sm" id="select-projections" onchange="onChangeInputParameter()"></select>
+          <select class="form-select form-select-sm" id="select-projection" onchange="onChangeInputParameter()"></select>
         </div> 
         <div class="select-button">
         <button id="clean-button" type="button" class="btn btn-circle" onclick="resetSelects()"><i class="fa fa-undo" aria-hidden="true"></i></button>
@@ -229,6 +229,7 @@
     let SERVER;
     let LIST;
     let DATASET_SELECTED;
+    let ALL_DATA;
     
     
     async function test(){
@@ -264,6 +265,11 @@
     tippy('#select-partitions', {
         delay: 300,
         content: 'Select the number of partitions',
+    });
+
+    tippy('#select-projection', {
+        delay: 300,
+        content: 'Select the type of projection',
     });
 
     tippy('#clean-button', {

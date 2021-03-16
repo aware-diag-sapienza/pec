@@ -39,16 +39,19 @@ function updateSelects(list_dataset){
     const tech = ['I-PecK','I-PecK++','HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
     const clusters = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
     const partition = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
+    const projections = ['tsne','pca']
 
     $("#select-dataset").empty()
     $("#select-technique").empty()
     $("#select-cluster").empty()
     $("#select-partitions").empty()
+    $("#select-projection").val('tsne')
 
     const selectDataset = document.getElementById('select-dataset');
     const selectTechnique = document.getElementById('select-technique');
     const selectCluster = document.getElementById('select-cluster');
     const selectPartitions = document.getElementById('select-partitions');
+    const selectProjections = document.getElementById('select-projection');
 
     for(let i = 0; i < datasetsArray.length; i++){
         selectDataset.options.add(new Option(labelsDataset[i], datasetsArray[i]));
@@ -66,10 +69,15 @@ function updateSelects(list_dataset){
         selectPartitions.options.add(new Option(partition[i], partition[i]));
     }
 
+    for(let i = 0; i < projections.length; i++){
+        selectProjections.options.add(new Option(projections[i], projections[i]));
+    }
+
     document.getElementById("select-dataset").value = ""
     document.getElementById("select-technique").value = ""
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
+    document.getElementById("select-projection").value = 'tsne'
 
 }
 
@@ -78,6 +86,7 @@ function resetSelects(){
     document.getElementById("select-technique").value = ""
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
+    document.getElementById("select-projection").value = 'tsne'
 }
 function getSeed(){
     let newseed = Math.random()*(100000-1)+1;
@@ -87,11 +96,14 @@ function getSeed(){
 
 async function startSelects(){
 
+    ALL_DATA = []
+
     ITERAZIONE_PER_MATRICE = 1
     dataset = $( "#select-dataset" ).val()
     technique =  $( "#select-technique" ).val()
     cluster = $( "#select-cluster" ).val()
     partitions = $( "#select-partitions" ).val()
+    projection = $( "#select-projection" ).val()
     seed = getSeed()
 
     console.log('SEED',seed)
@@ -123,9 +135,10 @@ async function startSelects(){
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         job.onPartialResult(result => {
+            ALL_DATA.push(result)
             if (result.iteration == 1){
                 console.log('sono qui dentro ALESSIA')
-                system.scatterplot.createData(DATASET_SELECTED.projections.tsne, result.labels)
+                system.scatterplot.createData(DATASET_SELECTED.projections[projection], result.labels)
             }
 
             if (result.iteration >= 1){
