@@ -10,7 +10,7 @@ system.matrixAdjacency = (function() {
 
     this.width = null
     this.height =  null
-    this.margin = null
+    this.margin = {top: 20, right: 20, bottom: 20, left: 40}
     this.cell_size = null
 
     this.matrix = []
@@ -20,10 +20,13 @@ system.matrixAdjacency = (function() {
       this.div = d3.select(idDiv)
       this.divname = idDiv
       this.g= idDiv+'-g-adiacency'
-      this.margin = {top: 20, right: 20, bottom: 20, left: 40}
+      
       
       this.width = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.left - this.margin.right;
       this.height = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.top - this.margin.bottom;
+
+      console.log('SUSHI-WIdth-1',this.width)
+      console.log('SUSHI-Height-1',this.height)
       
       return this
     } 
@@ -132,17 +135,14 @@ system.matrixAdjacency = (function() {
       //console.log('MATRICE', this.matrix)
       
       this.cell_size = (d3.min([that.width,that.height])-that.margin.top)/nodes.length
+      //system.timelinepartitions.height_like_matrix = this.cell_size
       
-  
-      console.log('WIDTH-WIDTH',this.width)
-      console.log('WIDTH-HEIGHT',this.height)
+
     let svg = this.div
     .append("svg")
     .attr("width", this.width + this.margin.left + this.margin.right)
     .attr("height", this.height +  this.margin.top + this.margin.bottom)
 
-    console.log('WIDTH-WIDTH',svg.attr('width'), this.margin.left)
-    console.log('WIDTH-HEIGHT',svg.attr('height'),this.margin.top )
 
     svg.append("g")
       .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")

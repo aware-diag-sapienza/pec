@@ -10,7 +10,7 @@ system.matrixAdjacencyFixed = (function() {
 
     this.width = null
     this.height =  null
-    this.margin = null
+    this.margin = {top: 20, right: 20, bottom: 20, left: 40}
     this.cell_size = null
     this.divname = null;
     this.matrix = []
@@ -23,11 +23,14 @@ system.matrixAdjacencyFixed = (function() {
       this.divname = idDiv;
       this.div = d3.select(idDiv)
       this.divSelected = idDiv;
-      this.margin = {top: 20, right: 20, bottom: 20, left: 40}
+
       
-      this.width = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.left - this.margin.right;
-      this.height = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.top - this.margin.bottom;
+      this.width = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin.left - this.margin.right;
+      this.height = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin.top - this.margin.bottom;
       
+      console.log('SUSHI-WIdth-2',this.width)
+      console.log('SUSHI-Height-2',this.height)
+
       return this
     } 
 
@@ -43,25 +46,20 @@ system.matrixAdjacencyFixed = (function() {
     this.updateMatrixplotEarlyTermination= (partitions,decision_ars,decision_ami)=> {
 
       if ( this.early_termination == null){
-        let runs_ars_matrix =decision_ars //data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
-        let runs_ami_matrix =decision_ami//data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
+        let runs_ars_matrix =decision_ars
+        let runs_ami_matrix =decision_ami
        system.matrixAdjacencyFixed.createAdjacencyMatrix(partitions,runs_ars_matrix,runs_ami_matrix)
         this.early_termination = true;
-    
       }
-    
     }
 
     this.adjacency = (partitions,decision_ars,decision_ami) => {
-      //console.log("Partition",partitions,'ARSMATRIX',decision_ars,'AMIMATRIX',decision_ami)
-      let runs_ars_matrix = decision_ars//data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
-      let runs_ami_matrix = decision_ami//data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
+      let runs_ars_matrix = decision_ars
+      let runs_ami_matrix = decision_ami
       system.matrixAdjacencyFixed.createAdjacencyMatrix(partitions,runs_ars_matrix,runs_ami_matrix)
     }
     
     let updateData = () =>{
-      //console.log(that.matrix)
-      console.log('sono QUI MATRICE')
       let tooltRect = d3.select(this.g)
       .selectAll("rect")
       .data(that.matrix)
@@ -73,15 +71,8 @@ system.matrixAdjacencyFixed = (function() {
         .attr("height",that.cell_size)
         .attr("x", d=> d.x*that.cell_size)
         .attr("y", d=> d.y*that.cell_size)
-        .style("fill", d => d3.interpolateBlues(d.weight))//('#4E0560')
-        //.style("fill-opacity", d=> d.weight * .2)
-        .on('mouseover', function (d) {
-          console.log('d3 selected',d3.select(this).attr("id"))
-          
-          //console.log()
-        })
-        .attr("data-tippy-content", d => "" + d.id + " at row " + d.row + " end col " +d.col + " with weight " + d.weight)
-        ,
+        .style("fill", d => d3.interpolateBlues(d.weight))//('#4E0560'
+        .attr("data-tippy-content", d => "" + d.id + " at row " + d.row + " end col " +d.col + " with weight " + d.weight),
         update => update
         .call(update => update
           .transition()
@@ -117,14 +108,11 @@ system.matrixAdjacencyFixed = (function() {
             grid.metric = 'AMI';
           }
           this.matrix.push(grid)
-
         }
         nodes.push('P'+i)
       }
-
-      
-      
       this.cell_size = (d3.min([that.width,that.height])-that.margin.top)/nodes.length
+      
       
   
     let svg = this.div
@@ -132,7 +120,6 @@ system.matrixAdjacencyFixed = (function() {
     .attr("width", this.width + this.margin.left + this.margin.right)
     .attr("height", this.height +  this.margin.top + this.margin.bottom)
 
-    
     svg.append("g")
       .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
       .attr("id",this.g.replace('#',''))
@@ -162,6 +149,7 @@ system.matrixAdjacencyFixed = (function() {
       .text(d => d)
       .style("text-anchor","end")
       .style("font-size","10px")  
+      
       // label delle metriche 
       svg
       .append("g")
@@ -193,8 +181,6 @@ system.matrixAdjacencyFixed = (function() {
       .attr("y2", "100%")
       .attr("spreadMethod", "pad");
 
-      
-
     legend.append("stop")
       .attr("offset", "0%")
       .attr("stop-color",  d3.interpolateBlues(0))
@@ -219,13 +205,13 @@ system.matrixAdjacencyFixed = (function() {
     .append("g")
       .attr("transform","translate(" + (that.margin.left) + "," + (that.height+5) + ")")
       .append("rect")
-      .attr("width", this.cell_size*16)
+      .attr("width", this.cell_size*partitions)
       .attr("height", 5)
       .style("fill", "url(#gradient-fixed)")
       
 
     var y = d3.scaleLinear()
-      .range([this.cell_size*16, 0])
+      .range([this.cell_size*partitions, 0])
       .domain([1, 0]);
 
     var yAxis = d3.axisBottom()

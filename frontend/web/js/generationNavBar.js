@@ -107,10 +107,11 @@ async function startSelects(){
     $('#ineP').html('--');
 
     if (dataset != null && technique != null && cluster != null){
-        linechart1 = system.linechart.init('#linechart_inertia', technique)
-        timelinePartitions = system.timelinepartitions.init('#timeline-partitions', technique,partitions)
         matrix1 = system.matrixAdjacency.init('#id-matrix-1');
         matrix2 = system.matrixAdjacencyFixed.init('#id-matrix-2');
+        linechart1 = system.linechart.init('#linechart_inertia', technique)
+        timelinePartitions = system.timelinepartitions.init('#timeline-partitions', technique,partitions)
+        
 
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
         DATASET_SELECTED = await SERVER.getDataset(dataset);

@@ -8,9 +8,16 @@ system.timelinepartitions = (function() {
     this.segmentedData = []
     
     this.divName = null
-    this.margin = { top: 10, right: 30,bottom: 30, left: 60 }
+    this.margin = { top: 20, right: 30,bottom: 20, left: 60 }
+    this.margin_matrix =  {top: 20, right: 20, bottom: 20, left: 40}
+    this.matrix_cell_size = null
+    this.matrix_width = null
+    this.matrix_height = null
+    this.all_cell = null
+
     this.width = null
     this.height = null
+    this.height_like_matrix = null
     this.xScale = null
     this.yScale = null
     this.xAxis = null
@@ -26,18 +33,21 @@ system.timelinepartitions = (function() {
         this.div.selectAll('svg')
             .remove();
 
+        console.log('SUSHI FIX',this.height_like_matrix)
+        this.matrix_width = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin_matrix.left - this.margin_matrix.right;
+        this.matrix_height = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin_matrix.top - this.margin_matrix.bottom;
+        this.all_cell = (d3.min([this.matrix_width,this.matrix_height])-that.margin_matrix.top)
+        this.matrix_cell_size = (d3.min([this.matrix_width,this.matrix_height])-that.margin_matrix.top)/partitions
+        
+     
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
         this.height = parseInt(this.div.style("height")) - this.margin.top - this.margin.bottom;
+        //this.height_like_matrix = system.matrixAdjacencyFixed.cell_size
         this.xScale = d3.scaleBand().domain([...Array(40).keys()]).range([0, this.width]).paddingInner(0.2).paddingOuter(0.2);//d3.scaleLinear().domain([0, 40]).range([0, this.width]);
-        this.yScale = d3.scaleBand().domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse()).range([this.height, 0]).paddingInner(0.2).paddingOuter(0.2);//d3.scaleLinear().range([this.height, 0]);
+        this.yScale = d3.scaleBand().domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse()).range([(this.all_cell), 0]).paddingInner(0.1).paddingOuter(0.1);//d3.scaleLinear().range([this.height, 0]);
         this.xAxis = d3.axisBottom().scale(this.xScale);
         this.yAxis = d3.axisLeft().scale(this.yScale)//.tickFormat(d3.format("~s"));   
-        
-        //this.colorScaleCell= d3.scaleLinear().domain([0,1])
-        //d3.scaleThreshold()
-        //.domain([38000000, 42000000,47000000])
-        //.range(["yellow", "pink", "red", "purple"])//d3.scaleLinear().domain([0,1]).range([0,1000])
         
         return that
     } 
@@ -53,13 +63,11 @@ system.timelinepartitions = (function() {
     
     this.updateData = (obj,data_matrix) => {
         this.data = this.data.concat(obj)
-        // modificare qui la parte per la scala di colore della timeline
-        console.log('ALESSIA',obj.iteration === 5,obj.iteration,5)
+        
         if (obj.iteration === 5 || d3.min(obj.metrics.partitionsMetrics.inertia) < this.colorScaleCell.domain()[0]){
             let min_range = d3.min(obj.metrics.partitionsMetrics.inertia) - (d3.min(obj.metrics.partitionsMetrics.inertia))*0.05
             let max_range = this.colorScaleCell.domain()[1]
             this.colorScaleCell = d3.scaleLinear().range([1,0]).domain([min_range,max_range])
-            console.log('ALESSIA DOMINIO',this.colorScaleCell.domain())
         }
         this.render(obj.iteration)
         
@@ -82,10 +90,10 @@ system.timelinepartitions = (function() {
             this.xScale = d3.scaleBand().domain([...Array(this.data.length+1).keys()]).range([0, this.width]).paddingInner(0.2).paddingOuter(0.2);//d3.scaleLinear().domain([0, this.data.length]).range([0, this.width]);
             this.xAxis = d3.axisBottom().scale(this.xScale);
         }
-
+        console.log('SUSHI',that.all_cell)
         svg.append("g")
             .attr("class", "x axisTimeline")
-            .attr("transform", "translate(0," + this.height + ")")	
+            .attr("transform", "translate(0," + (that.all_cell)+ ")")	
             .call(that.xAxis)
                 .selectAll("text")	
                 .style("text-anchor", "start")
@@ -96,9 +104,10 @@ system.timelinepartitions = (function() {
         // Add Y axis
         this.yScale = d3.scaleBand()
             .domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse())
-            .range([this.height, 0])
-            .paddingInner(0.1)
-            .paddingOuter(0.1);
+            .range([that.all_cell, 0])
+            .paddingInner(0.1).paddingOuter(0.1);
+            //.paddingInner(0.1)
+            //.paddingOuter(0.1);
 
 
         svg.append("g")
@@ -110,7 +119,7 @@ system.timelinepartitions = (function() {
             .attr("class", "textXAxis")            
             .attr("transform",
                   "translate(" + (this.width/2) + " ," + 
-                                 (this.height + this.margin.top) + ")")
+                                 (this.height + this.margin.top + this.margin_bottom - (this.margin_bottom/2) ) + ")")
             .style("text-anchor", "middle")
             .text("Iterations");
         
@@ -130,7 +139,7 @@ system.timelinepartitions = (function() {
             that.width = parseInt(that.div.style("width")) - that.margin.left - that.margin.right,
             that.height = parseInt(that.div.style("height")) - that.margin.top - that.margin.bottom;
             that.xScale.range([0, that.width]);
-            that.yScale.range([that.height, 0]);
+            that.yScale.range([that.all_cell, 0]);
             
             that.xAxis = d3.axisBottom().scale(that.xScale);
             //that.yAxis = d3.axisLeft().scale(that.yScale);
@@ -138,7 +147,7 @@ system.timelinepartitions = (function() {
             
             // Update the axis and text with the new scale
             svg.select(".x.axisTimeline")
-                .attr("transform", "translate(0," + that.height + ")")
+                .attr("transform", "translate(0," + that.all_cell+ ")")
                 .call(that.xAxis)
                 .selectAll("text")	
                 .style("text-anchor", "start")
@@ -216,6 +225,7 @@ system.timelinepartitions = (function() {
         // d[2] valore inertia
         // d[3] best run
         // d[4] best valore inertia
+
         that.div.select("g.gLineChart")
             .selectAll('rect.rect-partition')
             .data(parse_intertia_runs(this.data.map(d=> d.metrics.partitionsMetrics.inertia),this.data.map(f => f.info.best_run)))
