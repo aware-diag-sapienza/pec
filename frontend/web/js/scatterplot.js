@@ -296,7 +296,8 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
      
       
       
-      that.coordData = that.dataset_projection
+      that.coordData = dataset_projection
+      console.log('>>>>>>> ',that.coordData)
       system.scatterplotFixed.coordData= that.dataset_projection
       if(that.first_iteration){
 

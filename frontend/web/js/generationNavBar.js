@@ -242,6 +242,7 @@ function addPinHistory() {
     let width_history = $("#listhistory").width()
     let height_history = $("#listhistory").height()
     let margin_history = {top: 10, bottom:10, left:20, right:20}
+    let height_pin = 60;
 
     
 
@@ -271,7 +272,7 @@ function addPinHistory() {
         .attr('x', 0)
         .attr('y', (d)=> {return (d.tentative*54)})
         .attr('width', width_history-margin_history.right)
-        .attr('height', (d)=>{return 60})
+        .attr('height', height_pin)
         .attr('stroke', 'black')
         .attr('fill', 'white')
     
@@ -284,9 +285,9 @@ function addPinHistory() {
         .attr('class','bar-history-improvement')
         .attr('id',(d) => 'improvement-' + d.tentative)
         .attr('x', 0)
-        .attr('y', (d)=> {return (d.tentative*54)})
+        .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', 0)
-        .attr('height', (d)=>{return 50})
+        .attr('height', height_pin)
         .attr('fill', '#ffd9b3')
 
     let text = SVG_HISTORY.selectAll(".text-history")
@@ -295,7 +296,7 @@ function addPinHistory() {
         .append('text')
         .attr('class','text-history')
         .attr('x', 3)
-        .attr('y', (d)=> {return (d.tentative*54)+15})
+        .attr('y', (d)=> {return (d.tentative*(height_pin-10))+15})
         //.text((d)=> {return d.dataset})
 
         text.append("tspan")
