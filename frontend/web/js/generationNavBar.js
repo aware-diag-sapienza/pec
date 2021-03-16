@@ -164,14 +164,14 @@ function readResult(it_res){
                 timelinePartitions.setData([it_res]) 
                 timelinePartitions.render(it_res.iteration)
                 console.log('ALESSIA prima di tableupdate')
-                updateTable(it_res.info)
+                updateTable(it_res)
                 console.log('ALESSIA prima di adjacency')
                 system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 
         }else{
                 linechart1.updateData(it_res,it_res.info)
                 timelinePartitions.updateData(it_res,it_res.metrics)
-                updateTable(it_res.info)
+                updateTable(it_res)
                 system.scatterplot.updateScatterplot(false,it_res.labels);
                 system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 
@@ -205,17 +205,17 @@ function updateTable(obj){
     for(let i=0; i<verticalLines.length; i++){
         let d = verticalLines[i]
         if(d.draw && d.iteration==obj.iteration) {
-            $('#chE').html(arrotondaNumero(obj.calinsky_harabaz));
-            $('#dbE').html(arrotondaNumero(obj.db_index));
-            $('#diE').html(arrotondaNumero(obj.dunn_index));
-            $('#ineE').html(arrotondaNumero(obj.inertia));
+            $('#chE').html(arrotondaNumero(obj.metrics.labelsMetrics.calinskyHarabasz));
+            $('#dbE').html(arrotondaNumero(obj.metrics.labelsMetrics.dbIndex));
+            $('#diE').html(arrotondaNumero(obj.metrics.labelsMetrics.dunnIndex));
+            $('#ineE').html(arrotondaNumero(obj.metrics.labelsMetrics.inertia));
         }
     }
 
-    $('#chC').html(arrotondaNumero(obj.calinsky_harabaz));
-    $('#dbC').html(arrotondaNumero(obj.db_index));
-    $('#diC').html(arrotondaNumero(obj.dunn_index));
-    $('#ineC').html(arrotondaNumero(obj.inertia));
+    $('#chC').html(arrotondaNumero(obj.metrics.labelsMetrics.calinskyHarabasz));
+    $('#dbC').html(arrotondaNumero(obj.metrics.labelsMetrics.dbIndex));
+    $('#diC').html(arrotondaNumero(obj.metrics.labelsMetrics.dunnIndex));
+    $('#ineC').html(arrotondaNumero(obj.metrics.labelsMetrics.inertia));
 
     if(verticalLines.filter(d => d.draw).length>0){
         let chE = Number.parseFloat($("#chE").text());
@@ -223,10 +223,10 @@ function updateTable(obj){
         let diE = Number.parseFloat($("#diE").text());
         let ineE = Number.parseFloat($("#ineE").text());
         
-        $('#chP').html(computeRatioPerc(obj.calinsky_harabaz, chE));
-        $('#dbP').html(computeRatioPerc(obj.db_index, dbE));
-        $('#diP').html(computeRatioPerc(obj.dunn_index, diE));
-        $('#ineP').html(computeRatioPerc(obj.inertia, ineE));
+        $('#chP').html(computeRatioPerc(obj.metrics.labelsMetrics.calinskyHarabasz, chE));
+        $('#dbP').html(computeRatioPerc(obj.metrics.labelsMetrics.dbIndex, dbE));
+        $('#diP').html(computeRatioPerc(obj.metrics.labelsMetrics.dunnIndex, diE));
+        $('#ineP').html(computeRatioPerc(obj.metrics.labelsMetrics.inertia, ineE));
     }
 }
 

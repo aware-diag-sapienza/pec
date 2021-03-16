@@ -24,7 +24,7 @@ system.linechart = (function() {
     
     // Define lines
     this.line = d3.line()
-    this.verticalLines = []
+    verticalLines = []
 
     this.init = (idDiv, tech) => {
         this.div = d3.select(idDiv)
@@ -68,7 +68,7 @@ system.linechart = (function() {
               // code block
         }
 
-        this.verticalLines = [ 
+        verticalLines = [ 
             {
                 'name': 'fast',
                 'draw': false,
@@ -131,7 +131,7 @@ system.linechart = (function() {
     }
 
     this.updateVerticalLines = (obj,data_matrix) => {
-        that.verticalLines.map(d => {
+        verticalLines.map(d => {
             if(!d.draw) {
                 if(this.lastObj['metrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
@@ -259,8 +259,8 @@ system.linechart = (function() {
         const svgLegend = that.div.select("g.gLineChart")
 
         const ordinalScale = d3.scaleOrdinal()
-            .domain(that.verticalLines.map(d => d.label))
-            .range(that.verticalLines.map(d => d.fill));
+            .domain(verticalLines.map(d => d.label))
+            .range(verticalLines.map(d => d.fill));
 
         svgLegend.append("g")
             .attr("class", "legendOrdinal")
@@ -271,7 +271,7 @@ system.linechart = (function() {
             .shape("rect")
             .shapeWidth(15)
             .shapeHeight(5)
-            .shapePadding(that.width/that.verticalLines.length)
+            .shapePadding(that.width/verticalLines.length)
             .scale(ordinalScale);
             
           
@@ -283,7 +283,7 @@ system.linechart = (function() {
     let updateRendering = () => {
         let vv = that.div.select("g.gLineChart")
             .selectAll('line.lineVertical')
-            .data(that.verticalLines)
+            .data(verticalLines)
             .join(
                 enter => enter
                     .append("line")
