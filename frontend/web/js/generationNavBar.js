@@ -271,7 +271,7 @@ function addPinHistory() {
         .attr('x', 0)
         .attr('y', (d)=> {return (d.tentative*54)})
         .attr('width', width_history-margin_history.right)
-        .attr('height', (d)=>{return 50})
+        .attr('height', (d)=>{return 60})
         .attr('stroke', 'black')
         .attr('fill', 'white')
     
@@ -307,7 +307,7 @@ function addPinHistory() {
             .attr('font-size', 'smaller')
         
         text.append("tspan")
-            .text(d => 'K: ' + d.cluster)
+            .text(d => 'K:' + d.cluster)
             .attr("class", "tspan-cluster")
             .attr("x", 0)
             .attr("dx", 10)
@@ -317,6 +317,14 @@ function addPinHistory() {
         text.append("tspan")
             .text(d => d.technique)
             .attr("class", "tspan-technique")
+            .attr("x", 0)
+            .attr("dx", 10)
+            .attr("dy", 12)
+            .attr('font-size', 'smaller')
+        
+        text.append("tspan")
+            .text(d => 'S:' +d.seed)
+            .attr("class", "tspan-seed")
             .attr("x", 0)
             .attr("dx", 10)
             .attr("dy", 12)

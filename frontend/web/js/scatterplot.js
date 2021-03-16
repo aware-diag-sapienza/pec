@@ -308,7 +308,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
           //let e = await it.next()
           
           let array0 = dataset_projection[i]
-          console.log('arr_0',array0)
+          //console.log('arr_0',array0)
           first_feature.push(+array0[0])
           second_feature.push(+array0[1])
           xs = xs.concat(array0)
