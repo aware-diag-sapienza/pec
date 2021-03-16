@@ -29,7 +29,7 @@ function updateSelects(list_dataset){
     const datasetsArray = list_dataset.map((d)=> d.name)    
     const labelsDataset = list_dataset.map((ld)=> {
         return ld.name.charAt(0).toUpperCase() + ld.name.slice(1) +' n:'+ ld.n + ' d:'+ld.d+' [opt k='+ld.k+']'})
-    const tech = ['I-PecK','I-PecK++']//,'HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
+    const tech = ['I-PecK','I-PecK++','HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
     const clusters = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
     const partition = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
 
@@ -123,13 +123,15 @@ async function startSelects(){
             if (result.iteration >= 1){
                 // sono alla prima iterazione e devo creare il lo scatterplot.             
                 readResult(result)
-                d3.select('#iteration-label').html("")
-                d3.select('#information-info').html("Early Termination")
+                
+                //d3.select('#information-info').html("Early Termination")
                 
             }
+            d3.select('#iteration-label').html("Iteration " + result.iteration)
         })
 
         job.start()
+        
         addPinHistory()
     } else {
         alert("Select Dataset, technique e clusters to perform the query")
@@ -296,7 +298,7 @@ function addPinHistory() {
         .append('text')
         .attr('class','text-history')
         .attr('x', 3)
-        .attr('y', (d)=> {return (d.tentative*(height_pin-10))+15})
+        .attr('y', (d)=> {return (d.tentative*(height_pin))+15})
         //.text((d)=> {return d.dataset})
 
         text.append("tspan")

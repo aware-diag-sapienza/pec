@@ -45,22 +45,22 @@ system.linechart = (function() {
                 this.labelYAxis = "inertia"
                 break;
             case 'HGPA-PecK':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisFirstLevel = "progessiveMetrics"
                 this.attributeYAxisSecondLevel = "adjustedRandScore"
                 this.labelYAxis = "adjustedRandScore"
                 break;
             case 'HGPA-PecK++':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisFirstLevel = "progessiveMetrics"
                 this.attributeYAxisSecondLevel = "adjustedRandScore"
                 this.labelYAxis = "adjustedRandScore"
                 break;
             case 'MCLA-PecK':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisFirstLevel = "progessiveMetrics"
                 this.attributeYAxisSecondLevel = "adjustedRandScore"
                 this.labelYAxis = "adjustedRandScore"
                 break
             case 'MCLA-PecK++':
-                this.attributeYAxisFirstLevel = "progressiveMetrics"
+                this.attributeYAxisFirstLevel = "progessiveMetrics"
                 this.attributeYAxisSecondLevel = "adjustedRandScore"
                 this.labelYAxis = "adjustedRandScore"
                 break;
@@ -136,11 +136,12 @@ system.linechart = (function() {
                 if(this.lastObj['metrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
+                    console.log('ALESSIA SUSHI',obj)
                     //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.final_ars);
+                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progessiveMetrics.adjustedRandScore);
                     // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 
                     // ALESSIA qui update della matrice 2
-                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,data_matrix.runs_ars_matrix,data_matrix.runs_ami_matrix);
+                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics.adjustedRandScore,obj.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 }
             }
         })

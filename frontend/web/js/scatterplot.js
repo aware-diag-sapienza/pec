@@ -161,12 +161,6 @@ this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 }
 
 function plotCoordsKonva(numberPoints, col, useScale,labels) {
-
-  //const labels = Array.from({length: numberPoints}, () => Math.floor((Math.random()*numberPoints)%10));
-
-  console.log('nodes', nodes, 'start_computation',that.start_computation)
-  console.log('numberPoints',numberPoints, 'col',col, 'useScale',useScale,'labels',labels)
-  console.log('ALESSIA SUSHI ',that.coordData)
   // first time create the points
   const kWidth = stage.width();
   const kHeight = stage.height();
@@ -174,11 +168,10 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
   if (nodes.length === 0) {
     setupTooltip();
     for (let i = 0; i < that.tot_rows; i++) {
-      //console.log(i,coordData[i])
       if (useScale){ // se ho la scala di visualizzazione
         const xcoord = Math.round((that.scale_x(that.coordData[i][0])))//[i*2]))) // * (kWidth -10));
         const ycoord = Math.round((that.scale_y(that.coordData[i][1])))//[i*2+1]))) //* (kHeight -10));
-        console.log('ALESSIA X,Y ',xcoord,ycoord)
+        
         let colorlabel
         if(that.first_iteration){
           colorlabel = col
@@ -297,18 +290,17 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       
       
       that.coordData = dataset_projection
-      system.scatterplotFixed.coordData= that.dataset_projection
+      system.scatterplotFixed.coordData= dataset_projection
       if(that.first_iteration){
 
         // capire se togliere questo IF
         if (numOfFeatures == 2){
-          console.log('that.tot_rows num of features',that.tot_rows)
+          
         for (let i = 0; i<that.tot_rows; i++) {
 
           //let e = await it.next()
           
           let array0 = dataset_projection[i]
-          //console.log('arr_0',array0)
           first_feature.push(+array0[0])
           second_feature.push(+array0[1])
           xs = xs.concat(array0)
@@ -321,8 +313,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
         .domain([d3.min(second_feature), d3.max(second_feature)])
         .range([10, stage.height()-10]);
 
-        console.log('ALESSIA SCALE X', that.scale_x.domain(), that.scale_x.range())
-        console.log('ALESSIA SCALE Y', that.scale_y.domain(), that.scale_y.range())
+     
     
         
         plotCoordsKonva(that.tot_rows, '#b3b3b3',true,dataIteration);
@@ -527,7 +518,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       const y  = e.clientY - plotCtx.canvas.offsetTop;
       const digitIndex = this.plotDigitIndex[y * plotCanv.width + x];
       if (digitIndex >= 1) {
-        console.log(`digit idx: ${digitIndex}, label: ${labelSet[digitIndex]}`);
+        
         const labelEl = document.getElementById('sampId');
         labelEl.innerText = labelSet[digitIndex];
       }

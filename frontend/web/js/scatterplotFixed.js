@@ -158,13 +158,14 @@ function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labe
   that.scale_y =  d3.scaleLinear()
   .domain(system.scatterplot.scale_y.domain())
   .range([10, stage.height()-10]);
-}
+  
+  }
 
   
 
   //labels = Array.from({length: numberPoints}, () => Math.floor((Math.random()*numberPoints)%10));
 
-  console.log('--> inizio a disegnare ',that.coordData)
+  
   // first time create the points
   const kWidth = stage.width();
   const kHeight = stage.height();
@@ -177,8 +178,8 @@ function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labe
       let  colorlabel;
       //console.log(i,coordData[i])
       if (useScale){
-        const xcoord = Math.round((that.scale_x(that.coordData[i*2]))) //* (kWidth - 1));
-        const ycoord = Math.round((that.scale_y(that.coordData[i*2 + 1]))) //* (kHeight - 1));
+        const xcoord = Math.round((that.scale_x(that.coordData[i][0]))) //* (kWidth - 1));
+        const ycoord = Math.round((that.scale_y(that.coordData[i][1]))) //* (kHeight - 1));
         if(useColor){
           colorlabel= that.scale_color[labels[i]];
         } else {
@@ -196,8 +197,8 @@ function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labe
         layer.add(node);
         nodes.push(node);
       } else {
-      const xcoord = Math.round((that.coordData[i*2]) * (kWidth - 10));
-      const ycoord = Math.round((that.coordData[i*2 + 1]) * (kHeight - 10));
+      const xcoord = Math.round((that.coordData[i][0]) * (kWidth - 10));
+      const ycoord = Math.round((that.coordData[i][1]) * (kHeight - 10));
       if(useColor){
         colorlabel= that.scale_color[labels[i]];
       } else {

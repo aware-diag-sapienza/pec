@@ -43,8 +43,8 @@ system.matrixAdjacencyFixed = (function() {
     this.updateMatrixplotEarlyTermination= (partitions,decision_ars,decision_ami)=> {
 
       if ( this.early_termination == null){
-        let runs_ars_matrix = data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
-        let runs_ami_matrix = data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
+        let runs_ars_matrix =decision_ars //data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
+        let runs_ami_matrix =decision_ami//data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
        system.matrixAdjacencyFixed.createAdjacencyMatrix(partitions,runs_ars_matrix,runs_ami_matrix)
         this.early_termination = true;
     
@@ -54,8 +54,8 @@ system.matrixAdjacencyFixed = (function() {
 
     this.adjacency = (partitions,decision_ars,decision_ami) => {
       //console.log("Partition",partitions,'ARSMATRIX',decision_ars,'AMIMATRIX',decision_ami)
-      let runs_ars_matrix = data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
-      let runs_ami_matrix = data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
+      let runs_ars_matrix = decision_ars//data.info.runs_ars_matrix//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
+      let runs_ami_matrix = decision_ami//data.info.runs_ami_matrix//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
       system.matrixAdjacencyFixed.createAdjacencyMatrix(partitions,runs_ars_matrix,runs_ami_matrix)
     }
     
