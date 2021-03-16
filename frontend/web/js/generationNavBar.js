@@ -136,21 +136,6 @@ async function startSelects(){
     }
 }
 
-// questa non pen so che serva più
-/*async function startIterations(){
-    console.log(dataset)
-    if(dataset == $( "#select-dataset" ).val()){
-        readFile(1);
-        
-        d3.select('#iteration-label').html("")
-        d3.select('#information-info').html("Early Termination")
-        addPinHistory()
-    } else {
-        alert("Click START")
-    }
-
-    
-}*/
 
 let timestamp0;
 

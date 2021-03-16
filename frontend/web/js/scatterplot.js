@@ -166,6 +166,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
 
   console.log('nodes', nodes, 'start_computation',that.start_computation)
   console.log('numberPoints',numberPoints, 'col',col, 'useScale',useScale,'labels',labels)
+  console.log('ALESSIA SUSHI ',that.coordData)
   // first time create the points
   const kWidth = stage.width();
   const kHeight = stage.height();
@@ -175,8 +176,9 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
     for (let i = 0; i < that.tot_rows; i++) {
       //console.log(i,coordData[i])
       if (useScale){ // se ho la scala di visualizzazione
-        const xcoord = Math.round((that.scale_x(that.coordData[i*2]))) // * (kWidth -10));
-        const ycoord = Math.round((that.scale_y(that.coordData[i*2+1]))) //* (kHeight -10));
+        const xcoord = Math.round((that.scale_x(that.coordData[i][0])))//[i*2]))) // * (kWidth -10));
+        const ycoord = Math.round((that.scale_y(that.coordData[i][1])))//[i*2+1]))) //* (kHeight -10));
+        console.log('ALESSIA X,Y ',xcoord,ycoord)
         let colorlabel
         if(that.first_iteration){
           colorlabel = col
@@ -196,6 +198,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       } else {
       const xcoord = Math.round((that.coordData[i*2]) * (kWidth - 10));
       const ycoord = Math.round((that.coordData[i*2 + 1]) * (kHeight - 10));
+      
       let colorlabel
         if(that.first_iteration){
           colorlabel = col
@@ -278,8 +281,8 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       
       })*/
       
-      that.tot_rows = dataset_projection//= await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)}) // ALESSIAAAAA QUI VA IL LINK VECCHIO
-      console.log('that_rows',that.tot_rows)
+      that.tot_rows = dataset_projection.length//= await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)}) // ALESSIAAAAA QUI VA IL LINK VECCHIO
+     
       system.scatterplotFixed.tot_rows = that.tot_rows//await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)});
       let dataIteration= labelIteration//await d3.json(dataIterationURL).then((data)=> {return data})
       
@@ -291,23 +294,23 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
       let first_feature = []
       let second_feature = []
      
-      console.log('that.datasetComputed',that.datasetComputed,that.first_iteration)
       
-      that.coordData = that.tot_rows
-      system.scatterplotFixed.coordData= that.tot_rows
+      
+      that.coordData = that.dataset_projection
+      system.scatterplotFixed.coordData= that.dataset_projection
       if(that.first_iteration){
 
         // capire se togliere questo IF
         if (numOfFeatures == 2){
-          console.log('that.tot_rows',that.tot_rows)
+          console.log('that.tot_rows num of features',that.tot_rows)
         for (let i = 0; i<that.tot_rows; i++) {
 
-          let e = await it.next()
+          //let e = await it.next()
           
-          let array0 = e.value[0]
+          let array0 = dataset_projection[i]
           console.log('arr_0',array0)
-          first_feature.push(e.value[0][0])
-          second_feature.push(e.value[0][1])
+          first_feature.push(+array0[0])
+          second_feature.push(+array0[1])
           xs = xs.concat(array0)
        }
         that.scale_x = d3.scaleLinear()
@@ -317,20 +320,23 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
         that.scale_y = d3.scaleLinear()
         .domain([d3.min(second_feature), d3.max(second_feature)])
         .range([10, stage.height()-10]);
+
+        console.log('ALESSIA SCALE X', that.scale_x.domain(), that.scale_x.range())
+        console.log('ALESSIA SCALE Y', that.scale_y.domain(), that.scale_y.range())
     
         
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,dataIteration.labels);
-        system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,dataIteration.labels);//useScale,useColor, scaleX,ScaleY
-        } else {
-          plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration.labels);
-        system.scatterplotFixed.updateScatterplot(false,false, that.scale_x,that.scale_y,dataIteration.labels);//useScale,useColor, scaleX,ScaleY
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,dataIteration);
+        system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,dataIteration);//useScale,useColor, scaleX,ScaleY
+      } else {
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration);
+      system.scatterplotFixed.updateScatterplot(false,false, that.scale_x,that.scale_y,dataIteration);//useScale,useColor, scaleX,ScaleY
       
 
         }
         that.first_iteration = false
       } else {
       
-      plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration.labels); // qui bisogna mettere il ciclo per il numero di features
+      plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration); // qui bisogna mettere il ciclo per il numero di features
     
 
      
