@@ -188,4 +188,15 @@ fill: #41A368;
   margin-right: 10px;
 }
 
+.timeline-checkbox-active{
+  fill:#000;
+  stroke-width:3;
+  stroke: #000;
+}
+
+.timeline-checkbox-disable{
+  fill:#fff;
+  stroke-width:3;
+  stroke: #6C757D;
+}
 

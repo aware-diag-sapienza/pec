@@ -6,6 +6,7 @@
     <title>Progressive Ensemble Clustering</title>
     <link rel="stylesheet" type="text/css" href="./web/css/style.css" />
     <link rel="stylesheet" href="./web/css/vendor/font-awesome-4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretty-checkbox@3.0/dist/pretty-checkbox.min.css">
     
 
     <!-- CSS -->
@@ -54,6 +55,7 @@
           <button id="stop-button" type="button" class="btn btn-outline-dark" onclick="stopSelects()"><i class="fa fa-stop" aria-hidden="true"></i>
           </button>   </div>
         </div>
+
         
         
 
@@ -146,7 +148,12 @@
       <div class="item-scatterplot-1 scatter" id="id-scatterplot-1"></div>
       <div class="item-matrix-1" id ="id-matrix-1"></div>  
       <div class="item-linechart-1" id="linechart_inertia" ></div>
-      <div class="item-timeline-partitions" id="timeline-partitions" ></div>
+      <div class="item-timeline-partitions" id="timeline-partitions" >
+        <input type="radio" id="inertia" name="metric-timeline" value="inertia" onclick="system.timelinepartitions.updateMetricValue()" checked>
+<label for="inertia">inertia</label>
+<input type="radio" id="simplifiedSilhouette" name="metric-timeline" value="simplifiedSilhouette" onclick="system.timelinepartitions.updateMetricValue()">
+<label for="simplifiedSilhouette">labeling</label>
+      </div>
       <div class="item-information"><p id='information-info'></p></div>
       <div class="item-scatterplot-2 scatter" id="id-scatterplot-2"></div>
       <div class="item-matrix-2" id ="id-matrix-2"><!--<svg id="my_dataviz3" height=700 width=300></svg>--></div>
@@ -207,6 +214,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/1.1.0/d3-legend.js"></script>
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
 
 <script src="https://unpkg.com/popper.js@1"></script>
 <script src="https://unpkg.com/tippy.js@5"></script>
