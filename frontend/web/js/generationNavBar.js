@@ -138,13 +138,12 @@ async function startSelects(){
         job.onPartialResult(result => {
             ALL_DATA.push(result)
             if(result.iteration == 0){
-                system.scatterplot.createData(DATASET_SELECTED.projections[projection], result.labels)
                 LockUI.unlock()
+                system.scatterplot.createData(DATASET_SELECTED.projections[projection], result.labels)
             }
             readResult(result)
             d3.select('#iteration-label').html("Iteration " + result.iteration)
         })
-
         job.start()
 
         
