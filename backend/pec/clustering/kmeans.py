@@ -3,6 +3,7 @@ import time
 import numpy as np
 from multiprocessing import Process
 
+from ..metrics import ClusteringMetrics
 from ..utils import best_labels_dtype
 from ..events import IterationResultEvent, Ack
 from .__sklearn_kmeans import KMeans
@@ -44,7 +45,8 @@ class InertiaBased_ProgressiveKMeansRun(Process):
                 run_id = self.id,
                 iteration = r.iteration,
                 iteration_duration = r.duration,
-                is_last = r.is_last
+                is_last = r.is_last,
+                inertia = ClusteringMetrics.inertia(labels)
             )
             self.results_queue.put(it_event)
             if not r.is_last:

@@ -25,7 +25,7 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 class JsonWebSocketServer:
-    def __init__(self, port, host="0.0.0.0"):
+    def __init__(self, port, host="0.0.0.0", fn_onMessage=None, fn_onRequest=None):
         self.port = port
         self.host = host
         self.__server = WebsocketServer(self.port, host=self.host)
@@ -34,6 +34,9 @@ class JsonWebSocketServer:
         self.__server.set_fn_message_received(self.__fnMmessageReceived)	
         self.__sentCounter = 0
         self.__recievedCounter = 0
+
+        self.__fn_onMessage = fn_onMessage if fn_onMessage is not None else self.onMessage
+        self.__fn_onRequest = fn_onRequest if fn_onRequest is not None else self.onRequest
 
 
     def __fnNewClient(self, client, server):
@@ -47,9 +50,9 @@ class JsonWebSocketServer:
         obj = json.loads(message)
         #print(f"Incoming message: {obj}")
         if obj["type"] == "M":
-            self.onMessage(client, obj["id"], obj["body"])
+            self.__fn_onMessage(client, obj["id"], obj["body"])
         elif obj["type"] == "R":
-            self.onRequest(client, obj["id"], obj["body"])
+            self.__fn_onRequest(client, obj["id"], obj["body"])
         elif obj["type"] == "RR":
             pass
         else:
