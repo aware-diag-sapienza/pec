@@ -95,7 +95,7 @@ function getSeed(){
 }
 
 async function startSelects(){
-
+    LockUI.lock()
     ALL_DATA = []
 
     ITERAZIONE_PER_MATRICE = 1
@@ -133,25 +133,20 @@ async function startSelects(){
         
 
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
+        JOBS.push(job)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         job.onPartialResult(result => {
             ALL_DATA.push(result)
-            if (result.iteration == 1){
-                console.log('sono qui dentro ALESSIA')
+            if(result.iteration == 0){
                 system.scatterplot.createData(DATASET_SELECTED.projections[projection], result.labels)
+                LockUI.unlock()
             }
-
-            if (result.iteration >= 1){
-                // sono alla prima iterazione e devo creare il lo scatterplot.             
-                readResult(result)
-                
-                //d3.select('#information-info').html("Early Termination")
-                
-            }
+            readResult(result)
             d3.select('#iteration-label').html("Iteration " + result.iteration)
         })
 
         job.start()
+
         
         addPinHistory()
     } else {
