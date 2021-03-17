@@ -97,12 +97,14 @@
             <i class="fa fa-fast-forward"></i>RUN</button> <label></label></div>
       </div>
       <div class="item-dropdown-metrics">
-        <label>Linechart metric </label>
-        <div class="select-menu">
+        <label class="linechart_select" >Linechart metric </label>
+        <div class="linechart_select select-menu">
           <select class="form-select form-select-sm" id="select-variableYAxis-linechart" onchange="onChangeVariableYAxisLinechart()">
             <option value="default">intertia/adjustedRandScore</option>
             <option value="simplifiedSilhouette">simplified Silhouette</option>
-            <option value="globalStability">global stability</option>
+            <option value="globalStability0">globalStability0</option>
+            <option value="globalStability1">globalStability1</option>
+            <option value="globalStability2">globalStability2</option>
           </select>
         </div>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="button-metric" onclick="visualizeMetricsFunction()">METRICS</button>
@@ -209,6 +211,7 @@
 
 
 <script src="https://d3js.org/d3.v6.min.js"></script>
+<script src="https://d3js.org/d3-collection.v1.min.js"></script>
 <script src="https://d3js.org/d3-selection-multi.v0.4.min.js"></script>
 <script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
@@ -229,6 +232,7 @@
 <script src="./web/js/generationNavBar.js"></script>
 <script src="./web/js/main.js"></script>
 <script src="./PECServer.js"></script>
+<script src="./web/js/LockUI.js"></script>
 
 
 
@@ -238,14 +242,17 @@
     let LIST;
     let DATASET_SELECTED;
     let ALL_DATA;
+    let JOBS = [];
     
     
     async function test(){
+      LockUI.lock()
       console.log('inizio a connettermi')
       SERVER = await PECServer('ws://localhost:6789')
       LIST = await SERVER.getDatasetsInfo();
       console.log(LIST)
       updateSelects(LIST);
+      LockUI.unlock()
     }
 
     test();

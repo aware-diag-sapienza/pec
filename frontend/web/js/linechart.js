@@ -111,10 +111,18 @@ system.linechart = (function() {
             this.attributeYAxisSecondLevel = "simplifiedSilhouette"
             this.labelYAxis = "simplifiedSilhouette"
         }
-        else if(variableYAxisLinechart == "globalStability"){
-            this.attributeYAxisFirstLevel = "labelsMetrics"
-            this.attributeYAxisSecondLevel = "simplifiedSilhouette"
-            this.labelYAxis = "simplifiedSilhouette"
+        else if(variableYAxisLinechart == "globalStability0"){
+            this.attributeYAxisFirstLevel = "progressiveMetrics"
+            this.attributeYAxisSecondLevel = "globalStability0"
+            this.labelYAxis = "globalStability0"
+        }else if(variableYAxisLinechart == "globalStability1"){
+            this.attributeYAxisFirstLevel = "progressiveMetrics"
+            this.attributeYAxisSecondLevel = "globalStability1"
+            this.labelYAxis = "globalStability1"
+        }else if(variableYAxisLinechart == "globalStability2"){
+            this.attributeYAxisFirstLevel = "progressiveMetrics"
+            this.attributeYAxisSecondLevel = "globalStability2"
+            this.labelYAxis = "globalStability2"
         }
         
     }

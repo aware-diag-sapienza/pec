@@ -10,7 +10,7 @@ class Event(Bunch):
 
 
 class IterationResultEvent(Event):
-    def __init__(self, timestamp=None, run_id=None, iteration=None, iteration_duration=None, is_last=None, **kwargs):
+    def __init__(self, timestamp=None, run_id=None, iteration=None, iteration_duration=None, is_last=None, inertia=None, **kwargs):
         super().__init__(
             "IterationResultEvent",
             timestamp = timestamp,
@@ -18,6 +18,7 @@ class IterationResultEvent(Event):
             iteration = iteration,
             iteration_duration = iteration_duration,
             is_last = is_last,
+            inertia = inertia,
             **kwargs
         )
 

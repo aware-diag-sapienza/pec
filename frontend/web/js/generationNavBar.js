@@ -95,7 +95,7 @@ function getSeed(){
 }
 
 async function startSelects(){
-
+    LockUI.lock()
     ALL_DATA = []
 
     ITERAZIONE_PER_MATRICE = 1
@@ -133,25 +133,19 @@ async function startSelects(){
         
 
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
+        JOBS.push(job)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         job.onPartialResult(result => {
             ALL_DATA.push(result)
-            if (result.iteration == 1){
-                console.log('sono qui dentro ALESSIA')
+            if(result.iteration == 0){
+                LockUI.unlock()
                 system.scatterplot.createData(DATASET_SELECTED.projections[projection], result.labels)
             }
-
-            if (result.iteration >= 1){
-                // sono alla prima iterazione e devo creare il lo scatterplot.             
-                readResult(result)
-                
-                //d3.select('#information-info').html("Early Termination")
-                
-            }
+            readResult(result)
             d3.select('#iteration-label').html("Iteration " + result.iteration)
         })
-
         job.start()
+
         
         addPinHistory()
     } else {
@@ -176,6 +170,7 @@ function readResult(it_res){
     console.log('SONO ALL\'iTERAZIONE  ',it_res.iteration)
     
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
+    d3.selectAll('.linechart_select').style('display','block')
     d3.select('#button-metric').style('display','block')
     d3.select('#id-metrics').style('display','block')
         console.log('ALESSIA',it_res.iteration, it_res.iteration == 1,it_res.iteration === 1)
