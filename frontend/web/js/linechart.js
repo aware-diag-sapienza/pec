@@ -159,7 +159,7 @@ system.linechart = (function() {
                     d["iteration"] = this.lastObj.iteration
                     console.log('ALESSIA SUSHI',obj)
                     //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progessiveMetrics.adjustedRandScore);
+                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
                     // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 
                     // ALESSIA qui update della matrice 2
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics.adjustedRandScore,obj.metrics.partitionsMetrics.adjustedMutualInfoScore);
