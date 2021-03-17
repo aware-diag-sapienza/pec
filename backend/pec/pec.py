@@ -309,12 +309,17 @@ class ProgressiveEnsembleClustering:
         
         def fn_min_labelsMetricHistory(m): return np.min([h.labelsMetrics[m] for h in history])
         def fn_max_labelsMetricHistory(m): return np.max([h.labelsMetrics[m] for h in history])
-        def gradient(m): return progessiveMetrics[m] - history[-1].progessiveMetrics[m]
+        def gradient(m): return progressiveMetrics[m] - history[-1].progressiveMetrics[m]
         firstIteration = prevResult is None
-        progessiveMetrics = {
+        progressiveMetrics = {
             "entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(currentResult.labels, prevResult.labels),
             "entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability2(currentResult.labels, prevResult.labels),
             "clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(currentResult.labels, prevResult.labels),
+            
+            "globalStability0": 0 if firstIteration else np.mean(ClusteringMetrics.clusters_stability(currentResult.labels, prevResult.labels)),
+            "globalStability1": 0 if firstIteration else np.mean(ClusteringMetrics.entries_stability1(currentResult.labels, prevResult.labels)),
+            "globalStability2": 0 if firstIteration else np.mean(ClusteringMetrics.entries_stability2(currentResult.labels, prevResult.labels)),
+            
             "inertia_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("inertia") - labelsMetrics["inertia"]) / fn_max_labelsMetricHistory("inertia"),
             "dbIndex_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("dbIndex") - labelsMetrics["dbIndex"]) / fn_max_labelsMetricHistory("dbIndex"),
             "dunnIndex_improvement": 0 if firstIteration else (labelsMetrics["dunnIndex"] - fn_min_labelsMetricHistory("dunnIndex")) / fn_min_labelsMetricHistory("dunnIndex"),
@@ -324,22 +329,22 @@ class ProgressiveEnsembleClustering:
             "adjustedMutualInfoScore": 0 if firstIteration else ClusteringMetrics.adjusted_mutual_info_score(currentResult.labels, prevResult.labels)
         }
         # compute gradients
-        for key in list(progessiveMetrics.keys()):
+        for key in list(progressiveMetrics.keys()):
             if "Stability" in key: continue
-            if prevResult is not None: progessiveMetrics[f"{key}Gradient"] = gradient(key)
+            if prevResult is not None: progressiveMetrics[f"{key}Gradient"] = gradient(key)
 
         earlyTermination = {
             "slow": False,
             "fast": False
         }
         if not firstIteration:
-            if progessiveMetrics["inertia_improvementGradient"] < 1e-4 or prevResult.metrics.earlyTermination["fast"]:
+            if progressiveMetrics["inertia_improvementGradient"] < 1e-4 or prevResult.metrics.earlyTermination["fast"]:
                 earlyTermination["fast"] = True
-            if progessiveMetrics["inertia_improvementGradient"] < 1e-5 or prevResult.metrics.earlyTermination["slow"]:
+            if progressiveMetrics["inertia_improvementGradient"] < 1e-5 or prevResult.metrics.earlyTermination["slow"]:
                 earlyTermination["slow"] = True
    
    
-        currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progessiveMetrics=progessiveMetrics, earlyTermination=earlyTermination)
+        currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progressiveMetrics=progressiveMetrics, earlyTermination=earlyTermination)
         return currentResult
 
 
