@@ -2,6 +2,7 @@ import json
 import time
 import numpy as np
 from .websocket_server_lib import WebsocketServer
+from ...log import Log
 
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
@@ -28,6 +29,7 @@ class JsonWebSocketServer:
     def __init__(self, port, host="0.0.0.0", fn_onMessage=None, fn_onRequest=None):
         self.port = port
         self.host = host
+        self.__clients = {}
         self.__server = WebsocketServer(self.port, host=self.host)
         self.__server.set_fn_new_client(self.__fnNewClient)
         self.__server.set_fn_client_left(self.__fnClientLeft)	
@@ -40,19 +42,21 @@ class JsonWebSocketServer:
 
 
     def __fnNewClient(self, client, server):
-        print(f"Client connected: {client}")
+        Log.print(f"Client connected: {client['id']}@{client['address'][0]}:{client['address'][1]}")
+        self.__clients[client["id"]] = client
     
     def __fnClientLeft(self, client, server):
-        print(f"Client disconnected: {client}")
+        Log.print(f"Client disconnected: {client['id']}@{client['address'][0]}:{client['address'][1]}")
+        del self.__clients[client["id"]]
 
     def __fnMmessageReceived(self, client, server, message):
         self.__recievedCounter += 1
         obj = json.loads(message)
         #print(f"Incoming message: {obj}")
         if obj["type"] == "M":
-            self.__fn_onMessage(client, obj["id"], obj["body"])
+            self.__fn_onMessage(client["id"], obj["id"], obj["body"])
         elif obj["type"] == "R":
-            self.__fn_onRequest(client, obj["id"], obj["body"])
+            self.__fn_onRequest(client["id"], obj["id"], obj["body"])
         elif obj["type"] == "RR":
             pass
         else:
@@ -76,16 +80,19 @@ class JsonWebSocketServer:
 
 
     def sendMessage(self, client, data):
+        c = client if not isinstance(client, int) else self.__clients[client]
         messageId, messageString = self.__encodeOutgoingMessage("M", data)
-        self.__server.send_message(client, messageString)
+        self.__server.send_message(c, messageString)
 
     def sendRequest(self, client, data):
+        c = client if not isinstance(client, int) else self.__clients[client]
         messageId, messageString = self.__encodeOutgoingMessage("R", data)
-        self.__server.send_message(client, messageString)
+        self.__server.send_message(c, messageString)
 
     def sendRequestResponse(self, client, requestId, data):
+        c = client if not isinstance(client, int) else self.__clients[client]
         messageId, messageString = self.__encodeOutgoingMessage("RR", data, requestId=requestId)
-        self.__server.send_message(client, messageString)
+        self.__server.send_message(c, messageString)
 
     def onMessage(self, client, messageId, message):
         pass

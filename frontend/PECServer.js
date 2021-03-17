@@ -144,6 +144,15 @@ class __PECServer {
     this.ws.sendMessage(`startJob:${id}`)
   }
 
+  __pauseJob (id) {
+    this.ws.sendMessage(`pauseJob:${id}`)
+  }
+
+  __resumeJob (id) {
+    console.log("send resume")
+    this.ws.sendMessage(`resumeJob:${id}`)
+  }
+
   __stopJob (id) {
     this.ws.sendMessage(`stopJob:${id}`)
   }
@@ -176,23 +185,13 @@ class AsyncPECJob {
     
     this.status = null // running, paused, stopped, completed
     this.results = []
-    this.__resultsQueue = []
   }
 
   __addPartialResult (pr) {
-    this.__resultsQueue.push(pr)
+    this.results.push(pr)
+    this.__onPartialResultCallback(pr)
     
-    if(this.status == 'running') {
-      if(pr.isLast) this.status = 'completed'
-      this.results.push(pr)
-      this.__onPartialResultCallback(pr)
-    }
-    else if(this.status == 'paused') {
-
-    } 
-    else if(this.status == 'stopped') {
-
-    }
+    
   }
 
   start () {
@@ -203,20 +202,33 @@ class AsyncPECJob {
       if(this.status == 'running') console.warn('The job is already running')
       else if (this.status == 'stopped') console.warn('The job has been stopped')
       else if (this.status == 'completed') console.warn('The job is completed')
-      else if (this.status == 'paused') {} //resume TODO
+      else if (this.status == 'paused') this.__ws.__resumeJob(this.id)
     }
     return this
   }
 
   pause(){
     if (this.status === 'running'){ //pause the job
-      //TODO
+      this.status = 'paused'
+      this.__ws.__pauseJob(this.id)
     } else {  // the job is not running
       if (this.status == 'stopped') console.warn('The job has been stopped')
       else if (this.status == 'completed') console.warn('The job is completed')
-      else if (this.status == 'paused') console.warn('The job is paused')
+      else if (this.status == 'paused') console.warn('The job is already paused')
     }
     return this 
+  }
+
+  resume () {
+    if (this.status === 'paused'){ // start the job
+      this.status = 'running'
+      this.__ws.__resumeJob(this.id)
+    } else { // the job has been started, check if is in pause or stopped
+      if(this.status == 'running') console.warn('The job is already running')
+      else if (this.status == 'stopped') console.warn('The job has been stopped')
+      else if (this.status == 'completed') console.warn('The job is completed')
+    }
+    return this
   }
 
   stop () { /// ANCORA  NON FUNZIONA

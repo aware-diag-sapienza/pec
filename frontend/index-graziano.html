@@ -53,6 +53,14 @@
       */
       job.onPartialResult(result => {
         console.log(result)
+        if(result.iteration == 1){
+          //pasue
+          job.pause()
+          setTimeout(() => {
+            // resume after 3 sec
+            job.start()}, 3000)
+        } 
+        if(result.iteration == 3) job.stop()
       })
 
       //avvio il job

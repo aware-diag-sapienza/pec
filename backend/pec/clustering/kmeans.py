@@ -46,7 +46,7 @@ class InertiaBased_ProgressiveKMeansRun(Process):
                 iteration = r.iteration,
                 iteration_duration = r.duration,
                 is_last = r.is_last,
-                inertia = ClusteringMetrics.inertia(labels)
+                inertia = ClusteringMetrics.inertia(data, labels)
             )
             self.results_queue.put(it_event)
             if not r.is_last:
