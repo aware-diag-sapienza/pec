@@ -8,6 +8,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     port = args.port if args.port is not None else defaultPort
-    print(f"Starting PEC Server on address ws://0.0.0.0:{port}")
     server = PECServer(port)
-    server.run()
+    server.start()
