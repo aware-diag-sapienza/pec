@@ -107,6 +107,10 @@ body {
     display:none;
   }
 
+  .linechart_select{
+    display:none;
+  }
+
   .grid-container{
     display: grid;
    

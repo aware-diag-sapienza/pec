@@ -176,6 +176,7 @@ function readResult(it_res){
     console.log('SONO ALL\'iTERAZIONE  ',it_res.iteration)
     
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
+    d3.selectAll('.linechart_select').style('display','block')
     d3.select('#button-metric').style('display','block')
     d3.select('#id-metrics').style('display','block')
         console.log('ALESSIA',it_res.iteration, it_res.iteration == 1,it_res.iteration === 1)
