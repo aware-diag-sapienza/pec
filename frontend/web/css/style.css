@@ -60,6 +60,16 @@ body {
     grid-area: tabbar;
   }
 
+  .item-information-linechart{
+    grid-area: infolinechart;
+    padding-top: 5px;
+  }
+  
+  .item-information-scatterplot-1{
+    grid-area: infoscatterplot1;
+  }
+
+
   .item-navbar{
     grid-area: navigation;
     display: flex;
@@ -129,12 +139,12 @@ body {
     margin-left: 0;
     margin-right: 0;
     grid-template-columns: 7vw 33vw 24vw 35vw ;
-    grid-template-rows: 7vh 5vh 41vh 4vh 41vh;
+    grid-template-rows: 7vh 4vh 42vh 4vh 42vh;
     grid-template-areas: 
       "navigation navigation navigation navigation"
-      "iteration scatterplot-1 matrix-1 dropdownmetrics"
+      "iteration infoscatterplot1 metrics dropdownmetrics"
       "history scatterplot-1 matrix-1 linechart-1"
-      "history information information information"
+      "history information information infolinechart"
       "history scatterplot-2 matrix-2 partitions"
   }
 

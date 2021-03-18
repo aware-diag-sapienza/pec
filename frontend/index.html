@@ -54,7 +54,7 @@
           </button>
           <button id="stop-button" type="button" class="btn btn-outline-dark" onclick="stopSelects()"><i class="fa fa-stop" aria-hidden="true"></i>
           </button>   </div>
-        </div>
+        </div>    
         
         <label>Seed</label>
         <div class=".select-menu">
@@ -114,6 +114,25 @@
             <option value="globalStability2">globalStability2</option>
           </select>
         </div>
+      </div>
+      <div class="item-history" id="listhistory"></div>
+      <div class="item-information-scatterplot-1" id="info-scatterplot-1"></div>
+      <div class="item-scatterplot-1 scatter" id="id-scatterplot-1"></div>
+      <div class="item-matrix-1" id ="id-matrix-1"></div>  
+      <div class="item-linechart-1" id="linechart_inertia">
+        </div>
+      <div class="item-information-linechart" id="information-linechart" >
+        TIMELINE METRICS: 
+        <input type="radio" id="inertia" name="metric-timeline" value="inertia" onclick="system.timelinepartitions.updateMetricValue()" checked>
+        <label for="inertia">inertia</label>
+        <input type="radio" id="simplifiedSilhouette" name="metric-timeline" value="simplifiedSilhouette" onclick="system.timelinepartitions.updateMetricValue()">
+        <label for="simplifiedSilhouette">labeling</label>
+      </div>
+      <div class="item-timeline-partitions" id="timeline-partitions"></div>
+      <div class="item-information"><p id='information-info'></p></div>
+      <div class="item-scatterplot-2 scatter" id="id-scatterplot-2"></div>
+      <div class="item-matrix-2" id ="id-matrix-2"><!--<svg id="my_dataviz3" height=700 width=300></svg>--></div>
+      <div class="item-metrics" id ="id-metrics">
         <button type="button" class="btn btn-outline-secondary btn-sm" id="button-metric" onclick="visualizeMetricsFunction()">METRICS</button>
         <div class="metrics-dropdown">
         <table class="table table-hover" id="table-metrics">
@@ -152,23 +171,6 @@
             </tr>
           </tbody>
         </table></div>
-      </div>
-      <div class="item-history" id="listhistory"></div>
-      <div class="item-scatterplot-1 scatter" id="id-scatterplot-1"></div>
-      <div class="item-matrix-1" id ="id-matrix-1"></div>  
-      <div class="item-linechart-1" id="linechart_inertia" ></div>
-      <div class="item-timeline-partitions" id="timeline-partitions" >
-        <input type="radio" id="inertia" name="metric-timeline" value="inertia" onclick="system.timelinepartitions.updateMetricValue()" checked>
-<label for="inertia">inertia</label>
-<input type="radio" id="simplifiedSilhouette" name="metric-timeline" value="simplifiedSilhouette" onclick="system.timelinepartitions.updateMetricValue()">
-<label for="simplifiedSilhouette">labeling</label>
-      </div>
-      <div class="item-information"><p id='information-info'></p></div>
-      <div class="item-scatterplot-2 scatter" id="id-scatterplot-2"></div>
-      <div class="item-matrix-2" id ="id-matrix-2"><!--<svg id="my_dataviz3" height=700 width=300></svg>--></div>
-      <div class="item-metrics" id ="id-metrics">
-        
-        
       </div> 
          
 
