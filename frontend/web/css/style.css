@@ -73,6 +73,14 @@ body {
     padding:5px;
   }
 
+  .select-menu-input{
+    display: flex;
+    flex-direction: column;
+    height: 40px !important ;
+    padding:5px !important;
+    width: 100px!important;
+  }
+
   .select-button{
     line-height: 3.5vh;
   }

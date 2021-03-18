@@ -26,9 +26,11 @@ system.timelinepartitions = (function() {
     this.partitions_status = null
     this.metric_value = null
     this.labelYAxis = 'partitions'
-    this.MAX_INERTIA = null
-    this.MIN_INERTIA = null
+    this.DOMAINS = null
+    this.MAX_METRIC = null
+    this.MIN_METRIC = null
     this.METRICA_LABELING = 'simplifiedSilhouette';
+    this.ITERATION_LAST = null
 
     
     this.init = (idDiv, tech, numPart) => {
@@ -45,6 +47,11 @@ system.timelinepartitions = (function() {
         this.matrix_cell_size = (d3.min([this.matrix_width,this.matrix_height])-this.margin_matrix.top)/partitions
         this.partitions_status=Array.from({length:partitions},(_,i)=> [0,'P'+i,true])
         this.metric_value = $('input[name="metric-timeline"]:checked').val();
+
+        
+        this.DOMAINS = {inertia: [0,0], simplifiedSilhouette: [-1,1]}
+        
+        console.log(' this.DOMAINS ',this.DOMAINS)
         
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
@@ -61,14 +68,22 @@ system.timelinepartitions = (function() {
     this.setData = (data) => {
         this.data = data
         this.metric_value = $('input[name="metric-timeline"]:checked').val();
-        this.MAX_INERTIA = d3.max(data[0].metrics.partitionsMetrics[that.metric_value]);
-        this.MIN_INERTIA = 0;
+        this.MAX_METRIC = d3.max(data[0].metrics.partitionsMetrics[that.metric_value]);
+        this.MIN_METRIC = 0;
+        this.ITERATION_LAST = Array.from({length:partitions},(_)=> 0)
+        // inizializzo la scala per inertia e per l'altra, che poi aggiorno qualora non andasse bene. 
 
+        this.DOMAINS['inertia'][0] = d3.max(data[0].metrics.partitionsMetrics['inertia'])
+        this.DOMAINS['inertia'][1] = d3.max(data[0].metrics.partitionsMetrics['inertia']);
+
+        this.DOMAINS[this.METRICA_LABELING][0] = 1
+        this.DOMAINS[this.METRICA_LABELING][1] = -1;
+        
         if (this.metric_value === 'inertia'){
             this.colorScaleCell = d3.scaleLinear()
                 .range([1,0])
                 .domain(
-                    [0, this.MAX_INERTIA])
+                    [0, this.DOMAINS['inertia'][1]])
             }
 
         if (this.metric_value === this.METRICA_LABELING) {
@@ -82,37 +97,57 @@ system.timelinepartitions = (function() {
     
     this.updateData = (obj,data_matrix) => {
         this.data = this.data.concat(obj)
+
+        this.ITERATION_LAST = obj.info.runs_iterations
         
-        if (obj.iteration === 5 || d3.min(obj.metrics.partitionsMetrics[that.metric_value]) < this.colorScaleCell.domain()[0]){
-            this.MIN_INERTIA = d3.min(obj.metrics.partitionsMetrics[that.metric_value]) - (d3.min(obj.metrics.partitionsMetrics[that.metric_value]))*0.05
+        // UPDATE THE domain of the dynamic scale
+        if (d3.min(obj.metrics.partitionsMetrics['inertia']) < this.DOMAINS['inertia'][0]){
+            this.DOMAINS['inertia'][0] = d3.min(obj.metrics.partitionsMetrics['inertia'])
+        }
+        if (d3.max(obj.metrics.partitionsMetrics['inertia']) > this.DOMAINS['inertia'][1]){
+            this.DOMAINS['inertia'][1] = d3.max(obj.metrics.partitionsMetrics['inertia'])
+        }
+        if (d3.min(obj.metrics.partitionsMetrics[that.metric_value]) < this.DOMAINS[that.metric_value][0]){
+            this.DOMAINS[that.metric_value][0] = d3.min(obj.metrics.partitionsMetrics[that.metric_value])
+        }
+        if (d3.max(obj.metrics.partitionsMetrics[that.metric_value]) > this.DOMAINS[that.metric_value][1]){
+            this.DOMAINS[that.metric_value][1] = d3.max(obj.metrics.partitionsMetrics[that.metric_value])
+        }
+
+
+        // change the domain to the scale
+        if (obj.iteration === 5 || d3.min(obj.metrics.partitionsMetrics[that.metric_value]) < this.colorScaleCell.domain()[0] || d3.max(obj.metrics.partitionsMetrics[that.metric_value])> this.colorScaleCell.domain()[1]){
+            
+            if(d3.min(obj.metrics.partitionsMetrics[that.metric_value]) < this.colorScaleCell.domain()[0]){
+                this.DOMAINS[that.metric_value][0] = d3.min(obj.metrics.partitionsMetrics[that.metric_value]) - (d3.min(obj.metrics.partitionsMetrics[that.metric_value]))*0.05
+            }
+            if(d3.max(obj.metrics.partitionsMetrics[that.metric_value])> this.colorScaleCell.domain()[1]){
+                this.DOMAINS[that.metric_value][1] = d3.max(obj.metrics.partitionsMetrics[that.metric_value]) + (d3.max(obj.metrics.partitionsMetrics[that.metric_value]))*0.05
+            }
             //let max_range = this.colorScaleCell.domain()[1]
             if (this.metric_value === 'inertia'){
                 this.colorScaleCell = d3.scaleLinear()
                     .range([1,0])
-                    .domain(
-                        [this.MIN_INERTIA, this.MAX_INERTIA])
+                    .domain([this.DOMAINS[this.metric_value][0], this.DOMAINS[this.metric_value][1]])
                 }
-    
             if (this.metric_value === this.METRICA_LABELING) {
                 this.colorScaleCell = d3.scaleLinear()
                     .range([0,1])
-                    .domain([-1,1])
+                    .domain([this.DOMAINS[this.metric_value][0], this.DOMAINS[this.metric_value][1]])
             }
-            //this.colorScaleCell = d3.scaleLinear().range([1,0]).domain([min_range,max_range])
         }
-
         that.partitions_status.forEach((e)=> {
             if(e[2]){
                 e[0] = obj.iteration
             }
         })
-        console.log
+        console.log('>>>> DOMAIN',this.metric_value,this.DOMAINS,this.colorScaleCell.domain(),this.colorScaleCell.range())
         this.render(obj.iteration)
     }
 
    
     
-    this.render = (it) => {
+    this.render = () => {
         this.div.selectAll('svg')
             .remove();
         
@@ -143,10 +178,7 @@ system.timelinepartitions = (function() {
             .domain(Array.from({length:partitions},(_,i)=> 'P'+i).reverse())
             .range([that.all_cell, 0])
             .paddingInner(0.1).paddingOuter(0.1);
-            //.paddingInner(0.1)
-            //.paddingOuter(0.1);
-
-
+            
         svg.append("g")
             .attr("class", "y axisTimeline")
             .call(this.yAxis)
@@ -156,12 +188,9 @@ system.timelinepartitions = (function() {
             .attr("class", "textXAxis")            
             .attr("transform",
                   "translate(" + (this.width/2) + " ," + 
-                                 (this.height + this.margin.top + this.margin_bottom - (this.margin_bottom/2) ) + ")")
+                                 (this.height + this.margin.top + this.margin_bottom - (this.margin_top) ) + ")")
             .style("text-anchor", "middle")
             .text("Iterations");
-        
-    
-            console.log('STATUS_PARTITION',that.partitions_status)
 
             d3.select('.y.axisTimeline')
                 .selectAll("rect-chechbox")
@@ -170,7 +199,6 @@ system.timelinepartitions = (function() {
                 .join(
                     enter => enter
                         .append("rect")
-                        //.attr('class',(d)=> {console.log('sashimi',d); if (d) {console.log('sono attivo');return 'timeline-checkbox-active'; }else return 'timeline-checkbox-disable'})
                         .attr('id',(d) => 'checkbox-'+d[1])
                         .attr('x', 0 - (this.margin.left/3)*2)
                         .attr('y',(d,i) => that.yScale(d[1]) + (that.yScale.bandwidth()/2) -5 )
@@ -255,11 +283,7 @@ system.timelinepartitions = (function() {
          console.log('ARRAY-INERTIA',best_run)
       let parsed_array_inertia = []
       for( let i = 0; i < array_inertia.length; i++){
-        
-
-        //console.log('....',array_inertia)
-        //let partitios_inertia = array_inertia[i].split('::')
-        for( let j = 0; j < array_inertia[0].length; j++){
+       for( let j = 0; j < array_inertia[0].length; j++){
           let single_object = [];
           //single_object['P'+j]= +partitios_inertia[j]
           single_object.push(i)
@@ -267,7 +291,6 @@ system.timelinepartitions = (function() {
           single_object.push(+array_inertia[i][j])
           single_object.push('P'+best_run[i])// better partition
           single_object.push(array_inertia[i][best_run[i]]) // better inertia che sarebbe d[4]
-          
           parsed_array_inertia.push(single_object)
         }
         
@@ -275,22 +298,21 @@ system.timelinepartitions = (function() {
       return parsed_array_inertia;
     }
 
-    let updateMetricValue = () => {
+    this.updateMetricValue = () => {
         that.metric_value = $('input[name="metric-timeline"]:checked').val();
 
         if (this.metric_value === 'inertia'){
             this.colorScaleCell = d3.scaleLinear()
                 .range([1,0])
-                .domain(
-                    [this.MIN_INERTIA, this.MAX_INERTIA])
+                .domain([this.DOMAINS[this.metric_value][0], this.DOMAINS[this.metric_value][1]])
             }
 
         if (this.metric_value === this.METRICA_LABELING) {
             this.colorScaleCell = d3.scaleLinear()
                 .range([0,1])
-                .domain([-1,1])
+                .domain([this.DOMAINS[this.metric_value][0], this.DOMAINS[this.metric_value][1]])
         }
-        updateRendering();
+        system.timelinepartitions.render();
     }
 
     let updateRendering = () => {
@@ -327,14 +349,28 @@ system.timelinepartitions = (function() {
                                 return d3.interpolateGreens(this.colorScaleCell(d[2]));
                             }
                             if (this.metric_value === this.METRICA_LABELING){
-                                return d3.interpolateOrRd(this.colorScaleCell(d[2]));
+                                return d3.interpolateReds(this.colorScaleCell(d[2]));
                             }
                         }
                     })
                     .attr('stroke',(d)=> {
-                        if(d[3] === d[1]) { return '#ff0090'}
-                        else if((d[2] - d[4] <= d[4]*0.01) && (d[3] !== d[1])){ 
-                            return "#ff9d47"
+                        if(d[3] === d[1]) { 
+                            
+                            if(that.metric_value === 'inertia'){
+                                return '#ff0090'
+                            }
+                            if (this.metric_value === this.METRICA_LABELING){
+                                return '#0094db'
+                            }
+                        }
+                        else if((d[2] - d[4] <= d[4]*0.001) && (d[3] !== d[1])){ 
+                            if(that.metric_value === 'inertia'){
+                                return "#ffff16" //"#ff9d47"
+                            }
+                            /*if (this.metric_value === this.METRICA_LABELING){
+                                return '#ffff16'
+                            }*/
+                            
                         }
                         })
                     .attr('stroke-width',(d)=> {
@@ -346,11 +382,18 @@ system.timelinepartitions = (function() {
                         })
                     .attr('visibility', (d)=> {
                         let current_i = parseInt(d[1].replace('P',''))
-                         if(that.partitions_status[current_i][0]<d[0])
+                        if (d[0]>that.ITERATION_LAST[current_i]|| that.partitions_status[current_i][0]<=d[0]) //if(that.partitions_status[current_i][0]<d[0])
                             return 'hidden';
                         else
                             return 'visible';
                         })
+                    .style('opacity', (d)=> {
+                            let current_i = parseInt(d[1].replace('P',''))
+                            if(that.partitions_status[current_i][2])
+                                return 1;
+                            else
+                                return 0;
+                            })
                   ,
                 update => update
                   .attr('x', (d)=>  that.xScale(d[0]))

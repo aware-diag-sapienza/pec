@@ -89,9 +89,15 @@ function resetSelects(){
     document.getElementById("select-projection").value = 'tsne'
 }
 function getSeed(){
+
     let newseed = Math.random()*(100000-1)+1;
-    
-    return Math.ceil(newseed);
+
+    console.log('SEED',$( "#select-seed" ).val())
+
+    if ($( "#select-seed" ).val() === '')
+        return Math.ceil(newseed);
+    else 
+        return Math.ceil(parseInt($( "#select-seed" ).val()));
 }
 
 async function startSelects(){
@@ -153,12 +159,9 @@ async function startSelects(){
     }
 }
 
-
 let timestamp0;
 
 let swap_timestamp = 0;
-
-
 
 function readResult(it_res){
     timestamp0 = swap_timestamp
@@ -174,13 +177,13 @@ function readResult(it_res){
     d3.select('#button-metric').style('display','block')
     d3.select('#id-metrics').style('display','block')
         console.log('ALESSIA',it_res.iteration, it_res.iteration == 1,it_res.iteration === 1)
-        if(it_res.iteration == 1){
+        if(it_res.iteration === 0){
                 console.log('RISULTATO',it_res)
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res]) 
                 linechart1.render()
                 timelinePartitions.setData([it_res]) 
-                timelinePartitions.render(it_res.iteration)
+                timelinePartitions.render()
                 console.log('ALESSIA prima di tableupdate')
                 updateTable(it_res)
                 console.log('ALESSIA prima di adjacency')

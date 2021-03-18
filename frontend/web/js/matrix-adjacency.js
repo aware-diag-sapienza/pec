@@ -62,14 +62,27 @@ system.matrixAdjacency = (function() {
         .attr("height",that.cell_size)
         .attr("x", d=> d.x*that.cell_size)
         .attr("y", d=> d.y*that.cell_size)
-        .style("fill", d => d3.interpolateBlues(d.weight))
+        .style("fill", d => {
+          if (d.col === d.row) return d3.interpolateBlues(d.weight)
+          if(!system.timelinepartitions.partitions_status[parseInt(d.col.replace('P',''))][2])
+            return '#d2d2d2';
+        if(!system.timelinepartitions.partitions_status[parseInt(d.row.replace('P',''))][2])
+        return '#d2d2d2';
+        return d3.interpolateBlues(d.weight)})
         .attr("data-tippy-content", d => "" + d.id + " at row " + d.row + " end col " +d.col + " with weight " + d.weight)
         ,
         update => update
         .call(update => update
           .transition()
           .duration(500)
-          .style("fill", d => d3.interpolateBlues(d.weight))
+          .style("fill", d => {
+            if (d.col === d.row) 
+              return d3.interpolateBlues(d.weight)
+            if(!system.timelinepartitions.partitions_status[parseInt(d.col.replace('P',''))][2])
+              return '#d2d2d2';
+            if(!system.timelinepartitions.partitions_status[parseInt(d.row.replace('P',''))][2])
+              return '#d2d2d2';
+            return d3.interpolateBlues(d.weight)})
         ),
         exit => exit
           .call(exit => exit
