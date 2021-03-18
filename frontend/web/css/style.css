@@ -76,6 +76,10 @@ body {
   .select-button{
     line-height: 3.5vh;
   }
+
+  .select-label{
+    line-height: 38px;
+  }
  
 
   .item-configuration{

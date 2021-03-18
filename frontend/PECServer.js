@@ -51,6 +51,7 @@ class JsonWebSocket {
   }
 
   __decodeIncomingMessage (event) {
+    /*
     try {
       this.__recievedCounter++
       const message = JSON.parse(event.data)
@@ -61,6 +62,19 @@ class JsonWebSocket {
     } catch (e) {
       console.warn(e) //, event.data)
     }
+    */
+    let message = null
+    try {
+      this.__recievedCounter++
+      message = JSON.parse(event.data)
+    } catch (e) {
+      console.warn(e)
+    }
+    if (message === null) return
+    else if (message.type === 'M') this.__onMessageCallback(message.body)
+    else if (message.type === 'R') console.log('Request recieved... not yet implemented.')
+    else if (message.type === 'RR') this.__resolveRequest(message)
+    else console.warn(`Undefined message type recieved: ${message.type}`)
   }
 
   __resolveRequest (message) {

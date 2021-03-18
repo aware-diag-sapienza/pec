@@ -52,14 +52,7 @@
       c'è ancora un problema sul risultato di iterazione 0 che da eccezione e quindi non viene notificata (la prima iterazione che arriva è la 1)
       */
       job.onPartialResult(result => {
-        console.log(result)
-        if(result.iteration == 1){
-          //pasue
-          job.pause()
-          setTimeout(() => {
-            // resume after 3 sec
-            job.start()}, 3000)
-        } 
+        console.log(result) 
         if(result.iteration == 3) job.stop()
       })
 

@@ -35,7 +35,7 @@ class InertiaBased_ProgressiveDecisionWorker(Process):
         shm_partitions, partitions = self.shared_partitions.open()
         fn_inertia = lambda labels, data: ClusteringMetrics.inertia(data, labels)
         
-
+        old_result_labels = None
         runs_completed = np.array([False for _ in range(self.n_runs)])
         runs_iterations = np.array([-1 for _ in range(self.n_runs)], dtype=int)
         runs_iteration_duration = [None for _ in range(self.n_runs)]
@@ -58,7 +58,7 @@ class InertiaBased_ProgressiveDecisionWorker(Process):
             timestamp_before_decision = time.time()
             runs_inertia = np.apply_along_axis(fn_inertia, 1, partitions, data),
             best_run = np.argmin(runs_inertia)
-            best_labels = partitions[best_run,:]     
+            best_labels = partitions[best_run,:] if old_result_labels is None else ClusteringMetrics.normalize_labels(data, old_result_labels, partitions[best_run,:])[1]
             timestamp_after_decision = time.time()
             ## decision computed
 
@@ -85,6 +85,7 @@ class InertiaBased_ProgressiveDecisionWorker(Process):
             )
 
             result_labels = best_labels
+            old_result_labels = result_labels
             progressive_result = ProgressiveResult(result_info, result_labels, np.copy(partitions))
 
             self.partial_results_queue.put(progressive_result)
