@@ -40,12 +40,13 @@ class NetworkManager(Process):
                 e = self.eventQueue.get()
                 if e.name == "PartialResult":
                     client = e.data.client
-                    #jobId = e.data.jobId
                     pr = e.data.pr
                     self.socket.sendMessage(client, {
                         "type": "partial-result",
                         "data": pr
                     })
+                    if not pr.info.is_last: Log.print(f"{Log.GRAY}Computed partial result #{pr.info.iteration} of {pr.job_id}")
+                    else: Log.print(f"{Log.GRAY}Computed partial result #{pr.info.iteration} of {pr.job_id} -- {Log.RED}last{Log.ENDC}")
                 elif e.name == "AsyncJob":
                     self.socket.sendRequestResponse(e.data.client, e.data.requestId, e.data.jobId)
                 else:

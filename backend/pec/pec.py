@@ -312,13 +312,13 @@ class ProgressiveEnsembleClustering:
         def gradient(m): return progressiveMetrics[m] - history[-1].progressiveMetrics[m]
         firstIteration = prevResult is None
         progressiveMetrics = {
-            "entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(currentResult.labels, prevResult.labels),
-            "entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability2(currentResult.labels, prevResult.labels),
-            "clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(currentResult.labels, prevResult.labels),
+            "clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(self.data, currentResult.labels, prevResult.labels),
+            "entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(self.data, currentResult.labels, prevResult.labels),
+            "entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability2(self.data, currentResult.labels, prevResult.labels),
             
-            "globalStability0": 0 if firstIteration else np.mean(ClusteringMetrics.clusters_stability(currentResult.labels, prevResult.labels)),
-            "globalStability1": 0 if firstIteration else np.mean(ClusteringMetrics.entries_stability1(currentResult.labels, prevResult.labels)),
-            "globalStability2": 0 if firstIteration else np.mean(ClusteringMetrics.entries_stability2(currentResult.labels, prevResult.labels)),
+            "globalStability0": 0 if firstIteration else ClusteringMetrics.global_stability0(self.data, currentResult.labels, prevResult.labels),
+            "globalStability1": 0 if firstIteration else ClusteringMetrics.global_stability1(self.data, currentResult.labels, prevResult.labels),
+            "globalStability2": 0 if firstIteration else ClusteringMetrics.global_stability2(self.data, currentResult.labels, prevResult.labels),
             
             "inertia_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("inertia") - labelsMetrics["inertia"]) / fn_max_labelsMetricHistory("inertia"),
             "dbIndex_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("dbIndex") - labelsMetrics["dbIndex"]) / fn_max_labelsMetricHistory("dbIndex"),
