@@ -11,11 +11,13 @@ system.linechart = (function() {
     
     this.divName = null
     this.margin = { top: 40, right: 30,bottom: 20, left: 60 }
+    this.marginBetweenLineCharts = 15
     this.width = null
     this.height = null
     this.heightSingleLinechart = null
     
     this.xScale = null
+    this.numerTicksYAxis = 5
     
     this.yScale1 = null
     this.xAxis1 = null
@@ -72,13 +74,16 @@ system.linechart = (function() {
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
         this.height = parseInt(this.div.style("height")) - this.margin.top - this.margin.bottom;
-        this.heightSingleLinechart = parseInt(this.height)/3
+        
+        this.heightSingleLinechartArea = parseInt(parseInt(this.height)/3)
+        this.heightSingleLinechart = parseInt(this.heightSingleLinechartArea - this.marginBetweenLineCharts)
+
         
         this.xScale = d3.scaleLinear().domain([0, 40]).range([0, this.width]);
         //PRIMO
         this.yScale1 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
         this.xAxis1 = d3.axisBottom().scale(this.xScale);
-        this.yAxis1 = d3.axisLeft().scale(this.yScale1).tickFormat(d3.format("~s"));        
+        this.yAxis1 = d3.axisLeft().scale(this.yScale1).ticks(this.numerTicksYAxis, "s");        
         this.line1 = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
@@ -90,7 +95,7 @@ system.linechart = (function() {
         //SECONDO
         this.yScale2 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
         this.xAxis2 = d3.axisBottom().scale(this.xScale);
-        this.yAxis2 = d3.axisLeft().scale(this.yScale2).tickFormat(d3.format("~s"));        
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).ticks(this.numerTicksYAxis, "s");       
         this.line2 = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
@@ -102,7 +107,7 @@ system.linechart = (function() {
         //TERZO
         this.yScale3 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
         this.xAxis3 = d3.axisBottom().scale(this.xScale);
-        this.yAxis3 = d3.axisLeft().scale(this.yScale3).tickFormat(d3.format("~s"));        
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).ticks(this.numerTicksYAxis, "s");         
         this.line3 = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
@@ -120,32 +125,32 @@ system.linechart = (function() {
             case 'I-PecK':
                 this.attributeYAxisFirstLevel1 = "labelsMetrics"
                 this.attributeYAxisSecondLevel1 = "inertia"
-                this.labelYAxis1 = "inertia"
+                this.labelYAxis1 = "Progress: inertia"
                 break;
             case 'I-PecK++':
                 this.attributeYAxisFirstLevel1 = "labelsMetrics"
                 this.attributeYAxisSecondLevel1 = "inertia"
-                this.labelYAxis1 = "inertia"
+                this.labelYAxis1 = "Progress: inertia"
                 break;
             case 'HGPA-PecK':
                 this.attributeYAxisFirstLevel1 = "progressiveMetrics"
                 this.attributeYAxisSecondLevel1 = "adjustedRandScore"
-                this.labelYAxis1 = "adjustedRandScore"
+                this.labelYAxis1 = "Progress: adjustedRandScore"
                 break;
             case 'HGPA-PecK++':
                 this.attributeYAxisFirstLevel1 = "progressiveMetrics"
                 this.attributeYAxisSecondLevel1 = "adjustedRandScore"
-                this.labelYAxis1 = "adjustedRandScore"
+                this.labelYAxis1 = "Progress: adjustedRandScore"
                 break;
             case 'MCLA-PecK':
                 this.attributeYAxisFirstLevel1 = "progressiveMetrics"
                 this.attributeYAxisSecondLevel1 = "adjustedRandScore"
-                this.labelYAxis1 = "adjustedRandScore"
+                this.labelYAxis1 = "Progress: adjustedRandScore"
                 break
             case 'MCLA-PecK++':
                 this.attributeYAxisFirstLevel1 = "progressiveMetrics"
                 this.attributeYAxisSecondLevel1 = "adjustedRandScore"
-                this.labelYAxis1 = "adjustedRandScore"
+                this.labelYAxis1 = "Progress: adjustedRandScore"
                 break;
             default:
               // code block
@@ -153,20 +158,20 @@ system.linechart = (function() {
 
         this.attributeYAxisFirstLevel2 = "labelsMetrics"
         this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
-        this.labelYAxis2 = "sim.Silhouette"
+        this.labelYAxis2 = "Quality: sim.Silhouette"
 
         if(variableYAxisLinechart == "globalStability0"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
             this.attributeYAxisSecondLevel3 = "globalStability0"
-            this.labelYAxis3 = "globalStability0"
+            this.labelYAxis3 = "Global Stability 0"
         }else if(variableYAxisLinechart == "globalStability1"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
             this.attributeYAxisSecondLevel3 = "globalStability1"
-            this.labelYAxis3 = "globalStability1"
+            this.labelYAxis3 = "Global Stability 1"
         }else if(variableYAxisLinechart == "globalStability2"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
             this.attributeYAxisSecondLevel3 = "globalStability2"
-            this.labelYAxis3 = "globalStability2"
+            this.labelYAxis3 = "Global Stability 2"
         }
         
     }
@@ -245,29 +250,44 @@ system.linechart = (function() {
 
         svg.append("g")
             .attr("class", "x axisLineChart")
-            .attr("transform", "translate(0," + this.heightSingleLinechart*2 + ")")
+            .attr("transform", "translate(0," + (this.heightSingleLinechartArea + this.heightSingleLinechart)  + ")")
             .call(this.xAxis2);
         
         svg.append("g")
             .attr("class", "x axisLineChart")
-            .attr("transform", "translate(0," + this.heightSingleLinechart*3 + ")")
+            .attr("transform", "translate(0," + (2*this.heightSingleLinechartArea + this.heightSingleLinechart) + ")")
             .call(this.xAxis3);
           
         // Add Y axis
-        this.yScale1 = d3.scaleLinear()
-            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
-            .range([ this.heightSingleLinechart, 0 ]);
-        this.yAxis1 = d3.axisLeft().scale(this.yScale1).tickFormat(d3.format("~s"));   
+        if(relatiYAxisLineCharts){
+            this.yScale1 = d3.scaleLinear()
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); }))
+                .range([ this.heightSingleLinechart, 0 ]);
+            this.yScale2 = d3.scaleLinear()
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); }))
+                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+            this.yScale3 = d3.scaleLinear()
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); }))
+                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
+            
+        }else{
+            this.yScale1 = d3.scaleLinear()
+                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
+                .range([ this.heightSingleLinechart, 0 ]);
+
+            this.yScale2 = d3.scaleLinear()
+                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); })])
+                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+            
+            this.yScale3 = d3.scaleLinear()
+                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); })])
+                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
+            
+        }
         
-        this.yScale2 = d3.scaleLinear()
-            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); })])
-            .range([ 2 * this.heightSingleLinechart, this.heightSingleLinechart ]);
-        this.yAxis2 = d3.axisLeft().scale(this.yScale2).tickFormat(d3.format("~s"));   
-        
-        this.yScale3 = d3.scaleLinear()
-            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); })])
-            .range([ 3 * this.heightSingleLinechart, 2 * this.heightSingleLinechart ]);
-        this.yAxis3 = d3.axisLeft().scale(this.yScale3).tickFormat(d3.format("~s"));   
+        this.yAxis1 = d3.axisLeft().scale(this.yScale1).ticks(this.numerTicksYAxis, "s");    
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).ticks(this.numerTicksYAxis, "s");  
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).ticks(this.numerTicksYAxis, "s");  
         
         svg.append("g")
             .attr("class", "y axisLineChart")
@@ -283,7 +303,7 @@ system.linechart = (function() {
             .attr("class", "textXAxis")            
             .attr("transform",
                   "translate(" + (this.width/2) + " ," + 
-                                 (3 * this.heightSingleLinechart + this.margin.top) + ")")
+                                 (3 * this.heightSingleLinechartArea + this.margin.top) + ")")
             .style("text-anchor", "middle")
             .text("Iterations");
         
@@ -293,6 +313,7 @@ system.linechart = (function() {
             .attr("y", 0 - this.margin.left)
             .attr("x",0 - (this.heightSingleLinechart / 2))
             .attr("dy", "1em")
+            .style("font-size", "x-small")
             .style("text-anchor", "middle")
             .text(that.labelYAxis1);  
 
@@ -300,8 +321,9 @@ system.linechart = (function() {
             .attr("class", "textYAxis")   
             .attr("transform", "rotate(-90)")
             .attr("y", 0 - this.margin.left)
-            .attr("x",0 - ((this.heightSingleLinechart / 2) + this.heightSingleLinechart))
+            .attr("x",0 - (this.heightSingleLinechartArea + (this.heightSingleLinechart / 2)))
             .attr("dy", "1em")
+            .style("font-size", "x-small")
             .style("text-anchor", "middle")
             .text(that.labelYAxis2); 
 
@@ -309,7 +331,8 @@ system.linechart = (function() {
             .attr("class", "textYAxis")   
             .attr("transform", "rotate(-90)")
             .attr("y", 0 - this.margin.left)
-            .attr("x",0 - ((this.heightSingleLinechart / 2) + 2 * this.heightSingleLinechart))
+            .attr("x",0 - ((2*this.heightSingleLinechartArea) + (this.heightSingleLinechart / 2)))
+            .style("font-size", "x-small")
             .attr("dy", "1em")
             .style("text-anchor", "middle")
             .text(that.labelYAxis3); 
@@ -354,7 +377,7 @@ system.linechart = (function() {
                     .attr('class', 'lineVertical')
                     .attr('x1', d=> that.xScale(d.iteration))
                     .attr('x2', d=> that.xScale(d.iteration))
-                    .attr("y1", that.height)
+                    .attr("y1", that.height - (that.marginBetweenLineCharts))
                     .attr("y2", 0)
                     .attr("stroke", d=> (d.fill))
                     .attr("stroke-opacity", 0.8)

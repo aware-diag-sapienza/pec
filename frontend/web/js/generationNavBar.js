@@ -30,6 +30,13 @@ function onChangeVariableYAxisLinechart(){
     variableYAxisLinechart = $( "#select-variableYAxis-linechart" ).val()
     linechart1.updateYAxisVariable()
 }
+let relatiYAxisLineCharts = document.getElementById('realtiveYScaleLinechart').checked
+
+function changeRelativeYScale(){
+    let cbox = document.getElementById('realtiveYScaleLinechart');
+    relatiYAxisLineCharts = cbox.checked
+    linechart1.updateYAxisVariable()
+}
 
 function updateSelects(list_dataset){
 
