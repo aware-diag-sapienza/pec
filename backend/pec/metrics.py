@@ -1,6 +1,6 @@
 import numpy as np
 import sklearn.metrics
-from sklearn.utils.multiclass import unique_labels
+import traceback
 
 class ClusteringMetrics:
     @staticmethod
@@ -77,17 +77,20 @@ class ClusteringMetrics:
 
     @staticmethod
     def simplified_silhouette(data, labels):
-        n = data.shape[0]
-        clusters, centroids, clusters_idx, unique_labels = ClusteringMetrics._get_clusters(data, labels)
-        distances = sklearn.metrics.pairwise.euclidean_distances(data, centroids) #distance of each point to all centroids
+        try:
+            n = data.shape[0]
+            clusters, centroids, clusters_idx, unique_labels = ClusteringMetrics._get_clusters(data, labels)
+            distances = sklearn.metrics.pairwise.euclidean_distances(data, centroids) #distance of each point to all centroids
 
-        A = distances[np.arange(n), labels] #distance of each point to its cluster centroid
-        distances[np.arange(n), labels] = np.Inf #set to infinte the distance to own centroid
-        B = np.min(distances, axis=1) #distance to each point to the closer centroid (different from its own cluster)
-        M = np.maximum(A, B) #max row wise of A and B
-        S = np.sum( (B - A) / M)  / n
-        
-        return S
+            A = distances[np.arange(n), labels] #distance of each point to its cluster centroid
+            distances[np.arange(n), labels] = np.Inf #set to infinte the distance to own centroid
+            B = np.min(distances, axis=1) #distance to each point to the closer centroid (different from its own cluster)
+            M = np.maximum(A, B) #max row wise of A and B
+            S = np.sum( (B - A) / M)  / n
+            return S
+        except:
+            traceback.print_exc()
+            return 0
 
     @staticmethod
     def normalize_labels(data, labels_a, labels_b):

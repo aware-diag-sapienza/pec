@@ -75,7 +75,7 @@ class JsonWebSocketServer:
         messageString = json.dumps(message, cls=NumpyEncoder)
         return messageId, messageString
     
-    def run(self):
+    def start(self):
         self.__server.run_forever()
 
 

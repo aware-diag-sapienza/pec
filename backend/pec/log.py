@@ -12,4 +12,4 @@ class Log:
     @staticmethod
     def print(s):
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        print(f"{Log.GRAY}{time}{Log.ENDC} {s}{Log.ENDC}")
+        print(f"{Log.GRAY}[{time}]{Log.ENDC} {s}{Log.ENDC}")
