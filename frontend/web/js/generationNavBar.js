@@ -30,6 +30,13 @@ function onChangeVariableYAxisLinechart(){
     variableYAxisLinechart = $( "#select-variableYAxis-linechart" ).val()
     linechart1.updateYAxisVariable()
 }
+let relatiYAxisLineCharts = document.getElementById('realtiveYScaleLinechart').checked
+
+function changeRelativeYScale(){
+    let cbox = document.getElementById('realtiveYScaleLinechart');
+    relatiYAxisLineCharts = cbox.checked
+    linechart1.updateYAxisVariable()
+}
 
 function updateSelects(list_dataset){
 
@@ -365,3 +372,9 @@ function updatePinHistory(iteration,isLast){
     }
 
 }      
+
+function updateProjection(){
+    let last_it = ALL_DATA.length -1
+    projection = $( "#select-projection" ).val()
+    system.scatterplot.createDataProjection(DATASET_SELECTED.projections[projection], ALL_DATA[last_it].labels)
+}

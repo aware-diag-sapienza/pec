@@ -12,7 +12,7 @@ system.scatterplot = (function() {
   this.scale_label = d3.scaleOrdinal(d3.schemeCategory10);
 
   this.scale_color = ['#3366cc', '#dc3912','#ff9900','#109618','#d6616b','#990099','#0099c6','#dd4477','#66aa00','#b82e2e','#17becf','#bcbd22','#9467bd','#8c564b','#e377c2','#759EF1','#FFD40B','#52DA2E','#0ED1E3','#0C292B','#697374']
-
+  this.scale_color_stability = ['#9e9ac8','#3f007d']//['#dadaeb','red','#bcbddc', '#9e9ac8','#807dba','#6a51a3','#4a1486']
   this.tensorResultComputation= {};
   this.datasetComputed = [];
 
@@ -144,20 +144,25 @@ system.scatterplot = (function() {
     });
   }
 this.updateScatterplot = (fixed,labels)=> {
-
-  plotCoordsKonva(that.tot_rows,'#b3b3b3',false,labels)
-  
+  console.log('SONO QUI DENTRO')
+  let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
+  if (PLOT_SCATTERPLOT === 'cluster')
+    plotCoordsKonva(that.tot_rows,'#b3b3b3',false,labels)
+  if (PLOT_SCATTERPLOT === 'stability1')
+    plotCoordsKonvaStability();
 }
+
+this.updateScatterplotStability = () => {
+  plotCoordsKonvaStability();
+}
+
 this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 
   if ( this.early_termination === null){
-  d3.select('#information-info').html("Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
-  system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,labels);//useScale,useColor, scaleX,ScaleY
-
+    d3.select('#information-info').html("Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
+    system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,labels);//useScale,useColor, scaleX,ScaleY
   this.early_termination = true;
-
   }
-
 }
 
 function plotCoordsKonva(numberPoints, col, useScale,labels) {
@@ -169,8 +174,8 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
     setupTooltip();
     for (let i = 0; i < that.tot_rows; i++) {
       if (useScale){ // se ho la scala di visualizzazione
-        const xcoord = Math.round((that.scale_x(that.coordData[i][0])))//[i*2]))) // * (kWidth -10));
-        const ycoord = Math.round((that.scale_y(that.coordData[i][1])))//[i*2+1]))) //* (kHeight -10));
+        const xcoord = Math.round((that.scale_x(that.coordData[i][0])))
+        const ycoord = Math.round((that.scale_y(that.coordData[i][1])))
         
         let colorlabel
         if(that.first_iteration){
@@ -224,27 +229,25 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
   layer.batchDraw();
   
 
-  if (that.datasetComputed.indexOf(dataset) == -1){
-    that.tensorResultComputation[dataset] = that.coordData
-    that.datasetComputed.push(dataset)
-  }
-
   d3.selectAll('.scatter')
   .style('border-style', 'solid')
   .style('border-width', '1px')
-  
-  if (that.start_computation == null){
-    that.start_computation = true
-    d3.select('#iteration-label').html('<button type="button" id="runButton" class="btn btn-outline-info" onclick="startIterations()" style="display: none;"><i class="fa fa-fast-forward"></i>RUN</button> <label class="control-label"> Click run</label>    ')
-    document.getElementById('runButton').style.display = "inline-block"
-
-  }
 }
 
-//const csvUrl = //'https://storage.googleapis.com/tfjs-examples/multivariate-linear-regression/data/boston-housing-train.csv';
-
-//'./data/n5000-d2-k15-s2.csv';
-
+function plotCoordsKonvaStability() {
+  // first time create the points
+    let current_it = ALL_DATA.length -1
+    for (let i = 0; i < nodes.length; i++) {
+      const colorlabel = that.scale_color_stability[ALL_DATA[current_it].metrics.progressiveMetrics.entriesStability1[i]];
+      nodes[i].attrs.fill = colorlabel
+  }
+  
+  layer.batchDraw();
+  
+  d3.selectAll('.scatter')
+  .style('border-style', 'solid')
+  .style('border-width', '1px')
+}
 
  async function generateDataForScatterplot(dataset_projection,labelIteration){
 
@@ -279,94 +282,31 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
         system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
         that.first_iteration = false
       } else {
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',false,labelIteration);
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration);
         system.scatterplotFixed.updateScatterplot(true,true, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
       }
       
     }
-/*
-   if (numOfFeatures == 2){ // I can map the dataset directly on the scatter
 
-    for (let i = 0; i<that.tot_rows; i++) {
-      let e = await it.next()
-
-      let array0 = e.value[0]
-      first_feature.push(e.value[0][0])
-      second_feature.push(e.value[0][1])
-      xs = xs.concat(array0)
-   }
-
-   //
-
-    
-    that.coordData = await new Float32Array(xs);
-    system.scatterplotFixed.coordData = await new Float32Array(xs);
-    
-
-    
-    that.scale_x = d3.scaleLinear()
-    .domain([d3.min(first_feature), d3.max(first_feature)])
-    .range([10,stage.width()-10]);
-    
-    that.scale_y = d3.scaleLinear()
-    .domain([d3.min(second_feature), d3.max(second_feature)])
-    .range([10, stage.height()-10]);
-
-    
-    plotCoordsKonva(that.tot_rows, '#b3b3b3',true,dataIteration.labels);
-    system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,dataIteration.labels);//useScale,useColor, scaleX,ScaleY
-   } 
-   else { // I need to permorm t-SNE
-    d3.select('#iteration-label').html('Running t-SNE<img src="./img/loading.gif" width= "20px"/>')
-
-    for (let i = 0; i<that.tot_rows; i++) {
-      let e = await it.next()
-      let array0 = (e.value[0])
-      xs.push(array0)
-    }
-
-   
-  const features = await tf.tensor(xs)
-  features.print();
-    const tsneOpt = tsne.tsne(features);
-    tsneOpt.compute().then((d) => {
-
-      this.coordinates = tsneOpt.coordinates();
-      let attendRes = tsneOpt.coordinates().data()
-      attendRes.then((res)=>{
-        that.coordData = res
-        system.scatterplotFixed.coordData = res;
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration.labels);
-        system.scatterplotFixed.updateScatterplot(false,false, that.scale_x,that.scale_y,dataIteration.labels);//useScale,useColor, scaleX,ScaleY
-      })       
-      this.coordinates.print();
-    })
-    }
-  } 
-  this.first_iteration = false;
-}
-
- //}
-*/
     this.createData = (csvUrl, labelCluster) => {
       system.scatterplot.reset();
       system.scatterplotFixed.reset();
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
 
-      let provaTensor =  generateDataForScatterplot(csvUrl,labelCluster);
+      generateDataForScatterplot(csvUrl,labelCluster);
 
     }
 
     this.createDataProjection = (csvUrl, labelCluster) => {
 
-      
+
       system.scatterplot.reset();
       system.scatterplotFixed.reset();
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
-
-      let provaTensor =  generateDataForScatterplot(csvUrl,labelCluster);
+      that.first_iteration = false;
+      generateDataForScatterplot(csvUrl,labelCluster);
 
     }
 
@@ -494,66 +434,5 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
 
 }
 
-    this.createDataIteratively = () => {
-      const data = tf.randomUniform([2000,10]);
-const tsneOPT = tsne.tsne(data);
- 
-
-async function iterativeTsne() {
-  // Get the suggested number of iterations to perform.
-  const knnIterations = tsneOPT.knnIterations();
-  // Do the KNN computation. This needs to complete before we run tsneOPT
-  for(let i = 0; i < knnIterations; ++i){
-    await tsneOPT.iterateKnn();
-    // You can update knn progress in your ui here.
-  }
-
-  const tsneIterations = 10;
-  for(let i = 0; i < tsneIterations; ++i){
-    await tsneOPT.iterate();
-    // Draw the embedding here...
-    const coordinates = tsneOPT.coordinates();
-    coordinates.print();
-  }
-}
-
-iterativeTsne();
-    }
-
-    this.render= () =>{
-      function gaussianRand() {
-        var rand = 0;
-        for (var i = 0; i < 6; i += 1) {
-          rand += Math.random();
-        }
-        return (rand / 6)-0.5;
-      }
-      
-      var X = [],
-          Y = [],
-          n = 1000000,
-          i;
-      
-      for (i = 0; i < n; i += 1) {
-        X.push(gaussianRand());
-        Y.push(gaussianRand());
-      }
-      
-
-      var data = [{
-        type: "scattergl",
-          mode: "markers",
-          marker: {
-          color : 'rgb(152, 0, 0)',
-          line: {
-            width: 1,
-            color: 'rgb(0,0,0)'}
-        },
-          x: X,
-          y: Y
-      }]
-      
-      Plotly.newPlot('id-scatterplot-1', data)
-    }
     return this;
 }).call({})
