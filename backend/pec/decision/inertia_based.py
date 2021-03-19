@@ -58,7 +58,9 @@ class InertiaBased_ProgressiveDecisionWorker(Process):
             timestamp_before_decision = time.time()
             runs_inertia = np.apply_along_axis(fn_inertia, 1, partitions, data),
             best_run = np.argmin(runs_inertia)
-            best_labels = partitions[best_run,:] if old_result_labels is None else ClusteringMetrics.normalize_labels(data, old_result_labels, partitions[best_run,:])[1]
+            best_labels = partitions[best_run,:] 
+            if old_result_labels is None:
+                best_labels = ClusteringMetrics.smooth_labels(data, old_result_labels, best_labels)
             timestamp_after_decision = time.time()
             ## decision computed
 

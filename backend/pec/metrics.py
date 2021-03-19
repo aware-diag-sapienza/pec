@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.lib.arraysetops import unique
 import sklearn.metrics
 import traceback
 
@@ -77,11 +78,10 @@ class ClusteringMetrics:
 
     @staticmethod
     def simplified_silhouette(data, labels):
+        n = data.shape[0]
+        clusters, centroids, clusters_idx, unique_labels = ClusteringMetrics._get_clusters(data, labels)
+        distances = sklearn.metrics.pairwise.euclidean_distances(data, centroids) #distance of each point to all centroids
         try:
-            n = data.shape[0]
-            clusters, centroids, clusters_idx, unique_labels = ClusteringMetrics._get_clusters(data, labels)
-            distances = sklearn.metrics.pairwise.euclidean_distances(data, centroids) #distance of each point to all centroids
-
             A = distances[np.arange(n), labels] #distance of each point to its cluster centroid
             distances[np.arange(n), labels] = np.Inf #set to infinte the distance to own centroid
             B = np.min(distances, axis=1) #distance to each point to the closer centroid (different from its own cluster)
@@ -90,71 +90,106 @@ class ClusteringMetrics:
             return S
         except:
             traceback.print_exc()
+            print(n, centroids.shape, distances.shape, labels.shape)
             return 0
 
+    
     @staticmethod
-    def normalize_labels(data, labels_a, labels_b):
+    def smooth_labels_jaccard(data, prev, curr):
         """
-        Normalize labels of 2 clusterings by considering the centroids.
-        Resolve the problem of having the same cluster in the two clusterings (a,b) with a different id.
+        Smooth current labels in order to have less difference with previous.
 
-        !!! FUNZIONA SOLO SE labels_a, labels_b HANNO LO STESSO NUMERO DI CLUSTER !!!
-
+        !!! FUNZIONA SOLO SE prev e curr HANNO LO STESSO NUMERO DI CLUSTER, ALTRIMENTI RITORNA curr !!!
         """
-        clusters_a, centroids_a, clusters_idx_a, unique_labels_a = ClusteringMetrics._get_clusters(data, labels_a)
-        clusters_b, centroids_b, clusters_idx_b, unique_labels_b = ClusteringMetrics._get_clusters(data, labels_b)
-        #unique_labels = np.unique(np.concatenate(unique_labels_a, unique_labels_b))
-        unique_labels = np.unique(unique_labels_a.tolist() + unique_labels_b.tolist())
+        unique_prev = np.unique(prev)
+        unique_curr = np.unique(curr)
+        if len(unique_prev) != len(unique_curr):
+            return curr
         
-        distances = np.full((unique_labels.shape[0], unique_labels.shape[0]), np.Inf, dtype=float)
-        for i,a in enumerate(unique_labels_a):
-            x = np.argwhere(unique_labels == a)
-            for j,b in enumerate(unique_labels_b):
-                y = np.argwhere(unique_labels == b)
-                distances[x,y] = sklearn.metrics.pairwise.euclidean_distances([centroids_a[i]], [centroids_b[j]])[0,0]
+        clusters_prev = [None] * len(unique_prev)
+        for i,l in enumerate(unique_prev):
+            clusters_prev[i] = np.full_like(prev, 0, dtype=np.uint8)
+            clusters_prev[i][np.where(prev == l)] = 1
 
-        #normalize_a = np.frompyfunc(lambda l: np.where(unique_labels == l)[0][0], 1, 1)
-        #normalize_b = np.frompyfunc(lambda l: np.argmin(distances[:,np.argwhere(unique_labels == l)]), 1, 1)
-        norm_labels_a = np.array([np.where(unique_labels == l)[0][0] for l in labels_a], dtype=labels_a.dtype) #normalize_a(labels_a)  #
-        norm_labels_b = np.array([np.argmin(distances[:,np.argwhere(unique_labels == l)]) for l in labels_b], dtype=labels_b.dtype) #normalize_b(labels_b) #
+        clusters_curr = [None] * len(unique_curr)
+        for i,l in enumerate(unique_curr):
+            clusters_curr[i] = np.full_like(curr, 0, dtype=np.uint8)
+            clusters_curr[i][np.where(curr == l)] = 1
+        
+        #jaccard
+        result = curr.copy()
+        for c in clusters_curr:
+            sim = [ sklearn.metrics.jaccard_score(c, p) for p in clusters_prev]
+            i = np.argmax(sim) #best index
+            l = unique_prev[i] #best label
+            #remove assigned cluster
+            np.delete(unique_prev, i)
+            np.delete(clusters_prev, i)
+            #update result
+            result[np.where(c)] = l
+        
+        return result
 
-        return norm_labels_a, norm_labels_b, unique_labels
+    
+    @staticmethod
+    def smooth_labels(data, prev, curr):
+        """
+        Smooth current labels in order to have less difference with previous.
+
+        !!! FUNZIONA SOLO SE prev e curr HANNO LO STESSO NUMERO DI CLUSTER, ALTRIMENTI RITORNA curr !!!
+        """
+        unique_prev = np.unique(prev)
+        unique_curr = np.unique(curr)
+        if len(unique_prev) != len(unique_curr):
+            return curr
+
+        _, centroids_prev, _, _ = ClusteringMetrics._get_clusters(data, prev)
+        _, centroids_curr, _, _ = ClusteringMetrics._get_clusters(data, curr)
+        
+        result = curr.copy()
+        for c in centroids_curr:
+            dist = [ sklearn.metrics.pairwise.euclidean_distances([c], [p])[0,0] for p in centroids_prev]
+            i = np.argmin(dist) #best index
+            l = unique_prev[i] #best label
+            #remove assigned cluster
+            np.delete(unique_prev, i)
+            np.delete(centroids_prev, i)
+            #update result
+            result[np.where(c)] = l
+        
+        return result
+
 
     @staticmethod
-    def clusters_stability(data, labels_a, labels_b):
-        n = data.shape[0]
-        norm_labels_a, norm_labels_b, unique_labels = ClusteringMetrics.normalize_labels(data, labels_a, labels_b)
-        sym = np.full(len(unique_labels), 0, dtype=float)
+    def clusters_stability(prev_labels, curr_labels):
+        n = prev_labels.shape[0]
+        unique_labels = np.unique(curr_labels)
+        similarity = np.full(len(unique_labels), 0, dtype=float)
         for i,l in enumerate(unique_labels):
             a = np.full(n, 0, dtype=np.uint8)
             b = np.full(n, 0, dtype=np.uint8)
-            a[np.where(labels_a == l)] = 1
-            b[np.where(labels_b == l)] = 1
-            sym[i] = sklearn.metrics.jaccard_score(a, b)
-        return sym
+            a[np.where(prev_labels == l)] = 1
+            b[np.where(curr_labels == l)] = 1
+            similarity[i] = sklearn.metrics.jaccard_score(a, b)
+        return similarity
 
     @staticmethod
-    def entries_stability1(data, labels_a, labels_b):
-        norm_labels_a, norm_labels_b, _ = ClusteringMetrics.normalize_labels(data, labels_a, labels_b)
-        stab = (norm_labels_a == norm_labels_b).astype(int)
-        return stab
-
+    def entries_stability1(prev_labels, curr_labels):
+        return (prev_labels == curr_labels).astype(np.uint8)
+        
     @staticmethod
-    def entries_stability2(data, labels_a, labels_b):
-        return np.full_like(labels_a, 0, dtype=int)
-        E = ClusteringMetrics.entries_stability1(labels_a, labels_b)
-        C = ClusteringMetrics.clusters_stability(labels_a, labels_b)[E] #cluster stability for each point
-        return E * C
-
+    def entries_stability2(prev_labels, curr_labels): ## TODO !!! DA SISTEMARE !!!
+        return np.full_like(curr_labels, 0, dtype=np.uint8)
+        
     @staticmethod
-    def global_stability0(data, labels_a, labels_b):
-        return np.mean(ClusteringMetrics.clusters_stability(data, labels_a, labels_b))
+    def global_stability0(prev_labels, curr_labels):
+        return np.mean(ClusteringMetrics.clusters_stability(prev_labels, curr_labels))
     
     @staticmethod
-    def global_stability1(data, labels_a, labels_b):
-        return np.mean(ClusteringMetrics.entries_stability1(data, labels_a, labels_b))
+    def global_stability1(prev_labels, curr_labels):
+        return np.mean(ClusteringMetrics.entries_stability1(prev_labels, curr_labels))
 
     @staticmethod
-    def global_stability2(data, labels_a, labels_b):
-        return np.mean(ClusteringMetrics.entries_stability2(data, labels_a, labels_b))
+    def global_stability2(prev_labels, curr_labels):
+        return np.mean(ClusteringMetrics.entries_stability2(prev_labels, curr_labels))
         
