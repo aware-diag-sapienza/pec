@@ -113,12 +113,15 @@
       <div class="item-information-scatterplot-1" id="info-scatterplot-1">
         <label class="select-label">Projection</label>
         <div class="select-menu">
-          <select class="form-select form-select-sm" id="select-projection" onchange="onChangeProjection()"></select>
-        </div> 
+          <select class="form-select form-select-sm" id="select-projection" onchange="updateProjection()"></select>
+        </div>
+        Visualization: 
         <input type="radio" id="cluster" name="plot-scatterplot" value="cluster" onclick="" checked>
         <label for="cluster">cluster</label>
-        <input type="radio" id="stability" name="plot-scatterplot" value="stability" onclick="">
-        <label for="stability">stability</label>
+        <input type="radio" id="stability1" name="plot-scatterplot" value="entriesStability1" onclick="system.scatterplot.updateScatterplotStability()">
+        <label for="stability1">stability 1</label>
+        <input type="radio" id="stability2" name="plot-scatterplot" value="entriesStability2" onclick="system.scatterplot.updateScatterplotStability()">
+        <label for="stability2">stability 2</label>
       </div>
       <div class="item-scatterplot-1 scatter" id="id-scatterplot-1"></div>
       <div class="item-matrix-1" id ="id-matrix-1"></div>  

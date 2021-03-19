@@ -365,3 +365,9 @@ function updatePinHistory(iteration,isLast){
     }
 
 }      
+
+function updateProjection(){
+    let last_it = ALL_DATA.length -1
+    projection = $( "#select-projection" ).val()
+    system.scatterplot.createDataProjection(DATASET_SELECTED.projections[projection], ALL_DATA[last_it].labels)
+}
