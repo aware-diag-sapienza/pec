@@ -10,7 +10,7 @@ system.linechart = (function() {
     this.technique = null
     
     this.divName = null
-    this.margin = { top: 35, right: 30, bottom: 50, left: 60 }
+    this.margin = { top: 40, right: 30,bottom: 20, left: 60 }
     this.width = null
     this.height = null
     this.heightSingleLinechart = null
@@ -153,7 +153,7 @@ system.linechart = (function() {
 
         this.attributeYAxisFirstLevel2 = "labelsMetrics"
         this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
-        this.labelYAxis2 = "simplifiedSilhouette"
+        this.labelYAxis2 = "sim.Silhouette"
 
         if(variableYAxisLinechart == "globalStability0"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
@@ -200,7 +200,6 @@ system.linechart = (function() {
         that.updateVerticalLines(obj,data_matrix)
         
         this.render()
-        //updateRendering()
     }
 
     this.updateVerticalLines = (obj,data_matrix) => {
@@ -236,7 +235,7 @@ system.linechart = (function() {
 
             this.xAxis1 = d3.axisBottom().scale(this.xScale);
             this.xAxis2 = d3.axisBottom().scale(this.xScale);
-            this.xAxis2 = d3.axisBottom().scale(this.xScale);
+            this.xAxis3 = d3.axisBottom().scale(this.xScale);
         }
 
         svg.append("g")
@@ -258,26 +257,25 @@ system.linechart = (function() {
         this.yScale1 = d3.scaleLinear()
             .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
             .range([ this.heightSingleLinechart, 0 ]);
-
+        this.yAxis1 = d3.axisLeft().scale(this.yScale1).tickFormat(d3.format("~s"));   
+        
         this.yScale2 = d3.scaleLinear()
             .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); })])
             .range([ 2 * this.heightSingleLinechart, this.heightSingleLinechart ]);
-
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).tickFormat(d3.format("~s"));   
+        
         this.yScale3 = d3.scaleLinear()
             .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); })])
             .range([ 3 * this.heightSingleLinechart, 2 * this.heightSingleLinechart ]);
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).tickFormat(d3.format("~s"));   
         
         svg.append("g")
             .attr("class", "y axisLineChart")
             .call(this.yAxis1)
         svg.append("g")
-            .attr("transform",
-                  "translate( 0, " + (this.heightSingleLinechart) + ")")
             .attr("class", "y axisLineChart")
             .call(this.yAxis2)
         svg.append("g")
-            .attr("transform",
-                  "translate( 0, " + (2 * this.heightSingleLinechart) + ")")
             .attr("class", "y axisLineChart")
             .call(this.yAxis3)
         //labels
@@ -301,7 +299,7 @@ system.linechart = (function() {
         svg.append("text")
             .attr("class", "textYAxis")   
             .attr("transform", "rotate(-90)")
-            .attr("y", 0 - this.margin.left - 10)
+            .attr("y", 0 - this.margin.left)
             .attr("x",0 - ((this.heightSingleLinechart / 2) + this.heightSingleLinechart))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
