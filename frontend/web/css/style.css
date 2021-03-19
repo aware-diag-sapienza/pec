@@ -167,6 +167,24 @@ body {
   stroke-width: 2px;
 }
 
+.lineLineChart1 {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.lineLineChart2 {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.lineLineChart3 {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
 .legendOrdinal {
   font-size: 10px
 }
