@@ -150,7 +150,7 @@ this.updateScatterplot = (fixed,labels)=> {
 }
 this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 
-  if ( this.early_termination == null){
+  if ( this.early_termination === null){
   d3.select('#information-info').html("Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
   system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,labels);//useScale,useColor, scaleX,ScaleY
 
@@ -237,12 +237,6 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
     that.start_computation = true
     d3.select('#iteration-label').html('<button type="button" id="runButton" class="btn btn-outline-info" onclick="startIterations()" style="display: none;"><i class="fa fa-fast-forward"></i>RUN</button> <label class="control-label"> Click run</label>    ')
     document.getElementById('runButton').style.display = "inline-block"
-  //readFile(1);
-  //d3.select('#iteration-label').html("")
-  //d3.select('#information-info').html("Early Termination")
-  //readFile(1);
-  //d3.select('#iteration-label').html("")
-  //d3.select('#information-info').html("Early Termination")
 
   }
 }
@@ -251,55 +245,22 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
 
 //'./data/n5000-d2-k15-s2.csv';
 
+
  async function generateDataForScatterplot(dataset_projection,labelIteration){
 
-  
-
-  //csvUrl, sia il dataset con la proiezione
-  //dataIterationURL, sia l'array con le label.
-   
-   /*const csvDataset = tf.data.csv(
-     csvUrl, {
-       columnConfigs: {
-       }
-     });*/
-   
-   const numOfFeatures = 2;
-
-   /*const flattenedDataset =
-     csvDataset
-     .map((rawFeatures) => {
-       
-       return [Object.values(rawFeatures)]
+      that.tot_rows = dataset_projection.length
       
-      })*/
+      system.scatterplotFixed.tot_rows = that.tot_rows
       
-      that.tot_rows = dataset_projection.length//= await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)}) // ALESSIAAAAA QUI VA IL LINK VECCHIO
-     
-      system.scatterplotFixed.tot_rows = that.tot_rows//await d3.json(csvUrl+'/entries').then((data)=> {return parseInt(data)});
-      let dataIteration= labelIteration//await d3.json(dataIterationURL).then((data)=> {return data})
-      
-      //const it = await flattenedDataset.iterator()
-      //const num = await flattenedDataset.iterator()
-
       let xs = []
 
       let first_feature = []
       let second_feature = []
-     
-      
       
       that.coordData = dataset_projection
       system.scatterplotFixed.coordData= dataset_projection
-      if(that.first_iteration){
-
-        // capire se togliere questo IF
-        if (numOfFeatures == 2){
-          
+      
         for (let i = 0; i<that.tot_rows; i++) {
-
-          //let e = await it.next()
-          
           let array0 = dataset_projection[i]
           first_feature.push(+array0[0])
           second_feature.push(+array0[1])
@@ -313,25 +274,17 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
         .domain([d3.min(second_feature), d3.max(second_feature)])
         .range([10, stage.height()-10]);
 
-     
-    
-        
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,dataIteration);
-        system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,dataIteration);//useScale,useColor, scaleX,ScaleY
-      } else {
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration);
-      system.scatterplotFixed.updateScatterplot(false,false, that.scale_x,that.scale_y,dataIteration);//useScale,useColor, scaleX,ScaleY
-      
-
-        }
+      if(that.first_iteration){ 
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration);
+        system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
         that.first_iteration = false
       } else {
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',false,labelIteration);
+        system.scatterplotFixed.updateScatterplot(true,true, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
+      }
       
-      plotCoordsKonva(that.tot_rows, '#b3b3b3',false,dataIteration); // qui bisogna mettere il ciclo per il numero di features
-    
-
-     
-
+    }
+/*
    if (numOfFeatures == 2){ // I can map the dataset directly on the scatter
 
     for (let i = 0; i<that.tot_rows; i++) {
@@ -394,14 +347,25 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
 }
 
  //}
-
+*/
     this.createData = (csvUrl, labelCluster) => {
       system.scatterplot.reset();
       system.scatterplotFixed.reset();
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
 
+      let provaTensor =  generateDataForScatterplot(csvUrl,labelCluster);
+
+    }
+
+    this.createDataProjection = (csvUrl, labelCluster) => {
+
       
+      system.scatterplot.reset();
+      system.scatterplotFixed.reset();
+      system.scatterplot.initKonva();
+      system.scatterplotFixed.initKonva();
+
       let provaTensor =  generateDataForScatterplot(csvUrl,labelCluster);
 
     }
@@ -481,10 +445,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
 
         }
       }
-      /*let imgIds = ['canvasR', 'canvasG','canvasB'];
-      for (let i = 0; i<3; i++) {
-        displayImage(rgbData[i], diameter, imgIds[i]);
-      }*/
+      
     }
 
     function displayImage(data, diameter, id) {
