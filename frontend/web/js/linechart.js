@@ -10,20 +10,37 @@ system.linechart = (function() {
     this.technique = null
     
     this.divName = null
-    this.margin = { top: 35, right: 30, bottom: 50, left: 60 }
+    this.margin = { top: 40, right: 30,bottom: 20, left: 60 }
     this.width = null
     this.height = null
-    this.xScale = null
-    this.yScale = null
-    this.xAxis = null
-    this.yAxis = null
-
-    this.attributeYAxisFirstLevel = null
-    this.attributeYAxisSecondLevel = null
-    this.labelYAxis = null
+    this.heightSingleLinechart = null
     
-    // Define lines
-    this.line = d3.line()
+    this.xScale = null
+    
+    this.yScale1 = null
+    this.xAxis1 = null
+    this.yAxis1 = null
+    this.attributeYAxisFirstLevel1 = null
+    this.attributeYAxisSecondLevel1 = null
+    this.labelYAxis1 = null
+    this.line1 = d3.line()
+
+    this.yScale2 = null
+    this.xAxis2 = null
+    this.yAxis2 = null
+    this.attributeYAxisFirstLevel2 = null
+    this.attributeYAxisSecondLevel2 = null
+    this.labelYAxis2 = null
+    this.line2 = d3.line()
+
+    this.yScale3 = null
+    this.xAxis3 = null
+    this.yAxis3 = null
+    this.attributeYAxisFirstLevel3 = null
+    this.attributeYAxisSecondLevel3 = null
+    this.labelYAxis3 = null
+    this.line3 = d3.line()
+
     verticalLines = []
 
     this.init = (idDiv, tech) => {
@@ -55,74 +72,101 @@ system.linechart = (function() {
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
         this.height = parseInt(this.div.style("height")) - this.margin.top - this.margin.bottom;
+        this.heightSingleLinechart = parseInt(this.height)/3
+        
         this.xScale = d3.scaleLinear().domain([0, 40]).range([0, this.width]);
-        this.yScale = d3.scaleLinear().range([this.height, 0]);
-        this.xAxis = d3.axisBottom().scale(this.xScale);
-        this.yAxis = d3.axisLeft().scale(this.yScale).tickFormat(d3.format("~s"));        
-        this.line = d3.line()
+        //PRIMO
+        this.yScale1 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
+        this.xAxis1 = d3.axisBottom().scale(this.xScale);
+        this.yAxis1 = d3.axisLeft().scale(this.yScale1).tickFormat(d3.format("~s"));        
+        this.line1 = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel][that.attributeYAxisSecondLevel]));
+                return that.yScale1(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]));
             });
+        //SECONDO
+        this.yScale2 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
+        this.xAxis2 = d3.axisBottom().scale(this.xScale);
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).tickFormat(d3.format("~s"));        
+        this.line2 = d3.line()
+            .curve(d3.curveMonotoneX)
+            .x(function(d) {
+                return that.xScale(d["iteration"]);
+            })
+            .y(function(d) {
+                return that.yScale2(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]));
+            });
+        //TERZO
+        this.yScale3 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
+        this.xAxis3 = d3.axisBottom().scale(this.xScale);
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).tickFormat(d3.format("~s"));        
+        this.line3 = d3.line()
+            .curve(d3.curveMonotoneX)
+            .x(function(d) {
+                return that.xScale(d["iteration"]);
+            })
+            .y(function(d) {
+                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]));
+            });
+        
         return that
     } 
 
     this.computeYAxisVariable = () => {
-        if(variableYAxisLinechart == "default"){
-            switch(this.technique) {
-                case 'I-PecK':
-                    this.attributeYAxisFirstLevel = "labelsMetrics"
-                    this.attributeYAxisSecondLevel = "inertia"
-                    this.labelYAxis = "inertia"
-                    break;
-                case 'I-PecK++':
-                    this.attributeYAxisFirstLevel = "labelsMetrics"
-                    this.attributeYAxisSecondLevel = "inertia"
-                    this.labelYAxis = "inertia"
-                    break;
-                case 'HGPA-PecK':
-                    this.attributeYAxisFirstLevel = "progressiveMetrics"
-                    this.attributeYAxisSecondLevel = "adjustedRandScore"
-                    this.labelYAxis = "adjustedRandScore"
-                    break;
-                case 'HGPA-PecK++':
-                    this.attributeYAxisFirstLevel = "progressiveMetrics"
-                    this.attributeYAxisSecondLevel = "adjustedRandScore"
-                    this.labelYAxis = "adjustedRandScore"
-                    break;
-                case 'MCLA-PecK':
-                    this.attributeYAxisFirstLevel = "progressiveMetrics"
-                    this.attributeYAxisSecondLevel = "adjustedRandScore"
-                    this.labelYAxis = "adjustedRandScore"
-                    break
-                case 'MCLA-PecK++':
-                    this.attributeYAxisFirstLevel = "progressiveMetrics"
-                    this.attributeYAxisSecondLevel = "adjustedRandScore"
-                    this.labelYAxis = "adjustedRandScore"
-                    break;
-                default:
-                  // code block
-            }
-        }else if(variableYAxisLinechart == "simplifiedSilhouette"){
-            this.attributeYAxisFirstLevel = "labelsMetrics"
-            this.attributeYAxisSecondLevel = "simplifiedSilhouette"
-            this.labelYAxis = "simplifiedSilhouette"
+        switch(this.technique) {
+            case 'I-PecK':
+                this.attributeYAxisFirstLevel1 = "labelsMetrics"
+                this.attributeYAxisSecondLevel1 = "inertia"
+                this.labelYAxis1 = "inertia"
+                break;
+            case 'I-PecK++':
+                this.attributeYAxisFirstLevel1 = "labelsMetrics"
+                this.attributeYAxisSecondLevel1 = "inertia"
+                this.labelYAxis1 = "inertia"
+                break;
+            case 'HGPA-PecK':
+                this.attributeYAxisFirstLevel1 = "progressiveMetrics"
+                this.attributeYAxisSecondLevel1 = "adjustedRandScore"
+                this.labelYAxis1 = "adjustedRandScore"
+                break;
+            case 'HGPA-PecK++':
+                this.attributeYAxisFirstLevel1 = "progressiveMetrics"
+                this.attributeYAxisSecondLevel1 = "adjustedRandScore"
+                this.labelYAxis1 = "adjustedRandScore"
+                break;
+            case 'MCLA-PecK':
+                this.attributeYAxisFirstLevel1 = "progressiveMetrics"
+                this.attributeYAxisSecondLevel1 = "adjustedRandScore"
+                this.labelYAxis1 = "adjustedRandScore"
+                break
+            case 'MCLA-PecK++':
+                this.attributeYAxisFirstLevel1 = "progressiveMetrics"
+                this.attributeYAxisSecondLevel1 = "adjustedRandScore"
+                this.labelYAxis1 = "adjustedRandScore"
+                break;
+            default:
+              // code block
         }
-        else if(variableYAxisLinechart == "globalStability0"){
-            this.attributeYAxisFirstLevel = "progressiveMetrics"
-            this.attributeYAxisSecondLevel = "globalStability0"
-            this.labelYAxis = "globalStability0"
+
+        this.attributeYAxisFirstLevel2 = "labelsMetrics"
+        this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
+        this.labelYAxis2 = "sim.Silhouette"
+
+        if(variableYAxisLinechart == "globalStability0"){
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStability0"
+            this.labelYAxis3 = "globalStability0"
         }else if(variableYAxisLinechart == "globalStability1"){
-            this.attributeYAxisFirstLevel = "progressiveMetrics"
-            this.attributeYAxisSecondLevel = "globalStability1"
-            this.labelYAxis = "globalStability1"
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStability1"
+            this.labelYAxis3 = "globalStability1"
         }else if(variableYAxisLinechart == "globalStability2"){
-            this.attributeYAxisFirstLevel = "progressiveMetrics"
-            this.attributeYAxisSecondLevel = "globalStability2"
-            this.labelYAxis = "globalStability2"
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStability2"
+            this.labelYAxis3 = "globalStability2"
         }
         
     }
@@ -156,7 +200,6 @@ system.linechart = (function() {
         that.updateVerticalLines(obj,data_matrix)
         
         this.render()
-        //updateRendering()
     }
 
     this.updateVerticalLines = (obj,data_matrix) => {
@@ -189,28 +232,58 @@ system.linechart = (function() {
             
         if(this.data.length>40) {
             this.xScale = d3.scaleLinear().domain([0, this.data.length]).range([0, this.width]);
-            this.xAxis = d3.axisBottom().scale(this.xScale);
+
+            this.xAxis1 = d3.axisBottom().scale(this.xScale);
+            this.xAxis2 = d3.axisBottom().scale(this.xScale);
+            this.xAxis3 = d3.axisBottom().scale(this.xScale);
         }
 
         svg.append("g")
             .attr("class", "x axisLineChart")
-            .attr("transform", "translate(0," + this.height + ")")
-            .call(this.xAxis);
+            .attr("transform", "translate(0," + this.heightSingleLinechart + ")")
+            .call(this.xAxis1);
+
+        svg.append("g")
+            .attr("class", "x axisLineChart")
+            .attr("transform", "translate(0," + this.heightSingleLinechart*2 + ")")
+            .call(this.xAxis2);
+        
+        svg.append("g")
+            .attr("class", "x axisLineChart")
+            .attr("transform", "translate(0," + this.heightSingleLinechart*3 + ")")
+            .call(this.xAxis3);
           
         // Add Y axis
-        this.yScale = d3.scaleLinear()
-            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel][that.attributeYAxisSecondLevel]); })])
-            .range([ this.height, 0 ]);
+        this.yScale1 = d3.scaleLinear()
+            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
+            .range([ this.heightSingleLinechart, 0 ]);
+        this.yAxis1 = d3.axisLeft().scale(this.yScale1).tickFormat(d3.format("~s"));   
+        
+        this.yScale2 = d3.scaleLinear()
+            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); })])
+            .range([ 2 * this.heightSingleLinechart, this.heightSingleLinechart ]);
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).tickFormat(d3.format("~s"));   
+        
+        this.yScale3 = d3.scaleLinear()
+            .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); })])
+            .range([ 3 * this.heightSingleLinechart, 2 * this.heightSingleLinechart ]);
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).tickFormat(d3.format("~s"));   
+        
         svg.append("g")
             .attr("class", "y axisLineChart")
-            .call(this.yAxis)
-        
+            .call(this.yAxis1)
+        svg.append("g")
+            .attr("class", "y axisLineChart")
+            .call(this.yAxis2)
+        svg.append("g")
+            .attr("class", "y axisLineChart")
+            .call(this.yAxis3)
         //labels
         svg.append("text")
             .attr("class", "textXAxis")            
             .attr("transform",
                   "translate(" + (this.width/2) + " ," + 
-                                 (this.height + this.margin.top) + ")")
+                                 (3 * this.heightSingleLinechart + this.margin.top) + ")")
             .style("text-anchor", "middle")
             .text("Iterations");
         
@@ -218,71 +291,32 @@ system.linechart = (function() {
             .attr("class", "textYAxis")   
             .attr("transform", "rotate(-90)")
             .attr("y", 0 - this.margin.left)
-            .attr("x",0 - (this.height / 2))
+            .attr("x",0 - (this.heightSingleLinechart / 2))
             .attr("dy", "1em")
             .style("text-anchor", "middle")
-            .text(that.labelYAxis);  
+            .text(that.labelYAxis1);  
+
+        svg.append("text")
+            .attr("class", "textYAxis")   
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - this.margin.left)
+            .attr("x",0 - ((this.heightSingleLinechart / 2) + this.heightSingleLinechart))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text(that.labelYAxis2); 
+
+        svg.append("text")
+            .attr("class", "textYAxis")   
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - this.margin.left)
+            .attr("x",0 - ((this.heightSingleLinechart / 2) + 2 * this.heightSingleLinechart))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text(that.labelYAxis3); 
 
         drawLegend()
         updateRendering()
 
-        let resize = function () {
-            that.width = parseInt(that.div.style("width")) - that.margin.left - that.margin.right,
-            that.height = parseInt(that.div.style("height")) - that.margin.top - that.margin.bottom;
-            that.xScale.range([0, that.width]);
-            that.yScale.range([that.height, 0]);
-            
-            that.xAxis = d3.axisBottom().scale(that.xScale);
-            //that.yAxis = d3.axisLeft().scale(that.yScale);
-            that.yAxis = d3.axisLeft().scale(that.yScale).tickFormat(d3.format("~s"));      
-            
-            // Update the axis and text with the new scale
-            svg.select(".x.axisLineChart")
-                .attr("transform", "translate(0," + that.height + ")")
-                .call(that.xAxis);
-            
-            svg.select(".y.axisLineChart").call(that.yAxis);
-
-            svg.select(".textXAxis")             
-                .attr("transform",
-                    "translate(" + (that.width/2) + " ," + 
-                                    (that.height + that.margin.top ) + ")")
-                .style("text-anchor", "middle")
-                .text("Iterations");
-
-            svg.select(".textYAxis")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0 - that.margin.left)
-                .attr("x",0 - (that.height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text(that.labelYAxis);   
-
-            svg.select(".legendOrdinal")
-                .attr("transform", "translate(0," + (0-that.margin.top) + ")")
-                //.attr("transform", "translate(" + (that.width - that.margin.left) + ","+ that.margin.top + ")");
-                    
-            // Force D3 to recalculate and update the line
-            svg.selectAll(".lineLineChart").attr("d", function(d) {
-                return that.line(d);
-            })   
-
-            svg.selectAll('.lineVertical')
-                .attr('x1', d=> that.xScale(d.iteration))
-                .attr('x2', d=> that.xScale(d.iteration))
-                .attr("y1", that.height)
-                .attr("y2", 0)
-            
-            // Update the tick marks
-            that.xAxis.ticks(Math.max(that.width / 75, 2));
-            that.yAxis.ticks(Math.max(that.height / 50, 2));
-        }
-        
-        // Call the resize function whenever a resize event occurs
-        d3.select(window).on('resize', resize);
-
-        // Call the resize function
-        resize();
     }
 
     let drawLegend = () => {
@@ -355,13 +389,57 @@ system.linechart = (function() {
         tippy(vv.nodes(),{delay: 300});
 
         that.div.select("g.gLineChart")
-            .selectAll('path.lineLineChart')
+            .selectAll('path.lineLineChart1')
             .data(that.segmentedData)
             .join(
                 enter => enter
                     .append('path')
-                    .attr('class', 'lineLineChart')
-                    .attr('d', d =>  that.line(d)),
+                    .attr('class', 'lineLineChart1')
+                    .attr('d', d =>  that.line1(d)),
+                update => update
+                .call(update => update
+                    .transition()
+                    .duration(0)
+                    //.style("stroke", 'red')
+                ),
+                exit => exit
+                .call(exit => exit
+                    .transition()
+                    .duration(0)
+                    .remove()
+                )
+            )  
+
+        that.div.select("g.gLineChart")
+            .selectAll('path.lineLineChart2')
+            .data(that.segmentedData)
+            .join(
+                enter => enter
+                    .append('path')
+                    .attr('class', 'lineLineChart2')
+                    .attr('d', d =>  that.line2(d)),
+                update => update
+                .call(update => update
+                    .transition()
+                    .duration(0)
+                    //.style("stroke", 'red')
+                ),
+                exit => exit
+                .call(exit => exit
+                    .transition()
+                    .duration(0)
+                    .remove()
+                )
+            )  
+
+        that.div.select("g.gLineChart")
+            .selectAll('path.lineLineChart3')
+            .data(that.segmentedData)
+            .join(
+                enter => enter
+                    .append('path')
+                    .attr('class', 'lineLineChart3')
+                    .attr('d', d =>  that.line3(d)),
                 update => update
                 .call(update => update
                     .transition()
