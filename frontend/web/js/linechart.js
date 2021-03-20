@@ -59,14 +59,14 @@ system.linechart = (function() {
                 'name': 'fast',
                 'draw': false,
                 'iteration': null,
-                'fill': "#FDE725",
+                'fill': "#ffd700",
                 'label': 'Early Termination Fast'
             },
             {
                 'name': 'slow',
                 'draw': false,
                 'iteration': null,
-                'fill': "#3CBB75",
+                'fill': "#c0c0c0",
                 'label': 'Early Termination Slow'
             }
         ]
@@ -214,10 +214,7 @@ system.linechart = (function() {
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
                     console.log('ALESSIA SUSHI',obj)
-                    //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
                     system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
-                    // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 
-                    // ALESSIA qui update della matrice 2
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics.adjustedRandScore,obj.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 }
             }

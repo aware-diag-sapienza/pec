@@ -316,7 +316,7 @@ function addPinHistory() {
         .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', 0)
         .attr('height', height_pin)
-        .attr('fill', '#ffd9b3')
+        .attr('fill', '#afeeee')
 
     let text = SVG_HISTORY.selectAll(".text-history")
         .data(previous_computations)

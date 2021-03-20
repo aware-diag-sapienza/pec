@@ -40,14 +40,14 @@ system.linechart = (function() {
                 'name': 'fast',
                 'draw': false,
                 'iteration': null,
-                'fill': "#FDE725",
+                'fill': "#c0c0c0",
                 'label': 'Early Termination Fast'
             },
             {
                 'name': 'slow',
                 'draw': false,
                 'iteration': null,
-                'fill': "#3CBB75",
+                'fill': "#FFD700",
                 'label': 'Early Termination Slow'
             }
         ]

@@ -31,6 +31,7 @@ system.timelinepartitions = (function() {
     this.MIN_METRIC = null
     this.METRICA_LABELING = 'simplifiedSilhouette';
     this.ITERATION_LAST = null
+    this.BEST_RUN = null
 
     
     this.init = (idDiv, tech, numPart) => {
@@ -99,6 +100,7 @@ system.timelinepartitions = (function() {
         this.data = this.data.concat(obj)
 
         this.ITERATION_LAST = obj.info.runs_iterations
+        this.BEST_RUN =  obj.info.best_run
         
         // UPDATE THE domain of the dynamic scale
         if (d3.min(obj.metrics.partitionsMetrics['inertia']) < this.DOMAINS['inertia'][0]){
@@ -327,7 +329,7 @@ system.timelinepartitions = (function() {
         // d[2] valore metrica
         // d[3] best run
         // d[4] best valore metrica
-
+        console.log('PARTITION_STATUS',that.ITERATION_LAST)
         that.div.select("g.gTimeLine")
             .selectAll('rect.rect-partition')
             .data(parse_intertia_runs(this.data.map(d=> d.metrics.partitionsMetrics[that.metric_value]),this.data.map(f => f.info.best_run)))
@@ -388,8 +390,8 @@ system.timelinepartitions = (function() {
                             return 'visible';
                         })
                     .style('opacity', (d)=> {
-                            let current_i = parseInt(d[1].replace('P',''))
-                            if(that.partitions_status[current_i][2])
+                            let current_index = parseInt(d[1].replace('P',''))
+                            if(that.partitions_status[current_index][2])
                                 return 1;
                             else
                                 return 0;
@@ -408,6 +410,23 @@ system.timelinepartitions = (function() {
                         .remove()
                     )
                 )
+
+                that.div.select("g.gTimeLine")
+                .append('text')
+                .attr('id','champion-icon')
+                .attr('font-family', 'FontAwesome')
+                .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN]+1))
+                .attr('y', that.yScale('P'+that.BEST_RUN)+((that.yScale.step()/3)*2))
+                .attr('font-size', 15)
+                .attr('fill',()=>{
+                    if(that.metric_value === 'inertia'){
+                        return '#ff0090'
+                    }
+                    if (that.metric_value === that.METRICA_LABELING){
+                        return '#0094db'
+                    }
+                })
+                .text('\uf091' ); 
             
     }
 
