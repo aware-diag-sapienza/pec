@@ -95,7 +95,7 @@ class ClusteringMetrics:
 
     
     @staticmethod
-    def smooth_labels__jaccarfd(data, prev, curr):
+    def smooth_labels(data, prev, curr):
         """
         Smooth current labels in order to have less difference with previous.
 
@@ -116,23 +116,21 @@ class ClusteringMetrics:
             clusters_curr[i] = np.full_like(curr, 0, dtype=np.uint8)
             clusters_curr[i][np.where(curr == l)] = 1
         
-        #jaccard
         result = curr.copy()
         for c in clusters_curr:
-            sim = [ sklearn.metrics.jaccard_score(c, p) for p in clusters_prev]
-            i = np.argmax(sim) #best index
-            l = unique_prev[i] #best label
+            sim = [ sklearn.metrics.jaccard_score(c, p) for p in clusters_prev ]
+            i = np.argmax(sim) #best fitting index
+            l = unique_prev[i] #best fitting label
+            result[np.where(c)] = l #set cluster to result
             #remove assigned cluster
-            np.delete(unique_prev, i)
-            np.delete(clusters_prev, i)
-            #update result
-            result[np.where(c)] = l
+            unique_prev = np.delete(unique_prev, i)
+            clusters_prev.pop(i)
         
         return result
-
+        
     
     @staticmethod
-    def smooth_labels(data, prev, curr):
+    def smooth_labels__euclidean(data, prev, curr): ##funziona meglio jaccard
         """
         Smooth current labels in order to have less difference with previous.
 
@@ -145,18 +143,17 @@ class ClusteringMetrics:
 
         _, centroids_prev, _, _ = ClusteringMetrics._get_clusters(data, prev)
         _, centroids_curr, _, _ = ClusteringMetrics._get_clusters(data, curr)
-        
+
         result = curr.copy()
         for c in centroids_curr:
             dist = [ sklearn.metrics.pairwise.euclidean_distances([c], [p])[0,0] for p in centroids_prev]
-            i = np.argmin(dist) #best index
-            l = unique_prev[i] #best label
+            i = np.argmin(dist) #best fitting index
+            l = unique_prev[i] #best fitting label
+            result[np.where(curr == c)] = l #set cluster to result
             #remove assigned cluster
-            np.delete(unique_prev, i)
-            np.delete(centroids_prev, i)
-            #update result
-            result[np.where(c)] = l
-        
+            unique_prev = np.delete(unique_prev, i)
+            centroids_prev = np.delete(centroids_prev, i, 0)
+
         return result
 
 
@@ -178,14 +175,22 @@ class ClusteringMetrics:
         return (prev_labels == curr_labels).astype(np.uint8)
         
     @staticmethod
-    def entries_stability2(labelsHistory):
+    def entries_stabilityLOG(labelsHistory):
         stability = np.full_like(labelsHistory[0], 0, dtype=float)
         h = len(labelsHistory)
-        w = [math.log(2 + i) for i in range(h)] #log weights
-        #w = [math.exp(i+1) for i in range(h)] #log weights
-
+        w = [math.log(2 + i) for i in range(h-1)] #log weights
         if h < 5: return stability
-
+        for i in range(h-1):
+            stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
+        return stability
+    
+    @staticmethod
+    def entries_stabilityEXP(labelsHistory):
+        stability = np.full_like(labelsHistory[0], 0, dtype=float)
+        h = len(labelsHistory)
+        w = [math.log(2 + i) for i in range(h-1)] #log weights
+        #w = [math.exp(i) for i in range(h-1)] #exp weights
+        if h < 5: return stability
         for i in range(h-1):
             stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
         return stability
@@ -199,6 +204,10 @@ class ClusteringMetrics:
         return np.mean(ClusteringMetrics.entries_stability1(prev_labels, curr_labels))
 
     @staticmethod
-    def global_stability2(labelsHistory):
-        return np.mean(ClusteringMetrics.entries_stability2(labelsHistory))
+    def global_stabilityLOG(labelsHistory):
+        return np.mean(ClusteringMetrics.entries_stabilityLOG(labelsHistory))
+    
+    @staticmethod
+    def global_stabilityEXP(labelsHistory):
+        return np.mean(ClusteringMetrics.entries_stabilityEXP(labelsHistory))
         

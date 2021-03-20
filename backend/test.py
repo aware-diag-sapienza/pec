@@ -2,16 +2,18 @@
 from pec.metrics import ClusteringMetrics
 import numpy as np
 
-x = [[0, 1], [0.1, 0.9]]
-y = [[1, 0], [0.9, 0.1]]
-data = np.array(x + y)
+data = np.array([
+    [0, 0],
+    [0, 1],
+    [1, 1],
+    [1, 0]
+], dtype=float)
 
-labels_a = [0,0, 1,1]
-labels_b = [0,0, 1,2][::-1]
+labels_prev = np.array([0, 1, 2, 3])
+labels_curr = np.array([1, 2, 0, 3])
 
-
-d = ClusteringMetrics.simplified_silhouette(data, labels_b)
-
+sm = ClusteringMetrics.smooth_labels__jaccard(data, labels_prev, labels_curr)
+print(sm)
 """
 a, b, u = ClusteringMetrics.normalize_labels(data, labels_a, labels_b)
 
