@@ -174,7 +174,7 @@ function readResult(it_res){
     timestamp0 = swap_timestamp
     let actual_timestamp;
     console.log('sono in readFile',it_res)
-
+    CURRENT_ITERATION = it_res.iteration
     actual_timestamp = it_res.timestamp
 
     console.log('SONO ALL\'iTERAZIONE  ',it_res.iteration)
@@ -200,7 +200,7 @@ function readResult(it_res){
                 linechart1.updateData(it_res,it_res.info)
                 timelinePartitions.updateData(it_res,it_res.metrics)
                 updateTable(it_res)
-                system.scatterplot.updateScatterplot(false,it_res.labels);
+                system.scatterplot.updateScatterplot();
                 system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 
             }

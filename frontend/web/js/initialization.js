@@ -34,7 +34,7 @@ system.initialization = (function() {
               }else{
                 linechart1.updateData(data[i])
                 if(i == 3 || i == 8 || i == 10 || i == 15) 
-                  system.scatterplot.updateScatterplot(true);
+                  system.scatterplot.updateScatterplot();
                 else 
                   system.scatterplot.updateScatterplot();
               }
