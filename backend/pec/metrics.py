@@ -95,7 +95,7 @@ class ClusteringMetrics:
 
     
     @staticmethod
-    def smooth_labels_jaccard(data, prev, curr):
+    def smooth_labels__jaccarfd(data, prev, curr):
         """
         Smooth current labels in order to have less difference with previous.
 
