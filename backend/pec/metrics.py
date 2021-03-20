@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.lib.arraysetops import unique
+import math
 import sklearn.metrics
 import traceback
 
@@ -178,8 +178,17 @@ class ClusteringMetrics:
         return (prev_labels == curr_labels).astype(np.uint8)
         
     @staticmethod
-    def entries_stability2(prev_labels, curr_labels): ## TODO !!! DA SISTEMARE !!!
-        return np.full_like(curr_labels, 0, dtype=np.uint8)
+    def entries_stability2(labelsHistory):
+        stability = np.full_like(labelsHistory[0], 0, dtype=float)
+        h = len(labelsHistory)
+        w = [math.log(2 + i) for i in range(h)] #log weights
+        #w = [math.exp(i+1) for i in range(h)] #log weights
+
+        if h < 5: return stability
+
+        for i in range(h-1):
+            stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
+        return stability
         
     @staticmethod
     def global_stability0(prev_labels, curr_labels):
@@ -190,6 +199,6 @@ class ClusteringMetrics:
         return np.mean(ClusteringMetrics.entries_stability1(prev_labels, curr_labels))
 
     @staticmethod
-    def global_stability2(prev_labels, curr_labels):
-        return np.mean(ClusteringMetrics.entries_stability2(prev_labels, curr_labels))
+    def global_stability2(labelsHistory):
+        return np.mean(ClusteringMetrics.entries_stability2(labelsHistory))
         
