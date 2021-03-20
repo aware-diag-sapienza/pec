@@ -95,19 +95,19 @@ system.linechart = (function() {
         //SECONDO
         this.yScale2 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
         this.xAxis2 = d3.axisBottom().scale(this.xScale);
-        this.yAxis2 = d3.axisLeft().scale(this.yScale2).ticks(this.numerTicksYAxis, "s");       
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).ticks(this.numerTicksYAxis);       
         this.line2 = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale2(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]));
+                return that.yScale2(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]);
             });
         //TERZO
         this.yScale3 = d3.scaleLinear().range([this.heightSingleLinechart, 0]);
         this.xAxis3 = d3.axisBottom().scale(this.xScale);
-        this.yAxis3 = d3.axisLeft().scale(this.yScale3).ticks(this.numerTicksYAxis, "s");         
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).ticks(this.numerTicksYAxis);         
         this.line3 = d3.line()
             .curve(d3.curveMonotoneX)
             .x(function(d) {
@@ -250,7 +250,48 @@ system.linechart = (function() {
         .append("g")
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
             .attr("class", "gLineChart")
+              
+        // Add Y axis
+        if(relatiYAxisLineCharts){
+            this.yScale1 = d3.scaleLinear()
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); }))
+                .range([ this.heightSingleLinechart, 0 ]);
+            let minMaxSilouhette = d3.extent(this.data, function(d) { return d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]; })
+            let minSilouhetteScale;
+            let maxSilouhetteScale;
+            if(Math.abs(minMaxSilouhette[0]) > Math.abs(minMaxSilouhette[1])) {
+                minSilouhetteScale = - Math.abs(minMaxSilouhette[0])
+                maxSilouhetteScale = Math.abs(minMaxSilouhette[0])
+            }else{
+                minSilouhetteScale = - Math.abs(minMaxSilouhette[1])
+                maxSilouhetteScale = Math.abs(minMaxSilouhette[1])
+            }
+            this.yScale2 = d3.scaleLinear()
+                .domain([minSilouhetteScale, maxSilouhetteScale])
+                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+            this.yScale3 = d3.scaleLinear()
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); }))
+                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
             
+        }else{
+            this.yScale1 = d3.scaleLinear()
+                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
+                .range([ this.heightSingleLinechart, 0 ]);
+
+            this.yScale2 = d3.scaleLinear()
+                .domain([-1, 1])
+                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+            
+            this.yScale3 = d3.scaleLinear()
+                .domain([0, 1])
+                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
+            
+        }
+        
+        this.yAxis1 = d3.axisLeft().scale(this.yScale1).ticks(this.numerTicksYAxis, "s");    
+        this.yAxis2 = d3.axisLeft().scale(this.yScale2).ticks(this.numerTicksYAxis);  
+        this.yAxis3 = d3.axisLeft().scale(this.yScale3).ticks(this.numerTicksYAxis, "s"); 
+        
         if(this.data.length>40) {
             this.xScale = d3.scaleLinear().domain([0, this.data.length]).range([0, this.width]);
 
@@ -266,44 +307,13 @@ system.linechart = (function() {
 
         svg.append("g")
             .attr("class", "x axisLineChart")
-            .attr("transform", "translate(0," + (this.heightSingleLinechartArea + this.heightSingleLinechart)  + ")")
+            .attr("transform", "translate(0," + (this.yScale2(0))  + ")")
             .call(this.xAxis2);
         
         svg.append("g")
             .attr("class", "x axisLineChart")
             .attr("transform", "translate(0," + (2*this.heightSingleLinechartArea + this.heightSingleLinechart) + ")")
             .call(this.xAxis3);
-          
-        // Add Y axis
-        if(relatiYAxisLineCharts){
-            this.yScale1 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); }))
-                .range([ this.heightSingleLinechart, 0 ]);
-            this.yScale2 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); }))
-                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
-            this.yScale3 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); }))
-                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
-            
-        }else{
-            this.yScale1 = d3.scaleLinear()
-                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
-                .range([ this.heightSingleLinechart, 0 ]);
-
-            this.yScale2 = d3.scaleLinear()
-                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]); })])
-                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
-            
-            this.yScale3 = d3.scaleLinear()
-                .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); })])
-                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
-            
-        }
-        
-        this.yAxis1 = d3.axisLeft().scale(this.yScale1).ticks(this.numerTicksYAxis, "s");    
-        this.yAxis2 = d3.axisLeft().scale(this.yScale2).ticks(this.numerTicksYAxis, "s");  
-        this.yAxis3 = d3.axisLeft().scale(this.yScale3).ticks(this.numerTicksYAxis, "s");  
         
         svg.append("g")
             .attr("class", "y axisLineChart")
@@ -434,6 +444,7 @@ system.linechart = (function() {
                 enter => enter
                     .append('path')
                     .attr('class', 'lineLineChart1')
+                    .attr('stroke', d=> { return d3.interpolateGreens(0.75)})
                     .attr('d', d =>  that.line1(d)),
                 update => update
                 .call(update => update
@@ -456,6 +467,7 @@ system.linechart = (function() {
                 enter => enter
                     .append('path')
                     .attr('class', 'lineLineChart2')
+                    .attr('stroke', d => { return d3.interpolateReds(0.75)})
                     .attr('d', d =>  that.line2(d)),
                 update => update
                 .call(update => update
@@ -478,6 +490,7 @@ system.linechart = (function() {
                 enter => enter
                     .append('path')
                     .attr('class', 'lineLineChart3')
+                    .style("stroke", 'steelblue')
                     .attr('d', d =>  that.line3(d)),
                 update => update
                 .call(update => update
