@@ -267,7 +267,7 @@ class ProgressiveEnsembleClustering:
             self.__prevResult = result
             self.__metricsHistory.append(result.metrics)
             self.__labelsHistory.append(result.labels)
-            if len(self.__labelsHistory) > 5: self.__labelsHistory = self.__labelsHistory[1:]
+            #if len(self.__labelsHistory) > 5: self.__labelsHistory = self.__labelsHistory[1:]
             
             self.__time_manager.resume()
         ###
@@ -317,11 +317,21 @@ class ProgressiveEnsembleClustering:
         progressiveMetrics = {
             "clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(prevResult.labels, currentResult.labels),
             "entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(prevResult.labels, currentResult.labels),
-            "entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability2(labelsHistory),
+            "entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory),
+            
+            "entriesStabilityLOG5": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory[-5:]),
+            "entriesStabilityEXP5": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityEXP(labelsHistory[-5:]),
+            "entriesStabilityLOG": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory),
+            "entriesStabilityEXP": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityEXP(labelsHistory),
             
             "globalStability0": 0 if firstIteration else ClusteringMetrics.global_stability0(prevResult.labels, currentResult.labels),
             "globalStability1": 0 if firstIteration else ClusteringMetrics.global_stability1(prevResult.labels, currentResult.labels),
-            "globalStability2": 0 if firstIteration else ClusteringMetrics.global_stability2(labelsHistory),
+            "globalStability2": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory),
+            
+            "globalStabilityLOG5": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory[-5:]),
+            "globalStabilityEXP5": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory[-5:]),
+            "globalStabilityLOG": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory),
+            "globalStabilityEXP": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory),
             
             "inertia_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("inertia") - labelsMetrics["inertia"]) / fn_max_labelsMetricHistory("inertia"),
             "dbIndex_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("dbIndex") - labelsMetrics["dbIndex"]) / fn_max_labelsMetricHistory("dbIndex"),

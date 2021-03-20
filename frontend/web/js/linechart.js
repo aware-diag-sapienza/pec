@@ -172,6 +172,22 @@ system.linechart = (function() {
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
             this.attributeYAxisSecondLevel3 = "globalStability2"
             this.labelYAxis3 = "Global Stability 2"
+        }else if(variableYAxisLinechart == "globalStabilityEXP"){
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStabilityEXP"
+            this.labelYAxis3 = "globalStabilityEXP"
+        }else if(variableYAxisLinechart == "globalStabilityEXP5"){
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStabilityEXP5"
+            this.labelYAxis3 = "globalStabilityEXP5"
+        }else if(variableYAxisLinechart == "globalStabilityLOG"){
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStabilityLOG"
+            this.labelYAxis3 = "globalStabilityLOG"
+        }else if(variableYAxisLinechart == "globalStabilityLOG5"){
+            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+            this.attributeYAxisSecondLevel3 = "globalStabilityLOG5"
+            this.labelYAxis3 = "globalStabilityLOG5"
         }
         
     }

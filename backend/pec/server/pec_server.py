@@ -68,7 +68,7 @@ class PECServer:
             ##
         except Exception:
             traceback.print_exc()
-            self.socket.sendMessage(client, traceback.format_exc())
+            self.socketServer.sendMessage(client, traceback.format_exc())
     
     def createAsyncJob(self, client, requestId, d):
         job = AsyncJob(d.type, d.dataset, d.k, d.r, d.s, self.partialResultsQueue, client=client)
