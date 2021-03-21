@@ -244,3 +244,7 @@ fill: #41A368;
   stroke: #6C757D;
 }
 
+
+#similarity-range{
+  width:100px;
+}

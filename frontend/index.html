@@ -113,11 +113,15 @@
       <div class="item-linechart-1" id="linechart_inertia">
         </div>
       <div class="item-information-linechart" id="information-linechart" >
-        TIMELINE METRICS: 
+        <b>TIMELINE METRICS</b>: 
         <input type="radio" id="inertia" name="metric-timeline" value="inertia" onclick="system.timelinepartitions.updateMetricValue()" checked>
         <label for="inertia">inertia</label>
         <input type="radio" id="simplifiedSilhouette" name="metric-timeline" value="simplifiedSilhouette" onclick="system.timelinepartitions.updateMetricValue()">
         <label for="simplifiedSilhouette">labeling</label>
+        <b>Similarity:</b> <label id="selected_similarity">1%</label>
+        <label for="similarity">0</label>
+        <input type="range" id="similarity-range" name="similarity" min="0" max="100" value = "1" onchange="system.timelinepartitions.updateSimilarity()"> 100 
+
       </div>
       <div class="item-timeline-partitions" id="timeline-partitions"></div>
       <div class="item-information"><p id='information-info'></p></div>

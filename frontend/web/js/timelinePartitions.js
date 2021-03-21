@@ -32,27 +32,27 @@ system.timelinepartitions = (function() {
     this.METRICA_LABELING = 'simplifiedSilhouette';
     this.ITERATION_LAST = null
     this.BEST_RUN = null
+    this.percentage_similarity= null;
 
     
     this.init = (idDiv, tech, numPart) => {
         this.div = d3.select(idDiv)
-        console.log('idDiv', idDiv)
+
     
         this.div.selectAll('svg')
             .remove();
 
-        console.log('SUSHI FIX',this.height_like_matrix)
+
         this.matrix_width = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin_matrix.left - this.margin_matrix.right;
         this.matrix_height = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin_matrix.top - this.margin_matrix.bottom;
         this.all_cell = (d3.min([this.matrix_width,this.matrix_height])-this.margin_matrix.top)
         this.matrix_cell_size = (d3.min([this.matrix_width,this.matrix_height])-this.margin_matrix.top)/partitions
         this.partitions_status=Array.from({length:partitions},(_,i)=> [0,'P'+i,true])
         this.metric_value = $('input[name="metric-timeline"]:checked').val();
+        this.percentage_similarity = +$('#similarity-range').val()
 
         
         this.DOMAINS = {inertia: [0,0], simplifiedSilhouette: [-1,1]}
-        
-        console.log(' this.DOMAINS ',this.DOMAINS)
         
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
@@ -143,7 +143,7 @@ system.timelinepartitions = (function() {
                 e[0] = obj.iteration
             }
         })
-        console.log('>>>> DOMAIN',this.metric_value,this.DOMAINS,this.colorScaleCell.domain(),this.colorScaleCell.range())
+
         this.render(obj.iteration)
     }
 
@@ -210,12 +210,12 @@ system.timelinepartitions = (function() {
                         .attr('stroke-width',3)
                         .attr('stroke',(d)=> {if(d[2]) return '#000'; else {return'#6C757D'}})
                         .on('click',function(d){
-                            console.log(d)
+                            
                             let index_checkbox = parseInt(d3.select(this).attr('id').replace('checkbox-P',''))
-                            console.log(that.partitions_status[index_checkbox],index_checkbox)
+                            
                             if (that.partitions_status[index_checkbox][2]){
                                 that.partitions_status[index_checkbox][2] = false
-                                console.log(d3.select(this))
+                                
                                 d3.select(this)
                                 .attr('fill','#fff')
                                 .attr('stroke-width',3)
@@ -282,7 +282,7 @@ system.timelinepartitions = (function() {
     }
 
     let parse_intertia_runs = (all_data, array_inertia, best_run) =>{
-        console.log('ARRAY-INERTIA',best_run)
+        
       
         let parsed_array_inertia = []
         for( let i = 0; i < array_inertia.length; i++){ // i iterazione
@@ -326,11 +326,6 @@ system.timelinepartitions = (function() {
     }
 
     let updateRendering = () => {
-
-        //that.metric_value = $('input[name="metric-timeline"]:checked').val();
-
-        
-        console.log(this.data.map(d => d.info.best_run))
         // DATI CELLE
         // d[0] iteratione
         // d[1] partizione
@@ -338,7 +333,6 @@ system.timelinepartitions = (function() {
         // d[3] best run
         // d[4] best valore metrica
         // d[5] altre metriche
-        console.log('PARTITION_STATUS',that.ITERATION_LAST)
         that.div.select("g.gTimeLine")
             .selectAll('rect.rect-partition')
             .data(parse_intertia_runs(this.data,this.data.map(d=> d.metrics.partitionsMetrics[that.metric_value]),this.data.map(f => f.info.best_run)))
@@ -374,13 +368,11 @@ system.timelinepartitions = (function() {
                                 return '#0094db'
                             }
                         }
-                        else if((d[2] - d[4] <= d[4]*0.001) && (d[3] !== d[1])){ 
+                        else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
                             if(that.metric_value === 'inertia'){
                                 return "#ffff16" //"#ff9d47"
                             }
-                            /*if (this.metric_value === this.METRICA_LABELING){
-                                return '#ffff16'
-                            }*/
+                           
                             
                         }
                         })
@@ -437,6 +429,14 @@ system.timelinepartitions = (function() {
                 })
                 .text('\uf091' ); 
             
+    }
+
+    this.updateSimilarity = () =>{
+
+        this.percentage_similarity = +$('#similarity-range').val()
+        console.log($('#similarity-range').val());
+        d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
+        updateRendering();
     }
 
     return this;

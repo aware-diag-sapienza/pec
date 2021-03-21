@@ -8,10 +8,14 @@ let timelinePartitions;
 let matrix1;
 let matrix2;
 let SVG_HISTORY;
+let SVG_SILOUETTE;
 let previous_computations = [];
 let width_rect;
 let USED_SEED = []
+const SCALE_SILOUHETTE =  d3.scaleLinear().domain([-1,1]).range([0, 1]) 
 const LIMIT_IT = 100;
+
+
 
 let visualizeMetrics = false;
 
@@ -85,6 +89,9 @@ function updateSelects(list_dataset){
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
     document.getElementById("select-projection").value = 'tsne'
+    document.getElementById("similarity-range").value = 1
+    d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
+    
 
 }
 
@@ -94,12 +101,13 @@ function resetSelects(){
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
     document.getElementById("select-projection").value = 'tsne'
+    document.getElementById("similarity-range").value = 1
+    d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
+    
 }
 function getSeed(){
 
     let newseed = Math.random()*(100000-1)+1;
-
-    console.log('SEED',$( "#select-seed" ).val())
 
     if ($( "#select-seed" ).val() === '')
         return Math.ceil(newseed);
@@ -119,7 +127,6 @@ async function startSelects(){
     projection = $( "#select-projection" ).val()
     seed = getSeed()
 
-    console.log('SEED',seed)
 
     d3.select('#iteration-label').html('');
     d3.select('#id-metrics').style('display','none');
@@ -175,27 +182,21 @@ let swap_timestamp = 0;
 function readResult(it_res){
     timestamp0 = swap_timestamp
     let actual_timestamp;
-    console.log('sono in readFile',it_res)
    
     actual_timestamp = it_res.timestamp
-
-    console.log('SONO ALL\'iTERAZIONE  ',it_res.iteration)
     
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
     d3.selectAll('.linechart_select').style('display','block')
     d3.select('#button-metric').style('display','block')
     d3.select('#id-metrics').style('display','block')
-        console.log('ALESSIA',it_res.iteration, it_res.iteration == 1,it_res.iteration === 1)
         if(it_res.iteration === 0){
-                console.log('RISULTATO',it_res)
+                
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res]) 
                 linechart1.render()
                 timelinePartitions.setData([it_res]) 
                 timelinePartitions.render()
-                console.log('ALESSIA prima di tableupdate')
                 updateTable(it_res)
-                console.log('ALESSIA prima di adjacency')
                 system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 
         }else{
@@ -206,7 +207,7 @@ function readResult(it_res){
                 system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
                 
             }
-            updatePinHistory(it_res.iteration,it_res.isLast)
+            updatePinHistory(it_res.iteration,it_res.isLast, it_res.metrics.labelsMetrics.simplifiedSilhouette)
             system.matrixAdjacency.updateBestPartition(it_res.info.best_run)
 
             if (it_res.is_last){
@@ -218,7 +219,7 @@ function readResult(it_res){
 }
 
 function visualizeMetricsFunction(){
-    console.log('voglio visualizzare')
+    
     if(!visualizeMetrics){
         d3.select('#table-metrics').style('display','block')
         d3.select('.metrics-dropdown').style('border-width','2px')
@@ -274,22 +275,22 @@ function addPinHistory() {
     let margin_history = {top: 5, bottom:10, left:20, right:20}
     let height_pin = 60;
 
-    
-
     if (SVG_HISTORY == undefined){
         SVG_HISTORY = d3.select("#listhistory")
             .append("svg")
             .attr('width',width_history)
             .attr('height', height_history)
             .append("g")
-            .attr('width',width_history-margin_history.left-margin_history.right)
+            .attr('width',width_history)
             .attr('height', height_history-margin_history.top-margin_history.bottom)
-            .attr("transform","translate(" + margin_history.top + "," + margin_history.left + ")")    
+            .attr("transform","translate(" + margin_history.top + "," + margin_history.left + ")")
+
+        
     }
 
     let tentative = previous_computations.length
 
-    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed})
+    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'simplifiedSilhouette':-1, iteration:0, earlyTerminationSlow:-1,earlyTerminationFast:-1})
 
     scaleHistory = d3.scaleBand()
        
@@ -306,6 +307,19 @@ function addPinHistory() {
         .attr('stroke', 'black')
         .attr('fill', 'white')
     
+    
+    /*SVG_SILOUETTE.selectAll(".bar-silouette")
+        .data(previous_computations)
+        .enter()
+        .append('rect')
+        .attr('class','bar-silouette')
+        .attr('id',(d) => 'silouette-' + d.tentative)
+        .attr('x', 0)
+        .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
+        .attr('width', 200)
+        .attr('height', height_pin)
+        .attr('stroke', 'black')
+        .attr('fill', 'pink')*/
     width_rect = (width_history-margin_history.right)/LIMIT_IT
 
     SVG_HISTORY.selectAll(".bar-history-improvement")
@@ -338,7 +352,7 @@ function addPinHistory() {
             .attr('font-size', 'smaller')
         
         text.append("tspan")
-            .text(d => 'K:' + d.cluster)
+            .text(d => 'K:' + d.cluster + ' P:' + d.partitions)
             .attr("class", "tspan-cluster")
             .attr("x", 0)
             .attr("dx", 10)
@@ -360,16 +374,36 @@ function addPinHistory() {
             .attr("dx", 10)
             .attr("dy", 12)
             .attr('font-size', 'smaller')
+    
+        SVG_HISTORY.selectAll(".bar-silouette")
+            .data(previous_computations)
+            .enter()
+            .append('rect')
+            .attr('class','bar-silouette')
+            .attr('id',(d) => 'silouette-' + d.tentative)
+            .attr('x', width_history-margin_history.right)
+            .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
+            .attr('width', 10)
+            .attr('height', height_pin)
+            .attr('stroke', 'black')
+            .attr('fill', (d) => d3.interpolateReds(SCALE_SILOUHETTE(d.simplifiedSilhouette)))
         }
 
-function updatePinHistory(iteration,isLast){
+function updatePinHistory(iteration,isLast,valore_silouette){
 
     //previous_computations.length
+    let current_computation_index = previous_computations.length-1
+    previous_computations[current_computation_index]['simplifiedSilhouette'] = valore_silouette
+
+    d3.select('#silouette-' + current_computation_index)
+        .attr('fill', (d) => d3.interpolateReds(SCALE_SILOUHETTE(d.simplifiedSilhouette)))
+    
     if(isLast){
-        d3.select('#improvement-'+(previous_computations.length-1))
+        d3.select('#improvement-'+(current_computation_index))
         .attr('width',width_rect*LIMIT_IT)
+        
     } else {
-        d3.select('#improvement-'+(previous_computations.length-1))
+        d3.select('#improvement-'+(current_computation_index))
         .attr('width',width_rect*iteration)
     }
 

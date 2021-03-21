@@ -18,7 +18,7 @@ system.matrixAdjacencyFixed = (function() {
     
     this.init = function (idDiv){
       system.matrixAdjacencyFixed.reset();
-      console.log("SONO MATRICE 2",idDiv)
+
       this.g= idDiv+'-g-adiacency';
       this.divname = idDiv;
       this.div = d3.select(idDiv)
@@ -28,8 +28,6 @@ system.matrixAdjacencyFixed = (function() {
       this.width = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin.left - this.margin.right;
       this.height = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin.top - this.margin.bottom;
       
-      console.log('SUSHI-WIdth-2',this.width)
-      console.log('SUSHI-Height-2',this.height)
 
       return this
     } 
@@ -72,7 +70,7 @@ system.matrixAdjacencyFixed = (function() {
         .attr("x", d=> d.x*that.cell_size)
         .attr("y", d=> d.y*that.cell_size)
         .style("fill", d => {
-          console.log(d.col.replace('P',''))
+          
           if (d.col === d.row) return d3.interpolateBlues(d.weight)
           if(!system.timelinepartitions.partitions_status[parseInt(d.col.replace('ETP',''))][2])
           return '#d2d2d2';
@@ -86,7 +84,7 @@ system.matrixAdjacencyFixed = (function() {
           .transition()
           .duration(500)
           .style("fill", d => {
-            console.log(d.col.replace('P',''))
+            
             if (d.col === d.row) return d3.interpolateBlues(d.weight)
             if(!system.timelinepartitions.partitions_status[parseInt(d.col.replace('ETP',''))][2])
             return '#d2d2d2';

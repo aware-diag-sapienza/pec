@@ -24,10 +24,6 @@ system.matrixAdjacency = (function() {
       
       this.width = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.left - this.margin.right;
       this.height = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.top - this.margin.bottom;
-
-      console.log('SUSHI-WIdth-1',this.width)
-      console.log('SUSHI-Height-1',this.height)
-      
       return this
     } 
 
@@ -50,7 +46,7 @@ system.matrixAdjacency = (function() {
     }
     
     let updateData = () =>{
-      //console.log(that.matrix)
+
       let tooltRect = d3.select(this.g)
       .selectAll("rect")
       .data(that.matrix)
@@ -123,8 +119,7 @@ system.matrixAdjacency = (function() {
 
 
     this.createAdjacencyMatrix = (partitions,ARI,AMI) => {
-      
-      //console.log(ARI,AMI)
+
       this.matrix = []
       let nodes = []
       let i;
@@ -144,12 +139,7 @@ system.matrixAdjacency = (function() {
         }
         nodes.push('P'+i)
       }
-
-      //console.log('MATRICE', this.matrix)
-      
       this.cell_size = (d3.min([that.width,that.height])-that.margin.top)/nodes.length
-      //system.timelinepartitions.height_like_matrix = this.cell_size
-      
 
     let svg = this.div
     .append("svg")

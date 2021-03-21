@@ -50,7 +50,7 @@ system.initialization = (function() {
 
         //matrix2 = system.matrixAdjacencyFixed.init('#id-matrix-2');
         //system.matrixAdjacencyFixed.adjacency('#id-matrix-2');
-        console.log('matrix1', )
+
         
         
     }
