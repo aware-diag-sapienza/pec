@@ -1,3 +1,21 @@
+let globalNumberBrushActually = {one: false, second:false, third: false}
+
+let xMin1
+let xMax1
+let yMax1
+let yMin1
+
+let xMin2
+let xMax2
+let yMax2
+let yMin2
+
+let xMin3
+let xMax3
+let yMax3
+let yMin3
+
+
 if (window.system == undefined) window.system = {}
 system.linechart = (function() {
     const that = this;
@@ -321,6 +339,153 @@ system.linechart = (function() {
         svg.append("g")
             .attr("class", "y axisLineChart")
             .call(this.yAxis3)
+
+        var brush1 = d3.brush()                   // Add the brush feature using the d3.brush function
+            .extent( [ [0,0], [this.width, this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+            .on("end", updateBrush1)
+
+        var brush2 = d3.brush()                   // Add the brush feature using the d3.brush function
+            .extent( [ [0,this.heightSingleLinechartArea], [this.width, this.heightSingleLinechartArea + this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+            .on("end", updateBrush2)
+
+        var brush3 = d3.brush()                   // Add the brush feature using the d3.brush function
+            .extent( [ [0, 2*this.heightSingleLinechartArea], [this.width, 2*this.heightSingleLinechartArea + this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+            .on("end", updateBrush3)
+
+        svg.append("g")
+            .attr("class", "brush")
+            .call(brush1);
+
+        svg.append("g")
+            .attr("class", "brush")
+            .call(brush2);
+        
+        svg.append("g")
+            .attr("class", "brush")
+            .call(brush3);
+
+        function updateBrush1({selection}) {
+            if (selection === null) {
+                updateTimeBarDown('one', true)
+            } else {
+                xMin1 = that.xScale.invert(selection[0][0])
+                xMax1 = that.xScale.invert(selection[1][0])
+                yMax1 = that.yScale1.invert(selection[0][1])
+                yMin1 = that.yScale1.invert(selection[1][1])
+                
+                updateTimeBarDown('one', false)
+            }
+        }
+
+        function updateBrush2({selection}) {
+            if (selection === null) {
+                updateTimeBarDown('second', true)
+            } else {
+                xMin2 = that.xScale.invert(selection[0][0])
+                xMax2 = that.xScale.invert(selection[1][0])
+                yMax2 = that.yScale2.invert(selection[0][1])
+                yMin2 = that.yScale2.invert(selection[1][1])
+                
+                updateTimeBarDown('second', false)
+            }
+        }
+
+        function updateBrush3({selection}) {
+            if (selection === null) {
+                updateTimeBarDown('third', true)
+            } else {
+                xMin3 = that.xScale.invert(selection[0][0])
+                xMax3 = that.xScale.invert(selection[1][0])
+                yMax3 = that.yScale3.invert(selection[0][1])
+                yMin3 = that.yScale3.invert(selection[1][1])
+                
+                updateTimeBarDown('third', false)
+            }
+        }
+
+        
+
+        function updateTimeBarDown (numberLinechart, removeFromState){
+            if(removeFromState) globalNumberBrushActually[numberLinechart] = false
+            else globalNumberBrushActually[numberLinechart] = true
+
+            //console.log(globalNumberBrushActually)
+            d3.select('#timeline-partitions')
+                .selectAll('rect.rect-partition')
+                .style('opacity', 1)
+            if(globalNumberBrushActually['one']){
+                d3.select('#timeline-partitions')
+                .selectAll('rect.rect-partition')
+                .filter( d => d[5][that.attributeYAxisSecondLevel1] < yMin1 || d[5][that.attributeYAxisSecondLevel1] > yMax1 || d[0] < xMin1 || d[0] > xMax1)
+                .style('opacity', 0.1)
+            }
+
+            if(globalNumberBrushActually['second']){
+                d3.select('#timeline-partitions')
+                .selectAll('rect.rect-partition')
+                .filter( d => d[5][that.attributeYAxisSecondLevel2] < yMin2 || d[5][that.attributeYAxisSecondLevel2] > yMax2 || d[0] < xMin2 || d[0] > xMax2)
+                .style('opacity', 0.1)
+            }
+
+            if(globalNumberBrushActually['third']){
+                d3.select('#timeline-partitions')
+                .selectAll('rect.rect-partition')
+                .filter( d => d[5][that.attributeYAxisSecondLevel3] < yMin3 || d[5][that.attributeYAxisSecondLevel3] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
+                .style('opacity', 0.1)
+            }
+        }
+
+        //brush
+        // Add brushing
+        /*let onlyYBrush = false
+        var brush1 
+        if (onlyYBrush){
+            brush1 = d3.brushY()                   // Add the brush feature using the d3.brush function
+                .extent( [ [0,0], [this.width, this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+                .on("end", updateBrush1)
+        } else {
+            brush1 = d3.brush()                   // Add the brush feature using the d3.brush function
+                .extent( [ [0,0], [this.width, this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+                .on("end", updateBrush1)
+        }
+        
+        svg.append("g")
+            .attr("class", "brush")
+            .call(brush1);
+
+        function updateBrush1({selection}) {
+            d3.select('#timeline-partitions')
+                .selectAll('rect.rect-partition')
+                .style('opacity', 1)
+
+            if (selection === null) {
+                
+            } else {
+
+                if(onlyYBrush){
+                    let yMax = that.yScale1.invert(selection[0])
+                    let yMin = that.yScale1.invert(selection[1])
+                    
+                    d3.select('#timeline-partitions')
+                        .selectAll('rect.rect-partition')
+                        .filter( d => d[5][that.attributeYAxisSecondLevel1] < yMin || d[5][that.attributeYAxisSecondLevel1] > yMax)
+                        .style('opacity', 0.1)
+                }else{
+                    let xMin = that.xScale.invert(selection[0][0])
+                    let xMax = that.xScale.invert(selection[1][0])
+                    let yMax = that.yScale1.invert(selection[0][1])
+                    let yMin = that.yScale1.invert(selection[1][1])
+                    
+                    d3.select('#timeline-partitions')
+                        .selectAll('rect.rect-partition')
+                        .filter( d => d[5][that.attributeYAxisSecondLevel1] < yMin || d[5][that.attributeYAxisSecondLevel1] > yMax || d[0] < xMin || d[0] > xMax)
+                        .style('opacity', 0.1)
+                }
+                
+            }
+        }*/
+
+       
         //labels
         svg.append("text")
             .attr("class", "textXAxis")            
@@ -391,6 +556,8 @@ system.linechart = (function() {
     }
 
     let updateRendering = () => {
+        clearPartition()
+
         let vv = that.div.select("g.gLineChart")
             .selectAll('line.lineVertical')
             .data(verticalLines)
@@ -502,6 +669,14 @@ system.linechart = (function() {
                     .remove()
                 )
             )  
+    }
+
+    let clearPartition = () => {
+        globalNumberBrushActually = {one: false, second:false, third: false}
+
+        d3.select('#timeline-partitions')
+            .selectAll('rect.rect-partition')
+            .style('opacity', 1)
     }
 
     return this;
