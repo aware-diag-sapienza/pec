@@ -149,7 +149,9 @@ async function startSelects(){
         JOBS.push(job)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         job.onPartialResult(result => {
+
             ALL_DATA.push(result)
+            CURRENT_ITERATION = result.iteration
             if(result.iteration == 0){
                 LockUI.unlock()
                 system.scatterplot.createData(DATASET_SELECTED.projections[projection], result.labels)
@@ -174,7 +176,7 @@ function readResult(it_res){
     timestamp0 = swap_timestamp
     let actual_timestamp;
     console.log('sono in readFile',it_res)
-    CURRENT_ITERATION = it_res.iteration
+   
     actual_timestamp = it_res.timestamp
 
     console.log('SONO ALL\'iTERAZIONE  ',it_res.iteration)

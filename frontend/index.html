@@ -91,13 +91,22 @@
         <div class="select-menu">
           <select class="form-select form-select-sm" id="select-projection" onchange="updateProjection()"></select>
         </div>
-        Visualization: 
+        Vis: 
         <input type="radio" id="cluster" name="plot-scatterplot" value="cluster" onclick="system.scatterplot.updateScatterplot();" checked>
-        <label for="cluster">cluster</label>
+        <label for="cluster">clu</label>
         <input type="radio" id="stability1" name="plot-scatterplot" value="entriesStability1" onclick="system.scatterplot.updateScatterplot();">
-        <label for="stability1">stability 1</label>
+        <label for="stability1">s1</label>
         <input type="radio" id="stability2" name="plot-scatterplot" value="entriesStability2" onclick="system.scatterplot.updateScatterplot();">
-        <label for="stability2">stability 2</label>
+        <label for="stability2">s2</label>
+        <input type="radio" id="entriesStabilityLOG5" name="plot-scatterplot" value="entriesStabilityLOG5" onclick="system.scatterplot.updateScatterplot();">
+        <label for="stability2">sLOG5</label>
+        <input type="radio" id="entriesStabilityEXP5" name="plot-scatterplot" value="entriesStabilityEXP5" onclick="system.scatterplot.updateScatterplot();">
+        <label for="stability2">sEXP5</label>
+        <input type="radio" id="entriesStabilityLOG" name="plot-scatterplot" value="entriesStabilityLOG" onclick="system.scatterplot.updateScatterplot();">
+        <label for="stability2">sLOG</label>
+        <input type="radio" id="entriesStabilityEXP" name="plot-scatterplot" value="entriesStabilityEXP" onclick="system.scatterplot.updateScatterplot();">
+        <label for="stability2">sEXP</label>
+
       </div>
       <div class="item-scatterplot-1 scatter" id="id-scatterplot-1"></div>
       <div class="item-matrix-1" id ="id-matrix-1"></div>  

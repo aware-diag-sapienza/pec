@@ -147,20 +147,19 @@ system.scatterplot = (function() {
   }
 this.updateScatterplot = ()=> {
   let labels;
+  let stability;
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
+
   if (PLOT_SCATTERPLOT === 'cluster'){
     labels = ALL_DATA[CURRENT_ITERATION]['labels']
+    stability = ALL_DATA[CURRENT_ITERATION]['labels'] // qui la stability la faccio come il cluster label
+  }
+  else {
+    labels = ALL_DATA[CURRENT_ITERATION]['labels']
+    stability= ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
   }
 
-  if (PLOT_SCATTERPLOT === 'entriesStability1'){
-    labels= ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
-  }
-
-  if (PLOT_SCATTERPLOT === 'entriesStability2'){
-    labels = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
-  }
-     
-  plotCoordsKonva(that.tot_rows,'#b3b3b3',false,labels)
+  plotCoordsKonva(that.tot_rows,'#b3b3b3',false,labels,stability)
 
 }
 
@@ -174,41 +173,70 @@ this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
   }
 }
 
-function plotCoordsKonva(numberPoints, col, useScale,labels) {
-  console.log('ALESSIA - plotCoordsKonva')
+function scaleClusterStability(metrica,cluster,stability){
+
+  if(metrica == 'cluster'){
+    
+    return that.scale_color[+cluster]
+  } else {
+    if(stability <= 0.20){
+      return '#808080'
+    }
+    if(stability > 0.20 && stability <= 0.80 ){
+      return that.scale_color[+cluster]
+    }
+    if(stability > 0.80){
+      return that.scale_color[+cluster]
+    }
+  }
+}
+
+function scaleOpacityStability(metrica,cluster,stability){
+
+
+  if(metrica == 'cluster'){
+    return 1
+  } else {
+    if(stability <= 0.20){
+      return 1
+    }
+    if(stability > 0.20 && stability <= 0.80 ){
+      return 0.4
+    }
+    if(stability > 0.80){
+      return 1
+    }
+  }
+}
+
+
+function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
+  
   // first time create the points
   const kWidth = stage.width();
   const kHeight = stage.height();
+  let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
   
   if (nodes.length === 0) {
     setupTooltip();
     for (let i = 0; i < that.tot_rows; i++) {
-        console.log('ALESSIA - useScale TRUE', useScale)
+      
         const xcoord = Math.round((that.scale_x(that.coordData[i][0])))
         const ycoord = Math.round((that.scale_y(that.coordData[i][1])))
         
         let colorlabel;
-        let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
-        if(that.first_iteration){
-          colorlabel = col
-        } 
-        if (PLOT_SCATTERPLOT === 'cluster'){
-          colorlabel = that.scale_color[labels[i]];
-        }
-    
-        if (PLOT_SCATTERPLOT === 'entriesStability1'){
-          colorlabel = that.scale_color_stability[labels[i]];
-        }
-    
-        if (PLOT_SCATTERPLOT === 'entriesStability2'){
-          colorlabel = d3.interpolatePurples(labels[i]);
-        }
+        let opacitypoint;
 
+
+        colorlabel = scaleClusterStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+        opacitypoint =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+        
         let node = new Konva.Circle({
           x: xcoord,
           y: ycoord,
           radius: 3.5,
           fill: colorlabel,// + colStr,
+          opacity:opacitypoint,
           id: 'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel + '\nx: '+xcoord +
           '\ny:' + ycoord
         });
@@ -217,45 +245,16 @@ function plotCoordsKonva(numberPoints, col, useScale,labels) {
     }
     
   } else {
-    console.log('ALESSIA - sono gia esistito')
     
-    let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
-    console.log('ALESSIA - ',PLOT_SCATTERPLOT)
-    if (PLOT_SCATTERPLOT === 'cluster'){
-      let array_label = ALL_DATA[CURRENT_ITERATION]['labels']
-      console.log('ALESSIA - CLUSTER ',array_label)
-      for (let i = 0; i < numberPoints; i++) {
-        const colorlabel = that.scale_color[labels[i]];
-        nodes[i].attrs.fill = colorlabel
-      }
-    }
-
-    if (PLOT_SCATTERPLOT === 'entriesStability1'){
-      let array_label = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
-      console.log('ALESSIA - SSTAB 1 ',PLOT_SCATTERPLOT,array_label)
-      for (let i = 0; i < numberPoints; i++) {
-        const colorlabel = that.scale_color_stability[labels[i]];
-        nodes[i].attrs.fill = colorlabel
-      }
-    }
-
-    if (PLOT_SCATTERPLOT === 'entriesStability2'){
-      let array_label = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
-      console.log('ALESSIA - SSTAB 2 ',array_label)
-      for (let i = 0; i < numberPoints; i++) {
-        const colorlabel = d3.interpolatePurples(labels[i]);
-        nodes[i].attrs.fill = colorlabel
-      }
+    for (let i = 0; i < numberPoints; i++) {
+      nodes[i].attrs.fill = scaleClusterStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+      nodes[i].attrs.opacity =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
     }
   }
-  
-  
   layer.batchDraw();
-  
-
   d3.selectAll('.scatter')
-  .style('border-style', 'solid')
-  .style('border-width', '1px')
+    .style('border-style', 'solid')
+    .style('border-width', '1px')
 }
 
 function plotCoordsKonvaStability(labels) {
@@ -273,7 +272,7 @@ function plotCoordsKonvaStability(labels) {
   .style('border-width', '1px')
 }
 
- async function generateDataForScatterplot(dataset_projection,labelIteration){
+ async function generateDataForScatterplot(dataset_projection,labelIteration,stability){
 
       that.tot_rows = dataset_projection.length
       
@@ -302,11 +301,11 @@ function plotCoordsKonvaStability(labels) {
         .range([10, stage.height()-10]);
 
       if(that.first_iteration){ 
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration);
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration,stability);
         system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
         that.first_iteration = false
       } else {
-        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration);
+        plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration,stability);
         system.scatterplotFixed.updateScatterplot(true,true, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
       }
       
@@ -317,20 +316,35 @@ function plotCoordsKonvaStability(labels) {
       system.scatterplotFixed.reset();
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
+      let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
 
-      generateDataForScatterplot(csvUrl,labelCluster);
+      let stability_cluster;
+      if (PLOT_SCATTERPLOT === 'cluster'){
+        stability_cluster = labelCluster
+      } else {
+        
+        stability_cluster = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+      }
+
+      generateDataForScatterplot(csvUrl,labelCluster,stability_cluster);
 
     }
 
     this.createDataProjection = (csvUrl, labelCluster) => {
-
-
       system.scatterplot.reset();
       system.scatterplotFixed.reset();
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
       that.first_iteration = false;
-      generateDataForScatterplot(csvUrl,labelCluster);
+
+      let stability_cluster;
+      if (PLOT_SCATTERPLOT === 'cluster'){
+        stability_cluster = labelCluster
+      } else {
+        stability_cluster = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+      }
+
+      generateDataForScatterplot(csvUrl,labelCluster,stability_cluster);
 
     }
 
