@@ -2,6 +2,7 @@ import os
 import time
 import signal
 import numpy as np
+from numpy.core.numeric import full, full_like
 import pandas as pd
 import h5py
 import uuid
@@ -301,7 +302,24 @@ class ProgressiveEnsembleClustering:
             "calinskyHarabasz": np.apply_along_axis(fn_calinsky, 1, currentResult.partitions, self.data),
             "adjustedRandScore": np.ones((self.n_runs, self.n_runs), dtype=float),
             "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float),
-            "simplifiedSilhouette": np.apply_along_axis(fn_ssil, 1, currentResult.partitions, self.data)
+            "simplifiedSilhouette": np.apply_along_axis(fn_ssil, 1, currentResult.partitions, self.data),
+            
+            "entriesStability1": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            "entriesStability2": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            "entriesStabilityLOG5": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            "entriesStabilityEXP5": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            "entriesStabilityLOG": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            "entriesStabilityEXP": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            
+            "globalStability0": np.full(self.n_runs, 0, dtype=int),
+            "globalStability1": np.full(self.n_runs, 0, dtype=int),
+            "globalStability2": np.full(self.n_runs, 0, dtype=int),
+            "globalStabilityLOG5": np.full(self.n_runs, 0, dtype=int),
+            "globalStabilityEXP5": np.full(self.n_runs, 0, dtype=int),
+            "globalStabilityLOG": np.full(self.n_runs, 0, dtype=int),
+            "globalStabilityEXP": np.full(self.n_runs, 0, dtype=int),
+
+
         }
         for i in range(self.n_runs):
             labelsMetrics["adjustedRandScore"][i] = ClusteringMetrics.adjusted_rand_score(currentResult.partitions[i], currentResult.labels)
