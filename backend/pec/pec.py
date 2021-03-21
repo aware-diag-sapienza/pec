@@ -304,12 +304,14 @@ class ProgressiveEnsembleClustering:
             "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float),
             "simplifiedSilhouette": np.apply_along_axis(fn_ssil, 1, currentResult.partitions, self.data),
             
+            '''
             "entriesStability1": np.full((self.n_runs, self.n_entries), 0, dtype=int),
             "entriesStability2": np.full((self.n_runs, self.n_entries), 0, dtype=int),
             "entriesStabilityLOG5": np.full((self.n_runs, self.n_entries), 0, dtype=int),
             "entriesStabilityEXP5": np.full((self.n_runs, self.n_entries), 0, dtype=int),
             "entriesStabilityLOG": np.full((self.n_runs, self.n_entries), 0, dtype=int),
             "entriesStabilityEXP": np.full((self.n_runs, self.n_entries), 0, dtype=int),
+            '''
             
             "globalStability0": np.full(self.n_runs, 0, dtype=int),
             "globalStability1": np.full(self.n_runs, 0, dtype=int),
