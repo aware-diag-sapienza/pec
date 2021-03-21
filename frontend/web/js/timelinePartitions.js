@@ -281,23 +281,31 @@ system.timelinepartitions = (function() {
         resize();
     }
 
-    let parse_intertia_runs = (array_inertia, best_run) =>{
-         console.log('ARRAY-INERTIA',best_run)
-      let parsed_array_inertia = []
-      for( let i = 0; i < array_inertia.length; i++){
-       for( let j = 0; j < array_inertia[0].length; j++){
-          let single_object = [];
-          //single_object['P'+j]= +partitios_inertia[j]
-          single_object.push(i)
-          single_object.push('P'+j)
-          single_object.push(+array_inertia[i][j])
-          single_object.push('P'+best_run[i])// better partition
-          single_object.push(array_inertia[i][best_run[i]]) // better inertia che sarebbe d[4]
-          parsed_array_inertia.push(single_object)
+    let parse_intertia_runs = (all_data, array_inertia, best_run) =>{
+        console.log('ARRAY-INERTIA',best_run)
+      
+        let parsed_array_inertia = []
+        for( let i = 0; i < array_inertia.length; i++){ // i iterazione
+        for( let j = 0; j < array_inertia[0].length; j++){ // j la partizione
+            let single_object = [];
+            let object_for_brush = new Object();
+            Object.keys(all_data[i].metrics.partitionsMetrics).forEach(function(key) {
+                object_for_brush[key]= all_data[i].metrics.partitionsMetrics[key][j];
+                
+            });
+            //single_object['P'+j]= +partitios_inertia[j]
+            single_object.push(i)
+            single_object.push('P'+j)
+            single_object.push(+array_inertia[i][j])
+            single_object.push('P'+best_run[i])// better partition
+            single_object.push(array_inertia[i][best_run[i]]) // better inertia che sarebbe d[4]
+            single_object.push(object_for_brush) // object for brush
+            console.log('single_object',single_object)
+            parsed_array_inertia.push(single_object)
+            }
+            
         }
-        
-      }
-      return parsed_array_inertia;
+        return parsed_array_inertia;
     }
 
     this.updateMetricValue = () => {
@@ -329,10 +337,11 @@ system.timelinepartitions = (function() {
         // d[2] valore metrica
         // d[3] best run
         // d[4] best valore metrica
+        // d[5] altre metriche
         console.log('PARTITION_STATUS',that.ITERATION_LAST)
         that.div.select("g.gTimeLine")
             .selectAll('rect.rect-partition')
-            .data(parse_intertia_runs(this.data.map(d=> d.metrics.partitionsMetrics[that.metric_value]),this.data.map(f => f.info.best_run)))
+            .data(parse_intertia_runs(this.data,this.data.map(d=> d.metrics.partitionsMetrics[that.metric_value]),this.data.map(f => f.info.best_run)))
             .each()
             .join(
                 enter => enter
