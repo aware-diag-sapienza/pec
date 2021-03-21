@@ -300,7 +300,7 @@ system.timelinepartitions = (function() {
             single_object.push('P'+best_run[i])// better partition
             single_object.push(array_inertia[i][best_run[i]]) // better inertia che sarebbe d[4]
             single_object.push(object_for_brush) // object for brush
-            console.log('single_object',single_object)
+            
             parsed_array_inertia.push(single_object)
             }
             
