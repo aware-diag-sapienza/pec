@@ -318,13 +318,13 @@ class ProgressiveEnsembleClustering:
             "averageAdjustedRandScore": np.zeros((self.n_runs, self.n_runs), dtype=float),
             "averageAdjustedMutualInfoScore": np.zeros((self.n_runs, self.n_runs), dtype=float),
             
-            "globalStability0": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability0(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
-            "globalStability1": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability1(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
-            "globalStability2": np.full(self.n_runs, 0, dtype=int) if firstIteration  else  [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)) for i in range(self.n_runs) ],
-            "globalStabilityLOG5": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)[-5:]) for i in range(self.n_runs) ],
-            "globalStabilityEXP5": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityEXP(getPartionsHistory(i)[-5:]) for i in range(self.n_runs) ],
-            "globalStabilityLOG": np.full(self.n_runs, 0, dtype=int) if firstIteration  else  [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)) for i in range(self.n_runs) ],
-            "globalStabilityEXP": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityEXP(getPartionsHistory(i)) for i in range(self.n_runs) ],
+            #"globalStability0": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability0(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
+            #"globalStability1": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability1(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
+            #"globalStability2": np.full(self.n_runs, 0, dtype=int) if firstIteration  else  [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)) for i in range(self.n_runs) ],
+            #"globalStabilityLOG5": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)[-5:]) for i in range(self.n_runs) ],
+            #"globalStabilityEXP5": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityEXP(getPartionsHistory(i)[-5:]) for i in range(self.n_runs) ],
+            #"globalStabilityLOG": np.full(self.n_runs, 0, dtype=int) if firstIteration  else  [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)) for i in range(self.n_runs) ],
+            #"globalStabilityEXP": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityEXP(getPartionsHistory(i)) for i in range(self.n_runs) ],
         }
         
         for i in range(self.n_runs):
@@ -348,30 +348,45 @@ class ProgressiveEnsembleClustering:
             partitionsMetrics["averageAdjustedMutualInfoScore"] /= len(metricsHistory) 
 
         
-                    
-
+        
         def fn_min_labelsMetricHistory(m): return np.min([h.labelsMetrics[m] for h in history])
         def fn_max_labelsMetricHistory(m): return np.max([h.labelsMetrics[m] for h in history])
         def gradient(m): return progressiveMetrics[m] - history[-1].progressiveMetrics[m]
         
         progressiveMetrics = {
-            "clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(prevResult.labels, currentResult.labels),
-            "entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(prevResult.labels, currentResult.labels),
-            "entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory),
+            #"clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(prevResult.labels, currentResult.labels),
+            #"entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(prevResult.labels, currentResult.labels),
+            #"entriesStability2": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory),
             
-            "entriesStabilityLOG5": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory[-5:]),
-            "entriesStabilityEXP5": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityEXP(labelsHistory[-5:]),
-            "entriesStabilityLOG": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory),
-            "entriesStabilityEXP": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityEXP(labelsHistory),
+            #"entriesStabilityLOG5": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory[-5:]),
+            #"entriesStabilityEXP5": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityEXP(labelsHistory[-5:]),
+            #"entriesStabilityLOG": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityLOG(labelsHistory),
+            #"entriesStabilityEXP": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stabilityEXP(labelsHistory),
             
-            "globalStability0": 0 if firstIteration else ClusteringMetrics.global_stability0(prevResult.labels, currentResult.labels),
-            "globalStability1": 0 if firstIteration else ClusteringMetrics.global_stability1(prevResult.labels, currentResult.labels),
-            "globalStability2": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory),
+            #"globalStability0": 0 if firstIteration else ClusteringMetrics.global_stability0(prevResult.labels, currentResult.labels),
+            #"globalStability1": 0 if firstIteration else ClusteringMetrics.global_stability1(prevResult.labels, currentResult.labels),
+            #"globalStability2": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory),
             
-            "globalStabilityLOG5": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory[-5:]),
-            "globalStabilityEXP5": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory[-5:]),
-            "globalStabilityLOG": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory),
-            "globalStabilityEXP": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory),
+            #"globalStabilityLOG5": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory[-5:]),
+            #"globalStabilityEXP5": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory[-5:]),
+            #"globalStabilityLOG": 0 if firstIteration else ClusteringMetrics.global_stabilityLOG(labelsHistory),
+            #"globalStabilityEXP": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory),
+            
+            "entriesStability": {
+                "1":  np.zeros(self.n_entries) if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=1),
+                "2":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=2),
+                "3":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=3),
+                "4":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=4),
+                "5":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=5),
+            },
+            "globalStability": {
+                "1":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=1),
+                "2":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=2),
+                "3":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=3),
+                "4":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=4),
+                "5":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=5),
+            },
+
             
             "inertia_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("inertia") - labelsMetrics["inertia"]) / fn_max_labelsMetricHistory("inertia"),
             "dbIndex_improvement": 0 if firstIteration else (fn_max_labelsMetricHistory("dbIndex") - labelsMetrics["dbIndex"]) / fn_max_labelsMetricHistory("dbIndex"),
