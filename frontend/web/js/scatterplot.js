@@ -158,8 +158,9 @@ this.updateScatterplot = ()=> {
     stability = ALL_DATA[CURRENT_ITERATION]['labels'] // qui la stability la faccio come il cluster label
   }
   else {
+
     labels = ALL_DATA[CURRENT_ITERATION]['labels']
-    stability= ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+    stability= ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics.entriesStability[stability_window]
   }
 
   plotCoordsKonva(that.tot_rows,'#b3b3b3',false,labels,stability)
@@ -334,7 +335,8 @@ function plotCoordsKonvaStability(labels) {
         stability_cluster = labelCluster
       } else {
         
-        stability_cluster = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+        stability_cluster = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics.entriesStability[stability_window]// = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+        
       }
 
       generateDataForScatterplot(csvUrl,labelCluster,stability_cluster);
@@ -352,7 +354,8 @@ function plotCoordsKonvaStability(labels) {
       if (PLOT_SCATTERPLOT === 'cluster'){
         stability_cluster = labelCluster
       } else {
-        stability_cluster = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+        //stability_cluster = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics[PLOT_SCATTERPLOT]
+        stability_cluster= ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics.entriesStability[stability_window]
       }
 
       generateDataForScatterplot(csvUrl,labelCluster,stability_cluster);

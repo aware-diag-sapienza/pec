@@ -2,6 +2,7 @@ let dataset;
 let technique;
 let cluster;
 let partitions;
+let stability_window;
 var seed = 0;
 let linechart1;
 let timelinePartitions;
@@ -149,6 +150,8 @@ async function startSelects(){
     d3.select('#select-seed').attr('placeholder',seed)
     d3.select('#iteration-label').html('');
     d3.select('#id-metrics').style('display','none');
+
+    stability_window = $('#select-window').val()
    
     $('#chC').html('-');
     $('#dbC').html('--');
@@ -503,5 +506,11 @@ function updateEarlyTermination(){
     
     d3.select('#information-info').html("Early Termination Fast - Iteration #" + iterationFast + '   <b>ARI<b/>: ' + ALL_DATA[iterationFast].metrics.progressiveMetrics.adjustedRandScore.toFixed(4))
     system.scatterplotFixed.updateScatterplot(false,true, system.scatterplot.scale_x,system.scatterplot.scale_y,system.scatterplot.LABEL_EARLY_TERMINATION);
+
+}
+
+function changeStabilityWindow(){
+    stability_window = $('#select-window').val()
+    system.scatterplot.updateScatterplot();
 
 }
