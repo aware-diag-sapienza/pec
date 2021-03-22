@@ -1,6 +1,7 @@
 import os
 import time
 import signal
+import traceback
 import numpy as np
 from numpy.core.numeric import full, full_like
 import pandas as pd
@@ -75,6 +76,7 @@ class ProgressiveEnsembleClustering:
         self.__prevResult = None #previous partial result
         self.__metricsHistory = []
         self.__labelsHistory = []
+        self.__partitionsHistory = []
         '''
         self.__result_csv = None
         self.__result_hdf5 = None
@@ -259,7 +261,11 @@ class ProgressiveEnsembleClustering:
             result.job_id = self.job_id
             result.info.timestamp = self.__time_manager.timestamp(round_digits=4) #update timestamp of result. original timestamp is when the result was generated, but some delay can appear when is recieved here
             self.__active = not result.info.is_last
-            result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory)
+            try:
+                result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory, self.__partitionsHistory)
+            except:
+                traceback.print_exc()
+                exit()
             # pause the time manager. the time used by on_partial_result is out of timestamp count
             self.__time_manager.pause()
             self.__resultsFileWriter.save(result)
@@ -268,7 +274,7 @@ class ProgressiveEnsembleClustering:
             self.__prevResult = result
             self.__metricsHistory.append(result.metrics)
             self.__labelsHistory.append(result.labels)
-            #if len(self.__labelsHistory) > 5: self.__labelsHistory = self.__labelsHistory[1:]
+            self.__partitionsHistory.append(result.partitions)
             
             self.__time_manager.resume()
         ###
@@ -279,7 +285,10 @@ class ProgressiveEnsembleClustering:
         self.__clean()
         if self.verbose: print(f"[{self.__class__.__name__}] terminated.")
 
-    def __computeResultMetrics(self, currentResult, prevResult, history, labelsHistory):
+    def __computeResultMetrics(self, currentResult, prevResult, history, labelsHistory, partitionsHistory):
+        firstIteration = prevResult is None
+        getPartionsHistory = lambda partitionIndex: [partitionsHistory[i][partitionIndex] for i in range(len(partitionsHistory))]
+
         fn_inertia = lambda labels, data: ClusteringMetrics.inertia(data, labels)
         fn_calinsky = lambda labels, data: ClusteringMetrics.calinsky_harabaz_score(data, labels)
         fn_dbindex = lambda labels, data: ClusteringMetrics.davies_bouldin_index(data, labels)
@@ -304,14 +313,15 @@ class ProgressiveEnsembleClustering:
             "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float),
             "simplifiedSilhouette": np.apply_along_axis(fn_ssil, 1, currentResult.partitions, self.data),
             
-            "globalStability0": np.full(self.n_runs, 0, dtype=int),
-            "globalStability1": np.full(self.n_runs, 0, dtype=int),
-            "globalStability2": np.full(self.n_runs, 0, dtype=int),
-            "globalStabilityLOG5": np.full(self.n_runs, 0, dtype=int),
-            "globalStabilityEXP5": np.full(self.n_runs, 0, dtype=int),
-            "globalStabilityLOG": np.full(self.n_runs, 0, dtype=int),
-            "globalStabilityEXP": np.full(self.n_runs, 0, dtype=int)
+            "globalStability0": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability0(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
+            "globalStability1": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability1(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
+            "globalStability2": np.full(self.n_runs, 0, dtype=int) if firstIteration  else  [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)) for i in range(self.n_runs) ],
+            "globalStabilityLOG5": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)[-5:]) for i in range(self.n_runs) ],
+            "globalStabilityEXP5": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityEXP(getPartionsHistory(i)[-5:]) for i in range(self.n_runs) ],
+            "globalStabilityLOG": np.full(self.n_runs, 0, dtype=int) if firstIteration  else  [ ClusteringMetrics.entries_stabilityLOG(getPartionsHistory(i)) for i in range(self.n_runs) ],
+            "globalStabilityEXP": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ ClusteringMetrics.entries_stabilityEXP(getPartionsHistory(i)) for i in range(self.n_runs) ],
         }
+        
         for i in range(self.n_runs):
             labelsMetrics["adjustedRandScore"][i] = ClusteringMetrics.adjusted_rand_score(currentResult.partitions[i], currentResult.labels)
             labelsMetrics["adjustedMutualInfoScore"][i] = ClusteringMetrics.adjusted_mutual_info_score(currentResult.partitions[i], currentResult.labels)
@@ -322,7 +332,7 @@ class ProgressiveEnsembleClustering:
         def fn_min_labelsMetricHistory(m): return np.min([h.labelsMetrics[m] for h in history])
         def fn_max_labelsMetricHistory(m): return np.max([h.labelsMetrics[m] for h in history])
         def gradient(m): return progressiveMetrics[m] - history[-1].progressiveMetrics[m]
-        firstIteration = prevResult is None
+        
         progressiveMetrics = {
             "clustersStability": np.zeros_like(currentResult.info.n_clusters, dtype=int) if firstIteration else ClusteringMetrics.clusters_stability(prevResult.labels, currentResult.labels),
             "entriesStability1": np.zeros_like(currentResult.labels, dtype=int) if firstIteration else ClusteringMetrics.entries_stability1(prevResult.labels, currentResult.labels),
