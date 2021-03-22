@@ -2,10 +2,13 @@ import datetime
 from sklearn.utils import Bunch
 from threading import Thread
 from multiprocessing import Process
+from sklearn.utils import check_random_state
+import numpy as np
 
 from ..datasets import Dataset
 from ..pec_instances import I_PecK, I_PecKPP, MCLA_PecK, MCLA_PecKPP, HGPA_PecK, HGPA_PecKPP
 from ..pec_instances import TEPMLATE_ID_PLACEHOLDER
+from ..log import Log
 
 
 
@@ -50,8 +53,71 @@ class AsyncJob(Process):
     def partialResultCallback(self, pr):
         ##remove partitions in partial result
         pr.partitions = None
-        self.partialResultsQueue.put(Bunch(client=self.client, jobId=self.id, pr=pr))
+        self.partialResultsQueue.put(Bunch(jobType="AsyncJob", client=self.client, jobId=self.id, pr=pr))
 
     
     def run(self):
         self.pec.start()
+
+
+
+
+
+class ElbowJob(Process):
+    def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, **kwargs):
+        super().__init__(**kwargs)
+        self.id = f"ElbowJob:{dataset}:{min_n_clusters}:{max_n_clusters}:{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}:{client}"
+        self.client = client
+       
+        self.type = type
+        self.dataset = dataset
+        self.n_runs = n_runs
+        self.min_n_clusters = min_n_clusters
+        self.max_n_clusters = max_n_clusters
+        self.k_values = list(range(self.min_n_clusters, self.max_n_clusters+1))
+        self.random_state_arr = check_random_state(random_state).randint(np.iinfo(np.int32).max, size=len(self.k_values))
+        self.partialResultsQueue = partialResultsQueue
+        self.data = Dataset(self.dataset).data()
+
+        self.currentPec = None
+        self.isLastK = False
+    
+    def instantiatePec(self, n_clusters, random_state, callback):
+        pec = None
+        if self.type == "I-PecK":
+            pec = I_PecK(self.data, n_clusters=n_clusters, n_runs=self.n_runs, random_state=random_state, dataset_name=self.dataset, results_callback=callback)
+        elif self.type == "I-PecK++":
+            pec = I_PecKPP(self.data, n_clusters=n_clusters, n_runs=self.n_runs, random_state=random_state, dataset_name=self.dataset, results_callback=callback)
+        elif self.type == "HGPA-PecK":
+            pec = HGPA_PecK(self.data, n_clusters=n_clusters, n_runs=self.n_runs, random_state=random_state, dataset_name=self.dataset, results_callback=callback)
+        elif self.type == "HGPA-PecK++":
+            pec = HGPA_PecKPP(self.data, n_clusters=n_clusters, n_runs=self.n_runs, random_state=random_state, dataset_name=self.dataset, results_callback=callback)
+        elif self.type == "MCLA-PecK":
+            pec = MCLA_PecK(self.data, n_clusters=n_clusters, n_runs=self.n_runs, random_state=random_state, dataset_name=self.dataset, results_callback=callback)
+        elif self.type == "MCLA-PecK++":
+            pec = MCLA_PecKPP(self.data, n_clusters=n_clusters, n_runs=self.n_runs, random_state=random_state, dataset_name=self.dataset, results_callback=callback)
+        else:
+            raise RuntimeError(f"Undefined pec type '{self.type}'")
+        return pec
+
+    def partialResultCallback(self, pr):
+        k = pr.info.n_clusters
+        if pr.metrics.earlyTermination.fast:
+            Log.print(f"{Log.GRAY}k = {k} @ it = {pr.info.iteration} -- {Log.BLUE}FastEarlyTermination{Log.ENDC}")
+        else:
+            Log.print(f"{Log.GRAY}k = {k} @ it = {pr.info.iteration}{Log.ENDC}")
+
+        if pr.metrics.earlyTermination.fast:
+            inertia = pr.metrics.labelsMetrics["inertia"]
+            labels = pr.labels
+            result = Bunch(jobId=self.id, k=k, inertia=inertia, isLast=self.isLastK, labels=labels)
+            self.partialResultsQueue.put(Bunch(jobType="ElbowJob", client=self.client, jobId=self.id, pr=result))
+            self.currentPec.stop()
+            
+
+    def run(self):
+        for i,k in enumerate(self.k_values):
+            self.isLastK = (k == self.k_values[-1])
+            self.currentPec = self.instantiatePec(k, self.random_state_arr[i], self.partialResultCallback)
+            self.currentPec.start()
+        

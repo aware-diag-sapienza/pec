@@ -10,7 +10,7 @@ import uuid
 from pathlib import Path
 from multiprocessing import SimpleQueue, Lock
 from sklearn import metrics
-from sklearn.utils import check_random_state
+from sklearn.utils import Bunch, check_random_state
 
 from .utils import SharedArray, TimeManager, best_labels_dtype, ProgressiveResultMetrics
 from .clustering import ProgressiveKMeansRun, InertiaBased_ProgressiveKMeansRun
@@ -270,7 +270,9 @@ class ProgressiveEnsembleClustering:
             # pause the time manager. the time used by on_partial_result is out of timestamp count
             self.__time_manager.pause()
             self.__resultsFileWriter.save(result)
-            self.on_partial_result(result)
+            cbk_res = self.on_partial_result(result)
+            if cbk_res is not None and cbk_res == False:
+                self.__active = False
             
             self.__prevResult = result
             self.__metricsHistory.append(result.metrics)
@@ -403,6 +405,7 @@ class ProgressiveEnsembleClustering:
             if "Stability" in key: continue
             if prevResult is not None: progressiveMetrics[f"{key}Gradient"] = gradient(key)
 
+        """
         earlyTermination = {
             "slow": False,
             "fast": False
@@ -412,6 +415,13 @@ class ProgressiveEnsembleClustering:
                 earlyTermination["fast"] = True
             if progressiveMetrics["inertia_improvementGradient"] < 1e-5 or prevResult.metrics.earlyTermination["slow"]:
                 earlyTermination["slow"] = True
+        """
+        earlyTermination = Bunch(slow=False, fast=False)
+        if not firstIteration:
+            if progressiveMetrics["inertia_improvementGradient"] < 1e-4 or prevResult.metrics.earlyTermination.fast:
+                earlyTermination.fast = True
+            if progressiveMetrics["inertia_improvementGradient"] < 1e-5 or prevResult.metrics.earlyTermination.slow:
+                earlyTermination.slow = True
    
    
         currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progressiveMetrics=progressiveMetrics, earlyTermination=earlyTermination)
