@@ -1,5 +1,4 @@
-/* eslint-disable */
-let globalNumberBrushActually = { one: false, second: false, third: false }
+let globalNumberBrushActually = {one: false, second:false, third: false}
 
 let xMin1
 let xMax1
@@ -16,8 +15,9 @@ let xMax3
 let yMax3
 let yMin3
 
+
 if (window.system == undefined) window.system = {}
-system.linechart = function() {
+system.linechart = (function() {
     const that = this;
 
     // variable
@@ -58,7 +58,6 @@ system.linechart = function() {
     this.yAxis3 = null
     this.attributeYAxisFirstLevel3 = null
     this.attributeYAxisSecondLevel3 = null
-    this.attributeYAxisThirdLevel3 = null
     this.labelYAxis3 = null
     this.line3 = d3.line()
 
@@ -133,7 +132,7 @@ system.linechart = function() {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]));
+                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3]['globalStability'][that.attributeYAxisSecondLevel3]));
             });
         
         return that
@@ -179,31 +178,19 @@ system.linechart = function() {
         this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
         this.labelYAxis2 = "Quality: sim.Silhouette"
 
-        if(variableYAxisLinechart == "gs-w2"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability"
-            this.attributeYAxisThirdLevel3 = "2"
-            this.labelYAxis3 = "Global Stability w=2"
-        }else if(variableYAxisLinechart == "gs-w3"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability"
-            this.attributeYAxisThirdLevel3 = "3"
-            this.labelYAxis3 = "Global Stability w=3"
-        }else if(variableYAxisLinechart == "gs-w4"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability"
-            this.attributeYAxisThirdLevel3 = "4"
-            this.labelYAxis3 = "Global Stability w=4"
-        }else if(variableYAxisLinechart == "gs-w5"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability"
-            this.attributeYAxisThirdLevel3 = "2"
-            this.labelYAxis3 = "Global Stability w=5"
-        }else if(variableYAxisLinechart == "gs-w10"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability"
-            this.attributeYAxisThirdLevel3 = "10"
-            this.labelYAxis3 = "Global Stability w=10"
+        this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+        this.attributeYAxisSecondLevel3 = variableYAxisLinechart
+            
+        if(variableYAxisLinechart == "2"){
+            this.labelYAxis3 = "gs-w2"
+        }else if(variableYAxisLinechart == "3"){
+            this.labelYAxis3 = "gs-w3"
+        }else if(variableYAxisLinechart == "4"){
+            this.labelYAxis3 = "gs-w4"
+        }else if(variableYAxisLinechart == "5"){
+            this.labelYAxis3 = "gs-w5"
+        }else if(variableYAxisLinechart == "10"){
+            this.labelYAxis3 = "gs-w10"
         }
         
     }
@@ -290,7 +277,7 @@ system.linechart = function() {
                 .domain([minSilouhetteScale, maxSilouhetteScale])
                 .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
             this.yScale3 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); }))
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3]['globalStability'][that.attributeYAxisSecondLevel3]); }))
                 .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
             
         }else{
@@ -704,4 +691,4 @@ system.linechart = function() {
     }
 
     return this;
-}.call({})
+}).call({})

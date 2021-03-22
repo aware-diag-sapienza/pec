@@ -28,7 +28,7 @@ function onChangeInputParameter(){
     d3.select('#iteration-label').html('');
 }
 
-let variableYAxisLinechart = "globalStability0"
+let variableYAxisLinechart = "2"
 $('#select-variableYAxis-linechart').val(variableYAxisLinechart);
 function onChangeVariableYAxisLinechart(){
     variableYAxisLinechart = $( "#select-variableYAxis-linechart" ).val()
