@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>Stardust Example: Scatterplot</title>
+<canvas id="main-canvas"></canvas>
+
+<script type="text/javascript" src="https://stardustjs.github.io/stardust/v0.1.1/stardust.bundle.min.js"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
+
+<script type="text/javascript">
+  class WebGLScatterplot{
+    constructor(canvas){
+      this.canvas = canvas
+    }
+
+    create(){
+
+    }
+
+    update(data, labels, scale){
+
+    }
+
+  }
+  
+  
+  
+  
+  
+  
+  
+  var canvas = document.getElementById("main-canvas");
+  var width = 960;
+  var height = 500;
+  var platform = Stardust.platform("webgl-2d", canvas, width, height);
+
+  var Nx = 96 * 10;
+  var Ny = 50 * 10;
+
+  var data = [];
+  for (var i = 0; i < Nx; i++) {
+    for (var j = 0; j < Ny; j++) {
+      var x = (i / (Nx - 1)) * 2 - 1;
+      var y = (j / (Ny - 1)) * 2 - 1;
+      var scale = 2;
+      var len = Math.sqrt(x * x + y * y);
+      var d = len * Math.exp(-len * len * 5);
+      var dx = (y / len) * d;
+      var dy = (-x / len) * d;
+      data.push([
+        x + dx * scale,
+        y + dy * scale
+      ]);
+    }
+  }
+
+  console.log(data.length)
+
+  let circle = new Stardust.mark.circle(16);
+  var circles = Stardust.mark.create(circle, platform);
+
+  var scaleX = Stardust.scale
+    .linear()
+    .domain([-1, 1])
+    .range([10, width - 10]);
+  var scaleY = Stardust.scale
+    .linear()
+    .domain([-1, 1])
+    .range([10, height - 10]);
+
+  circles.attr("center", Stardust.scale.Vector2(scaleX(d => d[0]), scaleY(d => d[1])));
+  circles.attr("radius", 1);
+  circles.attr("color", [255, 153, 0, 0.4]);
+  circles.data(data);
+  circles.render();
+
+  setTimeout(() => {
+    circles.attr("color", [ 1, 0, 0, 1 ]);
+    platform.clear();
+    circles.render();
+  }, 2000)
+</script>

@@ -132,7 +132,7 @@ system.linechart = (function() {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]));
+                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3]['globalStability'][that.attributeYAxisSecondLevel3]));
             });
         
         return that
@@ -178,34 +178,19 @@ system.linechart = (function() {
         this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
         this.labelYAxis2 = "Quality: sim.Silhouette"
 
-        if(variableYAxisLinechart == "globalStability0"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability0"
-            this.labelYAxis3 = "Global Stability 0"
-        }else if(variableYAxisLinechart == "globalStability1"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability1"
-            this.labelYAxis3 = "Global Stability 1"
-        }else if(variableYAxisLinechart == "globalStability2"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability2"
-            this.labelYAxis3 = "Global Stability 2"
-        }else if(variableYAxisLinechart == "globalStabilityEXP"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityEXP"
-            this.labelYAxis3 = "globalStabilityEXP"
-        }else if(variableYAxisLinechart == "globalStabilityEXP5"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityEXP5"
-            this.labelYAxis3 = "globalStabilityEXP5"
-        }else if(variableYAxisLinechart == "globalStabilityLOG"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityLOG"
-            this.labelYAxis3 = "globalStabilityLOG"
-        }else if(variableYAxisLinechart == "globalStabilityLOG5"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityLOG5"
-            this.labelYAxis3 = "globalStabilityLOG5"
+        this.attributeYAxisFirstLevel3 = "progressiveMetrics"
+        this.attributeYAxisSecondLevel3 = variableYAxisLinechart
+            
+        if(variableYAxisLinechart == "2"){
+            this.labelYAxis3 = "gs-w2"
+        }else if(variableYAxisLinechart == "3"){
+            this.labelYAxis3 = "gs-w3"
+        }else if(variableYAxisLinechart == "4"){
+            this.labelYAxis3 = "gs-w4"
+        }else if(variableYAxisLinechart == "5"){
+            this.labelYAxis3 = "gs-w5"
+        }else if(variableYAxisLinechart == "10"){
+            this.labelYAxis3 = "gs-w10"
         }
         
     }
@@ -292,7 +277,7 @@ system.linechart = (function() {
                 .domain([minSilouhetteScale, maxSilouhetteScale])
                 .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
             this.yScale3 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]); }))
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3]['globalStability'][that.attributeYAxisSecondLevel3]); }))
                 .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
             
         }else{

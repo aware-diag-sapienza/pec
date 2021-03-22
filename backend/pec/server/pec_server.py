@@ -56,7 +56,9 @@ class PECServer:
             ##
             elif request.startswith("dataset:"):
                 datasetName = request.replace("dataset:", "")
-                self.socketServer.sendRequestResponse(client, requestId, Dataset(datasetName).dict)
+                d = Dataset(datasetName).dict.copy() 
+                d["data"] = None
+                self.socketServer.sendRequestResponse(client, requestId, d)
             ##
             elif request.startswith("createAsyncJob:"):
                 d = Bunch(**json.loads(request.replace("createAsyncJob:", "")) )
