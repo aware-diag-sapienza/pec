@@ -146,7 +146,7 @@ async function startSelects(){
     partitions = $( "#select-partitions" ).val()
     projection = $( "#select-projection" ).val()
     seed = getSeed()
-
+    d3.select('#select-seed').attr('placeholder',seed)
     d3.select('#iteration-label').html('');
     d3.select('#id-metrics').style('display','none');
    
@@ -278,21 +278,50 @@ function computeRatioPerc(final,initial){
     return Math.abs(Number.parseFloat( (1 - Number.parseFloat(initial).toFixed(4)/Number.parseFloat(final).toFixed(4)) * 100 ).toFixed(4))
 }
 
+    function colorPin(){
+        if (previous_computations.length === 1){
+            // sono alla prima iterazione e restituisco il verde chiaro
+            return '#a6c6a5';
+        } else {
+            let current_index = previous_computations.length -1
+            let previous_index = previous_computations.length -2
+
+            if ((previous_computations[current_index]['technique']!== previous_computations[previous_index]['technique']) && (previous_computations[current_index]['partitions']!== previous_computations[previous_index]['partitions']))
+                return '#ca96d0' // lilla
+            if (previous_computations[current_index]['technique']!== previous_computations[previous_index]['technique'])
+                return '#afeeee' // azzurro
+            if (previous_computations[current_index]['partitions']!== previous_computations[previous_index]['partitions'])
+                return '#f1ac7f' // pesca
+            
+            return '#a6c6a5' // verde
+        }   
+    }
 function addPinHistory() {
+    // SE IL dataset selezionato non è nella struttura dati presente allora riazzero l'svg e lla struttura dati. 
+    if (previous_computations.map(d=> d.dataset).indexOf(dataset)=== -1){
+        d3.select("#svg-list-history").remove('*');
+        previous_computations = [];
+        SVG_HISTORY = null
+    } 
+
     let width_history = $("#listhistory").width()
     let height_history = $("#listhistory").height()
-    let margin_history = {top: 5, bottom:10, left:20, right:20}
+    let margin_history = {top: 1, bottom:10, left:5, right:25}
     let height_pin = 60;
 
-    if (SVG_HISTORY == undefined){
+    if (SVG_HISTORY == null){
+        d3.select("#listhistory").append('p')
+        .style('padding-left','10px')
+        .html(dataset)
         SVG_HISTORY = d3.select("#listhistory")
             .append("svg")
+            .attr("id","svg-list-history")
             .attr('width',width_history)
             .attr('height', height_history)
             .append("g")
             .attr('width',width_history)
             .attr('height', height_history-margin_history.top-margin_history.bottom)
-            .attr("transform","translate(" + margin_history.top + "," + margin_history.left + ")")
+            .attr("transform","translate(" + margin_history.left + "," + margin_history.top + ")")
     }
 
     let tentative = previous_computations.length
@@ -300,6 +329,7 @@ function addPinHistory() {
     previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'simplifiedSilhouette':-1, 'iteration':0, 'earlyTerminationslow':-1, 'slowInertia': -1, 'earlyTerminationfast':-1, 'fastInertia':-1})
 
     scaleHistory = d3.scaleBand()
+
        
     SVG_HISTORY.selectAll(".bar-history")
         .data(previous_computations)
@@ -326,8 +356,30 @@ function addPinHistory() {
         .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', 0)
         .attr('height', height_pin)
-        .attr('fill', '#afeeee')
+        .attr('fill', colorPin())
 
+    SVG_HISTORY.selectAll(".bar-history-early-slow")
+        .data(previous_computations)
+        .enter()
+        .append('rect')
+        .attr('class','bar-history-early-slow')
+        .attr('id',(d) => 'early-slow-' + d.tentative)
+        .attr('x', 0)
+        .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
+        .attr('width', 0)
+        .attr('height', height_pin)
+        .attr('fill', '#c0c0c0')    
+    SVG_HISTORY.selectAll(".bar-history-early-fast")
+        .data(previous_computations)
+        .enter()
+        .append('rect')
+        .attr('class','bar-history-early-fast')
+        .attr('id',(d) => 'early-fast-' + d.tentative)
+        .attr('x', 0)
+        .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
+        .attr('width', 0)
+        .attr('height', height_pin)
+        .attr('fill', '#ffd700')    
     let text = SVG_HISTORY.selectAll(".text-history")
         .data(previous_computations)
         .enter()
@@ -337,13 +389,13 @@ function addPinHistory() {
         .attr('y', (d)=> {return (d.tentative*(height_pin+4))+15})
         //.text((d)=> {return d.dataset})
 
-        text.append("tspan")
+        /*text.append("tspan")
             .text(d => d.dataset)
             .attr("class", "tspan-dataset")
             .attr("x", 0)
             .attr("dx", 10)
             .attr("dy", 2)
-            .attr('font-size', 'smaller')
+            .attr('font-size', 'smaller')*/
         
         text.append("tspan")
             .text(d => 'K:' + d.cluster + ' P:' + d.partitions)
@@ -361,13 +413,13 @@ function addPinHistory() {
             .attr("dy", 12)
             .attr('font-size', 'smaller')
         
-        text.append("tspan")
+        /*text.append("tspan")
             .text(d => 'S:' +d.seed)
             .attr("class", "tspan-seed")
             .attr("x", 0)
             .attr("dx", 10)
             .attr("dy", 12)
-            .attr('font-size', 'smaller')
+            .attr('font-size', 'smaller')*/
     
         SVG_HISTORY.selectAll(".bar-silouette")
             .data(previous_computations)
@@ -397,10 +449,35 @@ function updatePinHistory(iteration,isLast,valore_silouette){
     if(isLast){
         d3.select('#improvement-'+(current_computation_index))
         .attr('width',width_rect*LIMIT_IT)
+        let width_iteration = (width_rect*LIMIT_IT)/iteration
+        
+            // ho trovato la early termination slow 
+            d3.select('#early-slow-'+current_computation_index)
+            .attr('width',5)
+            .attr('x',width_iteration*previous_computations[current_computation_index]['earlyTerminationslow']+5)
+            // ho trovato la early termination fast 
+            d3.select('#early-fast-'+current_computation_index)
+            .attr('width',5)
+            .attr('x',width_iteration*previous_computations[current_computation_index]['earlyTerminationslow'])
         
     } else {
         d3.select('#improvement-'+(current_computation_index))
         .attr('width',width_rect*iteration)
+
+        if (previous_computations[current_computation_index]['earlyTerminationslow'] === iteration){
+            // ho trovato la early termination slow 
+            d3.select('#early-slow-'+current_computation_index)
+            .attr('width',5)
+            .attr('x',width_rect*iteration+5)
+        }
+
+        if (previous_computations[current_computation_index]['earlyTerminationfast'] === iteration){
+            // ho trovato la early termination fast 
+            d3.select('#early-fast-'+current_computation_index)
+            .attr('width',5)
+            .attr('x',width_rect*iteration)
+        }
+
     }
 
 }      
