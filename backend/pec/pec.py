@@ -263,7 +263,7 @@ class ProgressiveEnsembleClustering:
             result.info.timestamp = self.__time_manager.timestamp(round_digits=4) #update timestamp of result. original timestamp is when the result was generated, but some delay can appear when is recieved here
             self.__active = not result.info.is_last
             try:
-                result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory, self.__partitionsHistory, self.__metricsHistory)
+                result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory, self.__metricsHistory)
             except:
                 traceback.print_exc()
                 exit()
@@ -275,7 +275,7 @@ class ProgressiveEnsembleClustering:
             self.__prevResult = result
             self.__metricsHistory.append(result.metrics)
             self.__labelsHistory.append(result.labels)
-            self.__partitionsHistory.append(result.partitions)
+            #self.__partitionsHistory.append(result.partitions)
             
             self.__time_manager.resume()
         ###
@@ -286,9 +286,9 @@ class ProgressiveEnsembleClustering:
         self.__clean()
         if self.verbose: print(f"[{self.__class__.__name__}] terminated.")
 
-    def __computeResultMetrics(self, currentResult, prevResult, history, labelsHistory, partitionsHistory, metricsHistory):
+    def __computeResultMetrics(self, currentResult, prevResult, history, labelsHistory, metricsHistory): #partitionsHistory
         firstIteration = prevResult is None
-        getPartionsHistory = lambda partitionIndex: [partitionsHistory[i][partitionIndex] for i in range(len(partitionsHistory))]
+        #getPartionsHistory = lambda partitionIndex: [partitionsHistory[i][partitionIndex] for i in range(len(partitionsHistory))]
 
         fn_inertia = lambda labels, data: ClusteringMetrics.inertia(data, labels)
         fn_calinsky = lambda labels, data: ClusteringMetrics.calinsky_harabaz_score(data, labels)
