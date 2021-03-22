@@ -336,7 +336,6 @@ system.timelinepartitions = (function() {
         that.div.select("g.gTimeLine")
             .selectAll('rect.rect-partition')
             .data(parse_intertia_runs(this.data,this.data.map(d=> d.metrics.partitionsMetrics[that.metric_value]),this.data.map(f => f.info.best_run)))
-            .each()
             .join(
                 enter => enter
                     .append("rect")
@@ -344,8 +343,8 @@ system.timelinepartitions = (function() {
                     .attr('id', (d) => 'timeline-'+d[0]+'-'+d[1])
                     .attr('x', (d)=>  that.xScale(d[0]))
                     .attr('y', d=> that.yScale(d[1]))
-                    .attr('width', that.xScale.bandwidth())
-                    .attr('height',that.yScale.bandwidth())
+                    .attr('width', that.xScale.bandwidth()*0.90)
+                    .attr('height',that.yScale.bandwidth()*0.70)
                     .attr('fill',d=> { 
                         if(d[0]<5) {
                             return d3.interpolateGreys(this.colorScaleCell(d[2]))
@@ -372,14 +371,12 @@ system.timelinepartitions = (function() {
                             if(that.metric_value === 'inertia'){
                                 return "#ffff16" //"#ff9d47"
                             }
-                           
-                            
                         }
                         })
                     .attr('stroke-width',(d)=> {
                         if(d[3] === d[1]) { 
                             return '1'
-                        } else if((d[2] - d[4] <= d[4]*0.01) && (d[3] !== d[1])){ 
+                        } else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
                             return '1'
                         }
                         })
@@ -397,13 +394,60 @@ system.timelinepartitions = (function() {
                             else
                                 return 0;
                             })
+                    .on('click', function(){
+                        d3.selectAll('rect.rect-partition').attr('stroke',(d)=> {
+                            if(d[3] === d[1]) { 
+                                if(that.metric_value === 'inertia'){
+                                    return '#ff0090'
+                                }
+                                if (this.metric_value === this.METRICA_LABELING){
+                                    return '#0094db'
+                                }
+                            }
+                            else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
+                                if(that.metric_value === 'inertia'){
+                                    return "#ffff16" //"#ff9d47"
+                                }
+                            }
+                            })
+                        .attr('stroke-width',1)
+                        .attr('width', that.xScale.bandwidth()*0.90)
+                        .attr('height',that.yScale.bandwidth()*0.70)
+                        d3.select(this)
+                            .attr('width', that.xScale.bandwidth())
+                            .attr('height',that.yScale.bandwidth())
+
+                        console.log(d3.select(this))
+                        console.log(d3.select(this).node())
+                        let data_rect = d3.select(this).attr('id').split('-')
+                        let iteration_clicked = +data_rect[1]
+                        let partition_selected = +(data_rect[2].replace('P',''))
+                        console.log(data_rect,iteration_clicked,partition_selected)
+                        system.scatterplot.updateScatterplotFromTimeline(iteration_clicked,partition_selected);
+
+                    })
                   ,
                 update => update
-                  .attr('x', (d)=>  that.xScale(d[0]))
-                  .attr('y', d=> that.yScale(d[1]))
-                  .attr('width', that.xScale.bandwidth())
-                  .attr('height',that.yScale.bandwidth())
-                  .attr('fill','black'),
+                .attr('stroke',(d)=> {
+                    if(d[3] === d[1]) { 
+                        
+                        if(that.metric_value === 'inertia'){
+                            return '#ff0090'
+                        }
+                        if (this.metric_value === this.METRICA_LABELING){
+                            return '#0094db'
+                        }
+                    }
+                    else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
+                        if(that.metric_value === 'inertia'){
+                            return "#ffff16" //"#ff9d47"
+                        }
+                       
+                        
+                    }
+                    })
+                
+                ,
                 exit => exit
                     .call(exit => exit
                         .transition()
@@ -430,6 +474,7 @@ system.timelinepartitions = (function() {
                 .text('\uf091' ); 
             
     }
+    
 
     this.updateSimilarity = () =>{
 

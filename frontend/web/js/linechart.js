@@ -247,9 +247,15 @@ system.linechart = (function() {
                 if(this.lastObj['metrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
-                    console.log('ALESSIA SUSHI',obj)
+                    console.log('***earlyTermination'+ d.name)
+                    let current_computation_index = previous_computations.length-1
+                    previous_computations[current_computation_index]['earlyTermination'+ d.name] = this.lastObj.iteration
+
+                    previous_computations[current_computation_index][d.name+'Inertia'] = this.lastObj['metrics']['labelsMetrics']['inertia']
+                    
                     system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics.adjustedRandScore,obj.metrics.partitionsMetrics.adjustedMutualInfoScore);
+
                 }
             }
         })

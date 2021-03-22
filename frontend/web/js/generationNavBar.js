@@ -290,7 +290,7 @@ function addPinHistory() {
 
     let tentative = previous_computations.length
 
-    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'simplifiedSilhouette':-1, iteration:0, earlyTerminationSlow:-1,earlyTerminationFast:-1})
+    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'simplifiedSilhouette':-1, 'iteration':0, 'earlyTerminationslow':-1, 'slowInertia': -1, 'earlyTerminationfast':-1, 'fastInertia':-1})
 
     scaleHistory = d3.scaleBand()
        
@@ -393,6 +393,8 @@ function updatePinHistory(iteration,isLast,valore_silouette){
 
     //previous_computations.length
     let current_computation_index = previous_computations.length-1
+
+
     previous_computations[current_computation_index]['simplifiedSilhouette'] = valore_silouette
 
     d3.select('#silouette-' + current_computation_index)
