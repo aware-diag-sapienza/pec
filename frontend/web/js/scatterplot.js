@@ -17,6 +17,7 @@ system.scatterplot = (function() {
   .range(['#fcfbfd','#efedf5','#dadaeb','#bcbddc','#9e9ac8','#807dba','#6a51a3','#54278f','#3f007d']);
   this.tensorResultComputation= {};
   this.datasetComputed = [];
+  this.LABEL_EARLY_TERMINATION = [];
 
   let stage;
   let layer;
@@ -49,6 +50,7 @@ system.scatterplot = (function() {
     this.coordinates = null
     this.early_termination = null
     this.first_iteration = true
+    this.LABEL_EARLY_TERMINATION = [];
 
     d3.select('#information-info').html("")
     d3.selectAll('.scatter')
@@ -163,12 +165,18 @@ this.updateScatterplot = ()=> {
 
 }
 
+this.updateScatterplotFromTimeline = (iteration, partition)=> {
+  system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,ALL_DATA[iteration]['partitions'][partition]);//useScale,useColor, scaleX,ScaleY
+}
+
 
 this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 
   if ( this.early_termination === null){
-    d3.select('#information-info').html("Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
+    d3.select('#information-info').html('<button type="button" class="btn btn-outline-secondary btn-sm" id="button-metric" onclick="visualizeMetricsFunction()">METRICS</button>'+"Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
+    this.LABEL_EARLY_TERMINATION = labels;
     system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,labels);//useScale,useColor, scaleX,ScaleY
+
   this.early_termination = true;
   }
 }
