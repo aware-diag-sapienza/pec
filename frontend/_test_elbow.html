@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body> 
+
+  <script src="./PECServer.js"></script>
+  <script>
+
+    async function test(){
+      /* Per prima cosa avvio la connessione col server. Torna una promise. */ 
+      const server = await PECServer('ws://localhost:6789')
+
+      
+     
+      /* 
+      Elbow Clustering Job Asincrono. Va prima creato, torna una promise. 
+      job.results è la lista di tutti i risultati parziali ricevuti
+      job.onPartialResult(callback) serve a settare una callback che viene chiamata quando arrivano i risultati
+      job.jobId è univoco e puù essere usato per gestire la visualizzazione dei risultati di più job contemporanei
+      */
+      const dname = 'glass'
+      const kMin = 2
+      const kMax = 10
+      const r = 8
+      const seed = 0
+      const type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
+      
+      const job = await server.createElbowJob (dname, type, kMin, kMax, r, seed)
+      /*
+      una volta creato il job, posso assegnare una callback per i risultati parziali
+      result.isLast dice se è l'ultimo k
+      */
+      job.onPartialResult(result => {
+        console.log(result) 
+        if(result.k == 5) job.stop()
+      })
+
+      //avvio il job
+      job.start()
+      
+    
+    }
+    
+      test()
+  </script>
+
+</body>
+</html>

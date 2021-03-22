@@ -1,3 +1,4 @@
+/* eslint-disable */
 class JsonWebSocket {
   constructor (url, verbose, promiseResolve) {
     this.url = url
@@ -115,7 +116,10 @@ class __PECServer {
       if (message.type !== undefined && message.type === 'partial-result') {
         const pr = new PECPartialResult(message.data)
         this.jobs.get(pr.jobId).__addPartialResult(pr)
-        //console.log(pr)
+      }
+      if (message.type !== undefined && message.type === 'elbow-partial-result') {
+        const pr = new ElbowPartialResult(message.data)
+        this.jobs.get(pr.jobId).__addPartialResult(pr)
       }
     })
   }
@@ -139,7 +143,22 @@ class __PECServer {
       s: s
     }
     const jobId = await this.ws.sendRequest(`createAsyncJob:${JSON.stringify(req)}`)
-    const job = new AsyncPECJob(jobId, req, this)
+    const job = new AsyncJob(jobId, req, this, "PEC")
+    this.jobs.set(jobId, job)
+    return job
+  }
+
+  async createElbowJob (dataset, type, kMin, kMax, r, s) {
+    const req = {
+      dataset: dataset,
+      type: type,
+      kMin: kMin,
+      kMax: kMax,
+      r: r,
+      s: s
+    }
+    const jobId = await this.ws.sendRequest(`createElbowJob:${JSON.stringify(req)}`)
+    const job = new AsyncJob(jobId, req, this, "Elbow")
     this.jobs.set(jobId, job)
     return job
   }
@@ -177,12 +196,13 @@ async function PECServer(url, verbose = false){
 }
 /**
  *
- * AsyncPECJob
+ * AsyncJob
  *
  */
-class AsyncPECJob {
-  constructor (id, req, ws) {
+class AsyncJob {
+  constructor (id, req, ws, type) {
     this.id = id
+    this.type = type
     this.__req = req
     this.__ws = ws
     this.__onPartialResultCallback = (res) => {}
@@ -254,7 +274,7 @@ class AsyncPECJob {
 }
 /**
  *
- * PartialResult
+ * PECPartialResult
  *
  */
 class PECPartialResult {
@@ -270,12 +290,24 @@ class PECPartialResult {
 
     // convert string to array or matrix
     this.info.completed_runs_status = this.info.completed_runs_status.split('-').map(d => d === 't')
-    
-    //this.info.decision_ami = this.info.decision_ami.split('::').map(d => parseFloat(d))
-    //this.info.decision_ars = this.info.decision_ars.split('::').map(d => parseFloat(d))
-    //this.info.runs_inertia = this.info.runs_inertia.split('::').map(d => parseFloat(d))
     this.info.runs_iterations = this.info.runs_iterations.split('-').map(d => parseInt(d))
-    //this.info.runs_ami_matrix = this.info.runs_ami_matrix.split('||').map(row => row.split('::').map(d => parseFloat(d)))
-    //this.info.runs_ars_matrix = this.info.runs_ars_matrix.split('||').map(row => row.split('::').map(d => parseFloat(d)))
   }
 }
+
+/**
+ *
+ * PECPartialResult
+ *
+ */
+ class ElbowPartialResult {
+  constructor (data) {
+    this.jobId = data.jobId
+    this.k = data.k
+    this.inertia = data.inertia
+    this.labels = data.labels
+    this.isLast = data.isLast
+  }
+}
+
+
+

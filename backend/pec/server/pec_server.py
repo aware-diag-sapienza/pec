@@ -6,7 +6,7 @@ from multiprocessing import Queue
 from sklearn.utils import Bunch
 
 from ..log import Log
-from .jobs import AsyncJob
+from .jobs import AsyncJob, ElbowJob
 from ..datasets import Dataset
 from .libs.json_websocket_server import JsonWebSocketServer
 
@@ -15,6 +15,7 @@ class PECServer:
         self.port = port
         self.host = host
         self.partialResultsQueue = Queue()
+        self.elbowResultsQueue = Queue()
         self.socketServer = JsonWebSocketServer(self.port, host=self.host, fn_onMessage=self.onMessage, fn_onRequest=self.onRequest)
         self.partialResultListener = Thread(target=self.fn_partialResultListener)
         self.jobs = {}
@@ -65,6 +66,11 @@ class PECServer:
                 jobId = self.createAsyncJob(client, requestId, d)
                 self.socketServer.sendRequestResponse(client, requestId, jobId)
             ##
+            elif request.startswith("createElbowJob:"):
+                d = Bunch(**json.loads(request.replace("createElbowJob:", "")) )
+                jobId = self.createElbowJob(client, requestId, d)
+                self.socketServer.sendRequestResponse(client, requestId, jobId)
+            ##
             else:
                 raise RuntimeError(f"Undefined request type '{request}'")
             ##
@@ -78,15 +84,30 @@ class PECServer:
         Log.print(f"{Log.PINK}Created AsyncJob {job.id}")
         return job.id
     
+    def createElbowJob(self, client, requestId, d):
+        job = ElbowJob(d.type, d.dataset, d.kMin, d.kMax, d.r, d.s, self.partialResultsQueue, client=client)
+        self.jobs[job.id] = job
+        Log.print(f"{Log.PINK}Created ElbowJob {job.id}")
+        return job.id
+    
     def fn_partialResultListener(self):
         while True:
             data = self.partialResultsQueue.get()
-            if not data.pr.info.is_last: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {data.pr.job_id}")
-            else: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {data.pr.job_id} -- {Log.RED}last{Log.ENDC}")
-            self.socketServer.sendMessage(data.client, {
-                "type": "partial-result",
-                "data": data.pr
-            })
+
+            if data.jobType == "AsyncJob":
+                if not data.pr.info.is_last: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {data.pr.job_id}")
+                else: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {data.pr.job_id} -- {Log.RED}last{Log.ENDC}")
+                self.socketServer.sendMessage(data.client, {
+                    "type": "partial-result",
+                    "data": data.pr
+                })
+            elif data.jobType == "ElbowJob":
+                if not data.pr.isLast: Log.print(f"{Log.GRAY}Sending elbow partial result K={data.pr.k} of {data.pr.jobId}")
+                else: Log.print(f"{Log.GRAY}Sending elbow partial result k={data.pr.k} of {data.pr.jobId} -- {Log.RED}last{Log.ENDC}")
+                self.socketServer.sendMessage(data.client, {
+                    "type": "elbow-partial-result",
+                    "data": data.pr
+                })
     
     def start(self):
         Log.print(f"Starting PEC Server on {Log.BLUE}ws://{self.host}:{self.port}")

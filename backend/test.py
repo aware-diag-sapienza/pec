@@ -1,4 +1,4 @@
-
+"""
 from pec.metrics import ClusteringMetrics
 import numpy as np
 
@@ -17,4 +17,12 @@ ss = ClusteringMetrics.simplified_silhouette(data, labels)
 
 print(F"S  {s}")
 print(F"SS {ss}")
+"""
+
+from pec.server.jobs import ElbowJob
+
+if __name__ == "__main__":
+    e = ElbowJob("I-PecK", "glass", 2, 10, 8, 0, None)
+    e.start()
+    e.join()
 
