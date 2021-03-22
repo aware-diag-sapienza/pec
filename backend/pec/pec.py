@@ -373,18 +373,20 @@ class ProgressiveEnsembleClustering:
             #"globalStabilityEXP": 0 if firstIteration else ClusteringMetrics.global_stabilityEXP(labelsHistory),
             
             "entriesStability": {
-                "1":  np.zeros(self.n_entries) if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=1),
+                #"1":  np.zeros(self.n_entries) if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=1),
                 "2":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=2),
                 "3":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=3),
                 "4":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=4),
                 "5":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=5),
+                "10":  0 if firstIteration else ClusteringMetrics.entries_stability(labelsHistory, window=10),
             },
             "globalStability": {
-                "1":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=1),
+                #"1":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=1),
                 "2":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=2),
                 "3":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=3),
                 "4":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=4),
                 "5":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=5),
+                "10":  0 if firstIteration else ClusteringMetrics.global_stability(labelsHistory, window=10),
             },
 
             

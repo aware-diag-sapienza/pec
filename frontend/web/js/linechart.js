@@ -1,4 +1,5 @@
-let globalNumberBrushActually = {one: false, second:false, third: false}
+/* eslint-disable */
+let globalNumberBrushActually = { one: false, second: false, third: false }
 
 let xMin1
 let xMax1
@@ -15,9 +16,8 @@ let xMax3
 let yMax3
 let yMin3
 
-
 if (window.system == undefined) window.system = {}
-system.linechart = (function() {
+system.linechart = function() {
     const that = this;
 
     // variable
@@ -58,6 +58,7 @@ system.linechart = (function() {
     this.yAxis3 = null
     this.attributeYAxisFirstLevel3 = null
     this.attributeYAxisSecondLevel3 = null
+    this.attributeYAxisThirdLevel3 = null
     this.labelYAxis3 = null
     this.line3 = d3.line()
 
@@ -132,7 +133,7 @@ system.linechart = (function() {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3]));
+                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]));
             });
         
         return that
@@ -178,34 +179,31 @@ system.linechart = (function() {
         this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
         this.labelYAxis2 = "Quality: sim.Silhouette"
 
-        if(variableYAxisLinechart == "globalStability0"){
+        if(variableYAxisLinechart == "gs-w2"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability0"
-            this.labelYAxis3 = "Global Stability 0"
-        }else if(variableYAxisLinechart == "globalStability1"){
+            this.attributeYAxisSecondLevel3 = "globalStability"
+            this.attributeYAxisThirdLevel3 = "2"
+            this.labelYAxis3 = "Global Stability w=2"
+        }else if(variableYAxisLinechart == "gs-w3"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability1"
-            this.labelYAxis3 = "Global Stability 1"
-        }else if(variableYAxisLinechart == "globalStability2"){
+            this.attributeYAxisSecondLevel3 = "globalStability"
+            this.attributeYAxisThirdLevel3 = "3"
+            this.labelYAxis3 = "Global Stability w=3"
+        }else if(variableYAxisLinechart == "gs-w4"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStability2"
-            this.labelYAxis3 = "Global Stability 2"
-        }else if(variableYAxisLinechart == "globalStabilityEXP"){
+            this.attributeYAxisSecondLevel3 = "globalStability"
+            this.attributeYAxisThirdLevel3 = "4"
+            this.labelYAxis3 = "Global Stability w=4"
+        }else if(variableYAxisLinechart == "gs-w5"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityEXP"
-            this.labelYAxis3 = "globalStabilityEXP"
-        }else if(variableYAxisLinechart == "globalStabilityEXP5"){
+            this.attributeYAxisSecondLevel3 = "globalStability"
+            this.attributeYAxisThirdLevel3 = "2"
+            this.labelYAxis3 = "Global Stability w=5"
+        }else if(variableYAxisLinechart == "gs-w10"){
             this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityEXP5"
-            this.labelYAxis3 = "globalStabilityEXP5"
-        }else if(variableYAxisLinechart == "globalStabilityLOG"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityLOG"
-            this.labelYAxis3 = "globalStabilityLOG"
-        }else if(variableYAxisLinechart == "globalStabilityLOG5"){
-            this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-            this.attributeYAxisSecondLevel3 = "globalStabilityLOG5"
-            this.labelYAxis3 = "globalStabilityLOG5"
+            this.attributeYAxisSecondLevel3 = "globalStability"
+            this.attributeYAxisThirdLevel3 = "10"
+            this.labelYAxis3 = "Global Stability w=10"
         }
         
     }
@@ -706,4 +704,4 @@ system.linechart = (function() {
     }
 
     return this;
-}).call({})
+}.call({})

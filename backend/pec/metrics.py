@@ -193,8 +193,8 @@ class ClusteringMetrics:
         for i in range(h-1):
             stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
         return stability
-    '''
-        
+    
+    
     @staticmethod
     def global_stability0(prev_labels, curr_labels):
         return np.mean(ClusteringMetrics.clusters_stability(prev_labels, curr_labels))
@@ -211,12 +211,12 @@ class ClusteringMetrics:
     def global_stabilityEXP(labelsHistory):
         return np.mean(ClusteringMetrics.entries_stabilityEXP(labelsHistory))
         
-    
+    '''
 
     @staticmethod
     def entries_stability(labelsHistory, window=None):
         if window <1:
-            raise RuntimeError(f"Window must me >1")
+            raise RuntimeError(f"Window must me >2")
         
         hist = None
         if window is None:
@@ -229,7 +229,8 @@ class ClusteringMetrics:
         if (window is None and h < 5) or (h < window): 
             return stability # return all 0
         
-        w = [math.log(2 + i) for i in range(h-1)] #log weights
+        #w = [math.log(2 + i) for i in range(h-1)] #log weights
+        w = [math.exp(i) for i in range(h-1)] #exp weights
         for i in range(h-1):
             stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
         return stability
