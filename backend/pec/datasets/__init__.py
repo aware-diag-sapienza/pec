@@ -20,7 +20,7 @@ class Dataset:
                     "n": data.shape[0],
                     "d": data.shape[1],
                     "k": 0,
-                    "data": data,
+                    #"data": data,
                     "projections": {
                         "pca": self.loadPCA(file, data),
                         "tsne": self.loadTSNE(file, data)
