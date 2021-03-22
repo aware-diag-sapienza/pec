@@ -42,6 +42,32 @@ function changeRelativeYScale(){
     linechart1.updateYAxisVariable()
 }
 
+let linechart_Elbow1;
+document.getElementById('elbowLinechartCheck').checked = false
+let elbowLinechart = document.getElementById('elbowLinechartCheck').checked
+
+function changeElbowLinechart(){
+    let cbox = document.getElementById('elbowLinechartCheck');
+    elbowLinechart = cbox.checked
+    
+    if(elbowLinechart){
+        linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia')
+        let onlyDataActualDataset = previous_computations.filter(d => d.dataset == dataset)
+
+        let elbowData = []
+        let allKActualDataset = new Set(onlyDataActualDataset.map(d => d.cluster))
+        allKActualDataset.forEach(d=> {
+            let value = d3.min(onlyDataActualDataset.filter(ele => ele.cluster == d).map(ele => ele.fastInertia))
+            elbowData.push({k: d, value: value})
+        })
+
+        linechart_Elbow1.setData(elbowData)
+        linechart_Elbow1.render()
+    }else{
+        linechart1.render()
+    }
+}
+
 function updateSelects(list_dataset){
 
     const datasetsArray = list_dataset.map((d)=> d.name)    
@@ -151,6 +177,8 @@ async function startSelects(){
         linechart1 = system.linechart.init('#linechart_inertia', technique)
         timelinePartitions = system.timelinepartitions.init('#timeline-partitions', technique,partitions)
         
+        document.getElementById('elbowLinechartCheck').checked = false
+        elbowLinechart = document.getElementById('elbowLinechartCheck').checked
 
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
         JOBS.push(job)
