@@ -302,7 +302,8 @@ class ProgressiveEnsembleClustering:
             "calinskyHarabasz": ClusteringMetrics.calinsky_harabaz_score(self.data, currentResult.labels),
             "adjustedRandScore": np.ones(self.n_runs, dtype=float),
             "adjustedMutualInfoScore": np.ones(self.n_runs, dtype=float),
-            "simplifiedSilhouette": ClusteringMetrics.simplified_silhouette(self.data, currentResult.labels)
+            "simplifiedSilhouette": ClusteringMetrics.simplified_silhouette(self.data, currentResult.labels),
+            "silhouette": ClusteringMetrics.silhouette(self.data, currentResult.labels)
         }
         partitionsMetrics = {
             "inertia": np.apply_along_axis(fn_inertia, 1, currentResult.partitions, self.data),

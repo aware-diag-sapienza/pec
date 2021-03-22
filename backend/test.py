@@ -6,19 +6,15 @@ data = np.array([
     [0, 0],
     [0, 1],
     [1, 1],
-    [1, 0]
+    [1, 0],
+    [0.5, 0.5]
 ], dtype=float)
 
-labels_prev = np.array([0, 1, 2, 3])
-labels_curr = np.array([1, 2, 0, 3])
+labels = np.array([0, 0, 1, 1, 0])
 
-sm = ClusteringMetrics.smooth_labels__jaccard(data, labels_prev, labels_curr)
-print(sm)
-"""
-a, b, u = ClusteringMetrics.normalize_labels(data, labels_a, labels_b)
+s = ClusteringMetrics.silhouette(data, labels)
+ss = ClusteringMetrics.simplified_silhouette(data, labels)
 
-print(labels_a, a)
-print(labels_b, b)
-print(u)
-"""
+print(F"S  {s}")
+print(F"SS {ss}")
 

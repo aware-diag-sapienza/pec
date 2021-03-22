@@ -84,9 +84,9 @@ class ClusteringMetrics:
         try:
             A = distances[np.arange(n), labels] #distance of each point to its cluster centroid
             distances[np.arange(n), labels] = np.Inf #set to infinte the distance to own centroid
-            B = np.min(distances, axis=1) #distance to each point to the closer centroid (different from its own cluster)
+            B = np.min(distances, axis=1) #distance to each point to the other closer centroid (different from its own cluster)
             M = np.maximum(A, B) #max row wise of A and B
-            S = np.sum( (B - A) / M)  / n
+            S = np.mean( (B - A) / M )
             return S
         except:
             traceback.print_exc()
@@ -188,8 +188,7 @@ class ClusteringMetrics:
     def entries_stabilityEXP(labelsHistory):
         stability = np.full_like(labelsHistory[0], 0, dtype=float)
         h = len(labelsHistory)
-        w = [math.log(2 + i) for i in range(h-1)] #log weights
-        #w = [math.exp(i) for i in range(h-1)] #exp weights
+        w = [math.exp(i) for i in range(h-1)] #exp weights
         if h < 5: return stability
         for i in range(h-1):
             stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
