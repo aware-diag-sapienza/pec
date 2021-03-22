@@ -50,6 +50,7 @@ system.timelinepartitions = (function() {
         this.partitions_status=Array.from({length:partitions},(_,i)=> [0,'P'+i,true])
         this.metric_value = $('input[name="metric-timeline"]:checked').val();
         this.percentage_similarity = +$('#similarity-range').val()
+        d3.select('#information-linechart').style('visibility','visible');
 
         
         this.DOMAINS = {inertia: [0,0], simplifiedSilhouette: [-1,1]}
@@ -147,6 +148,10 @@ system.timelinepartitions = (function() {
         this.render(obj.iteration)
     }
 
+    this.reset = () => {
+        d3.select('#information-linechart').style('visibility','hidden');
+        
+    }
    
     
     this.render = () => {
@@ -395,22 +400,7 @@ system.timelinepartitions = (function() {
                                 return 0;
                             })
                     .on('click', function(){
-                        d3.selectAll('rect.rect-partition').attr('stroke',(d)=> {
-                            if(d[3] === d[1]) { 
-                                if(that.metric_value === 'inertia'){
-                                    return '#ff0090'
-                                }
-                                if (this.metric_value === this.METRICA_LABELING){
-                                    return '#0094db'
-                                }
-                            }
-                            else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
-                                if(that.metric_value === 'inertia'){
-                                    return "#ffff16" //"#ff9d47"
-                                }
-                            }
-                            })
-                        .attr('stroke-width',1)
+                        d3.selectAll('rect.rect-partition')
                         .attr('width', that.xScale.bandwidth()*0.90)
                         .attr('height',that.yScale.bandwidth()*0.70)
                         d3.select(this)

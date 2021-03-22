@@ -83,7 +83,6 @@ function updateSelects(list_dataset){
     for(let i = 0; i < projections.length; i++){
         selectProjections.options.add(new Option(projections[i], projections[i]));
     }
-
     document.getElementById("select-dataset").value = ""
     document.getElementById("select-technique").value = ""
     document.getElementById("select-cluster").value = ""
@@ -91,8 +90,6 @@ function updateSelects(list_dataset){
     document.getElementById("select-projection").value = 'tsne'
     document.getElementById("similarity-range").value = 1
     d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
-    
-
 }
 
 function resetSelects(){
@@ -103,12 +100,9 @@ function resetSelects(){
     document.getElementById("select-projection").value = 'tsne'
     document.getElementById("similarity-range").value = 1
     d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
-    
 }
 function getSeed(){
-
     let newseed = Math.random()*(100000-1)+1;
-
     if ($( "#select-seed" ).val() === '')
         return Math.ceil(newseed);
     else 
@@ -118,7 +112,6 @@ function getSeed(){
 async function startSelects(){
     LockUI.lock()
     ALL_DATA = []
-
     ITERAZIONE_PER_MATRICE = 1
     dataset = $( "#select-dataset" ).val()
     technique =  $( "#select-technique" ).val()
@@ -126,7 +119,6 @@ async function startSelects(){
     partitions = $( "#select-partitions" ).val()
     projection = $( "#select-projection" ).val()
     seed = getSeed()
-
 
     d3.select('#iteration-label').html('');
     d3.select('#id-metrics').style('display','none');
@@ -150,13 +142,11 @@ async function startSelects(){
         matrix2 = system.matrixAdjacencyFixed.init('#id-matrix-2');
         linechart1 = system.linechart.init('#linechart_inertia', technique)
         timelinePartitions = system.timelinepartitions.init('#timeline-partitions', technique,partitions)
-        
-
+        d3.select('#info-scatterplot-1').style('visibility','visible');
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
         JOBS.push(job)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         job.onPartialResult(result => {
-
             ALL_DATA.push(result)
             CURRENT_ITERATION = result.iteration
             if(result.iteration == 0){
@@ -167,8 +157,6 @@ async function startSelects(){
             d3.select('#iteration-label').html("Iteration " + result.iteration)
         })
         job.start()
-
-        
         addPinHistory()
     } else {
         alert("Select Dataset, technique e clusters to perform the query")
@@ -176,46 +164,37 @@ async function startSelects(){
 }
 
 let timestamp0;
-
 let swap_timestamp = 0;
-
 function readResult(it_res){
     timestamp0 = swap_timestamp
     let actual_timestamp;
-   
     actual_timestamp = it_res.timestamp
-    
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
     d3.selectAll('.linechart_select').style('display','block')
     d3.select('#button-metric').style('display','block')
     d3.select('#id-metrics').style('display','block')
         if(it_res.iteration === 0){
-                
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res]) 
                 linechart1.render()
                 timelinePartitions.setData([it_res]) 
                 timelinePartitions.render()
                 updateTable(it_res)
-                system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
-                
+                system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore); 
         }else{
                 linechart1.updateData(it_res,it_res.info)
                 timelinePartitions.updateData(it_res,it_res.metrics)
                 updateTable(it_res)
                 system.scatterplot.updateScatterplot();
                 system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
-                
             }
             updatePinHistory(it_res.iteration,it_res.isLast, it_res.metrics.labelsMetrics.simplifiedSilhouette)
             system.matrixAdjacency.updateBestPartition(it_res.info.best_run)
-
             if (it_res.is_last){
                 ITERAZIONE_PER_MATRICE = ITERAZIONE_PER_MATRICE
             } else{
                 ITERAZIONE_PER_MATRICE +=1
             }
-            
 }
 
 function visualizeMetricsFunction(){
@@ -284,8 +263,6 @@ function addPinHistory() {
             .attr('width',width_history)
             .attr('height', height_history-margin_history.top-margin_history.bottom)
             .attr("transform","translate(" + margin_history.top + "," + margin_history.left + ")")
-
-        
     }
 
     let tentative = previous_computations.length
@@ -307,19 +284,6 @@ function addPinHistory() {
         .attr('stroke', 'black')
         .attr('fill', 'white')
     
-    
-    /*SVG_SILOUETTE.selectAll(".bar-silouette")
-        .data(previous_computations)
-        .enter()
-        .append('rect')
-        .attr('class','bar-silouette')
-        .attr('id',(d) => 'silouette-' + d.tentative)
-        .attr('x', 0)
-        .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
-        .attr('width', 200)
-        .attr('height', height_pin)
-        .attr('stroke', 'black')
-        .attr('fill', 'pink')*/
     width_rect = (width_history-margin_history.right)/LIMIT_IT
 
     SVG_HISTORY.selectAll(".bar-history-improvement")
@@ -415,4 +379,20 @@ function updateProjection(){
     let last_it = ALL_DATA.length -1
     projection = $( "#select-projection" ).val()
     system.scatterplot.createDataProjection(DATASET_SELECTED.projections[projection], ALL_DATA[last_it].labels)
+}
+
+function updateEarlyTermination(){
+    
+    // togliere la selezione dalla timeline
+    d3.selectAll('rect.rect-partition')
+        .attr('width', system.timelinepartitions.xScale.bandwidth()*0.90)
+        .attr('height',system.timelinepartitions.yScale.bandwidth()*0.70)
+    
+    // far vedere lo scatterplot della early termination
+    let index = previous_computations.length -1
+    let iterationFast = +previous_computations[index].earlyTerminationfast
+    
+    d3.select('#information-info').html("Early Termination Fast - Iteration #" + iterationFast + '   <b>ARI<b/>: ' + ALL_DATA[iterationFast].metrics.progressiveMetrics.adjustedRandScore.toFixed(4))
+    system.scatterplotFixed.updateScatterplot(false,true, system.scatterplot.scale_x,system.scatterplot.scale_y,system.scatterplot.LABEL_EARLY_TERMINATION);
+
 }

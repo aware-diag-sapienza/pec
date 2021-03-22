@@ -38,6 +38,7 @@ system.matrixAdjacencyFixed = (function() {
 
     this.reset = () => {
       this.early_termination = null;
+      
       d3.select(this.divname).selectAll("svg").remove();
     }
 
