@@ -53,6 +53,7 @@ system.scatterplot = (function() {
     this.LABEL_EARLY_TERMINATION = [];
 
     d3.select('#information-info').html("")
+    d3.select('.item-information').style('visibility','hidden');
     d3.selectAll('.scatter')
       .style('border-style', 'solid')
       .style('border-width', '0px')
@@ -166,6 +167,8 @@ this.updateScatterplot = ()=> {
 }
 
 this.updateScatterplotFromTimeline = (iteration, partition)=> {
+  d3.select('#information-info').html("Partition P"+partition + "at iteration "+iteration)
+    
   system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,ALL_DATA[iteration]['partitions'][partition]);//useScale,useColor, scaleX,ScaleY
 }
 
@@ -173,9 +176,9 @@ this.updateScatterplotFromTimeline = (iteration, partition)=> {
 this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 
   if ( this.early_termination === null){
-    d3.select('#information-info').html('<button type="button" class="btn btn-outline-secondary btn-sm" id="button-metric" onclick="visualizeMetricsFunction()">METRICS</button>'+"Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
     this.LABEL_EARLY_TERMINATION = labels;
-    system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,labels);//useScale,useColor, scaleX,ScaleY
+    d3.select('#information-info').html("Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
+    system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,this.LABEL_EARLY_TERMINATION);//useScale,useColor, scaleX,ScaleY
 
   this.early_termination = true;
   }
@@ -188,10 +191,10 @@ function scaleClusterStability(metrica,cluster,stability){
     return that.scale_color[+cluster]
   } else {
     if(stability <= 0.20){
-      return '#808080'
+      return '#a0a0a0'
     }
     if(stability > 0.20 && stability <= 0.80 ){
-      return that.scale_color[+cluster]
+      return '#808080'
     }
     if(stability > 0.80){
       return that.scale_color[+cluster]
@@ -209,7 +212,7 @@ function scaleOpacityStability(metrica,cluster,stability){
       return 1
     }
     if(stability > 0.20 && stability <= 0.80 ){
-      return 0.4
+      return 1
     }
     if(stability > 0.80){
       return 1

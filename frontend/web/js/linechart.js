@@ -248,6 +248,7 @@ system.linechart = (function() {
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
                     console.log('***earlyTermination'+ d.name)
+                    d3.select('.item-information').style('visibility','visible');
                     let current_computation_index = previous_computations.length-1
                     previous_computations[current_computation_index]['earlyTermination'+ d.name] = this.lastObj.iteration
 

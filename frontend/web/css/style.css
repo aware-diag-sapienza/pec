@@ -20,7 +20,12 @@ body {
   }
 
   .item-information {
+    display: flex;
+    flex-direction: row;
     grid-area: information;
+    padding-top: 2px;
+    line-height: 2;
+    visibility:hidden;
   }
   .item-iteration {
     grid-area: iteration;
@@ -28,6 +33,7 @@ body {
 
   .item-history {
     grid-area: history;
+    overflow: scroll;
   }
 
   .item-scatterplot-1 {
@@ -247,4 +253,9 @@ fill: #41A368;
 
 #similarity-range{
   width:100px;
+}
+
+#information-info{
+  line-height: 2;
+
 }
