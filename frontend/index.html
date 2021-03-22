@@ -93,17 +93,27 @@
       </div>
       <div class="item-history" id="listhistory"></div>
       <div class="item-information-scatterplot-1" id="info-scatterplot-1">
-        <label class="select-label">Projection</label>
+        <label class="select-label">Projection: </label>
         <div class="select-menu">
           <select class="form-select form-select-sm" id="select-projection" onchange="updateProjection()"></select>
+        </div>
+        <label class="select-label">Stability Window: </label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-window" onchange="changeStabilityWindow()">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
         </div>
         Vis: 
         <input type="radio" id="cluster" name="plot-scatterplot" value="cluster" onclick="system.scatterplot.updateScatterplot();" checked>
         <label for="cluster">clu</label>
-        <input type="radio" id="stability1" name="plot-scatterplot" value="entriesStability1" onclick="system.scatterplot.updateScatterplot();">
+        <!--<input type="radio" id="stability1" name="plot-scatterplot" value="entriesStability1" onclick="system.scatterplot.updateScatterplot();">
         <label for="stability1">s1</label>
         <input type="radio" id="stability2" name="plot-scatterplot" value="entriesStability2" onclick="system.scatterplot.updateScatterplot();">
-        <label for="stability2">s2</label>
+        <label for="stability2">s2</label>-->
         <input type="radio" id="entriesStabilityLOG5" name="plot-scatterplot" value="entriesStabilityLOG5" onclick="system.scatterplot.updateScatterplot();">
         <label for="stability2">sLOG5</label>
         <input type="radio" id="entriesStabilityEXP5" name="plot-scatterplot" value="entriesStabilityEXP5" onclick="system.scatterplot.updateScatterplot();">
@@ -119,15 +129,14 @@
       <div class="item-linechart-1" id="linechart_inertia">
         </div>
       <div class="item-information-linechart" id="information-linechart" >
-        <b>TIMELINE METRICS</b>: 
+        <b>METRICS</b>: 
         <input type="radio" id="inertia" name="metric-timeline" value="inertia" onclick="system.timelinepartitions.updateMetricValue()" checked>
         <label for="inertia">inertia</label>
         <input type="radio" id="simplifiedSilhouette" name="metric-timeline" value="simplifiedSilhouette" onclick="system.timelinepartitions.updateMetricValue()">
         <label for="simplifiedSilhouette">labeling</label>
-        <b>Similarity threshold:</b> <label id="selected_similarity">1%</label>
+        <b>SIMILARITY THRESHOLD</b>:<label id="selected_similarity">1%</label>
         <label for="similarity">0</label>
-        <input type="range" id="similarity-range" name="similarity" min="0" max="100" value = "1" onchange="system.timelinepartitions.updateSimilarity()"> 100 
-
+        <input type="range" id="similarity-range" name="similarity" min="0" max="30" value = "1" onchange="system.timelinepartitions.updateSimilarity()">30
       </div>
       <div class="item-timeline-partitions" id="timeline-partitions"></div>
       <div class="item-information"><button type="button" class="btn btn-outline-warning btn-sm" id="button-earlyTermination" onclick="updateEarlyTermination()" >EARLY TERMINATION</button><p id='information-info'></p></div>

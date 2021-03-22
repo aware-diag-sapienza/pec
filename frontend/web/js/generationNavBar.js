@@ -300,6 +300,7 @@ function addPinHistory() {
     // SE IL dataset selezionato non è nella struttura dati presente allora riazzero l'svg e lla struttura dati. 
     if (previous_computations.map(d=> d.dataset).indexOf(dataset)=== -1){
         d3.select("#svg-list-history").remove('*');
+        d3.select('#name-dataset-history').remove('*');
         previous_computations = [];
         SVG_HISTORY = null
     } 
@@ -311,6 +312,7 @@ function addPinHistory() {
 
     if (SVG_HISTORY == null){
         d3.select("#listhistory").append('p')
+        .attr('id', 'name-dataset-history')
         .style('padding-left','10px')
         .html(dataset)
         SVG_HISTORY = d3.select("#listhistory")

@@ -110,11 +110,11 @@ system.timelinepartitions = (function() {
         if (d3.max(obj.metrics.partitionsMetrics['inertia']) > this.DOMAINS['inertia'][1]){
             this.DOMAINS['inertia'][1] = d3.max(obj.metrics.partitionsMetrics['inertia'])
         }
-        if (d3.min(obj.metrics.partitionsMetrics[that.metric_value]) < this.DOMAINS[that.metric_value][0]){
-            this.DOMAINS[that.metric_value][0] = d3.min(obj.metrics.partitionsMetrics[that.metric_value])
+        if (d3.min(obj.metrics.partitionsMetrics[this.METRICA_LABELING]) < this.DOMAINS[this.METRICA_LABELING][0]){
+            this.DOMAINS[this.METRICA_LABELING][0] = d3.min(obj.metrics.partitionsMetrics[this.METRICA_LABELING])
         }
-        if (d3.max(obj.metrics.partitionsMetrics[that.metric_value]) > this.DOMAINS[that.metric_value][1]){
-            this.DOMAINS[that.metric_value][1] = d3.max(obj.metrics.partitionsMetrics[that.metric_value])
+        if (d3.max(obj.metrics.partitionsMetrics[this.METRICA_LABELING]) > this.DOMAINS[this.METRICA_LABELING][1]){
+            this.DOMAINS[this.METRICA_LABELING][1] = d3.max(obj.metrics.partitionsMetrics[this.METRICA_LABELING])
         }
 
 
@@ -145,6 +145,7 @@ system.timelinepartitions = (function() {
             }
         })
 
+        console.log('****',this.DOMAINS[this.METRICA_LABELING])
         this.render(obj.iteration)
     }
 
