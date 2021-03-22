@@ -51,23 +51,12 @@ class JsonWebSocket {
   }
 
   __decodeIncomingMessage (event) {
-    /*
-    try {
-      this.__recievedCounter++
-      const message = JSON.parse(event.data)
-      if (message.type === 'M') this.__onMessageCallback(message.body)
-      else if (message.type === 'R') console.log('Request recieved... not yet implemented.')
-      else if (message.type === 'RR') this.__resolveRequest(message)
-      else console.warn(`Undefined message type recieved: ${message.type}`)
-    } catch (e) {
-      console.warn(e) //, event.data)
-    }
-    */
     let message = null
     try {
       this.__recievedCounter++
       message = JSON.parse(event.data)
     } catch (e) {
+      console.warn(event.data)
       console.warn(e)
     }
     if (message === null) return
@@ -126,6 +115,7 @@ class __PECServer {
       if (message.type !== undefined && message.type === 'partial-result') {
         const pr = new PECPartialResult(message.data)
         this.jobs.get(pr.jobId).__addPartialResult(pr)
+        //console.log(pr)
       }
     })
   }

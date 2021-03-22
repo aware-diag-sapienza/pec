@@ -9,6 +9,7 @@ import h5py
 import uuid
 from pathlib import Path
 from multiprocessing import SimpleQueue, Lock
+from sklearn import metrics
 from sklearn.utils import check_random_state
 
 from .utils import SharedArray, TimeManager, best_labels_dtype, ProgressiveResultMetrics
@@ -262,7 +263,7 @@ class ProgressiveEnsembleClustering:
             result.info.timestamp = self.__time_manager.timestamp(round_digits=4) #update timestamp of result. original timestamp is when the result was generated, but some delay can appear when is recieved here
             self.__active = not result.info.is_last
             try:
-                result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory, self.__partitionsHistory)
+                result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory, self.__partitionsHistory, self.__metricsHistory)
             except:
                 traceback.print_exc()
                 exit()
@@ -285,7 +286,7 @@ class ProgressiveEnsembleClustering:
         self.__clean()
         if self.verbose: print(f"[{self.__class__.__name__}] terminated.")
 
-    def __computeResultMetrics(self, currentResult, prevResult, history, labelsHistory, partitionsHistory):
+    def __computeResultMetrics(self, currentResult, prevResult, history, labelsHistory, partitionsHistory, metricsHistory):
         firstIteration = prevResult is None
         getPartionsHistory = lambda partitionIndex: [partitionsHistory[i][partitionIndex] for i in range(len(partitionsHistory))]
 
@@ -313,6 +314,9 @@ class ProgressiveEnsembleClustering:
             "adjustedRandScore": np.ones((self.n_runs, self.n_runs), dtype=float),
             "adjustedMutualInfoScore": np.ones((self.n_runs, self.n_runs), dtype=float),
             "simplifiedSilhouette": np.apply_along_axis(fn_ssil, 1, currentResult.partitions, self.data),
+
+            "averageAdjustedRandScore": np.zeros((self.n_runs, self.n_runs), dtype=float),
+            "averageAdjustedMutualInfoScore": np.zeros((self.n_runs, self.n_runs), dtype=float),
             
             "globalStability0": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability0(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
             "globalStability1": np.full(self.n_runs, 0, dtype=int) if firstIteration  else [ClusteringMetrics.global_stability1(partitionsHistory[-1][i], currentResult.partitions[i]) for i in range(self.n_runs)],
@@ -329,7 +333,23 @@ class ProgressiveEnsembleClustering:
             for j in range(self.n_runs):
                 partitionsMetrics["adjustedRandScore"][i,j] = ClusteringMetrics.adjusted_rand_score(currentResult.partitions[i], currentResult.partitions[j])
                 partitionsMetrics["adjustedMutualInfoScore"][i,j] = ClusteringMetrics.adjusted_mutual_info_score(currentResult.partitions[i], currentResult.partitions[j])
+
         
+        ##compute average of adjustedRandScore and adjustedMutualInfoScore
+        if firstIteration:
+            for t in range(len(metricsHistory)):
+                partitionsMetrics["averageAdjustedRandScore"] = partitionsMetrics["adjustedRandScore"]
+                partitionsMetrics["averageAdjustedMutualInfoScore"] = partitionsMetrics["adjustedMutualInfoScore"]
+        else:
+            for t in range(len(metricsHistory)):
+                partitionsMetrics["averageAdjustedRandScore"] += metricsHistory[t].partitionsMetrics["adjustedRandScore"]
+                partitionsMetrics["averageAdjustedMutualInfoScore"] += metricsHistory[t].partitionsMetrics["adjustedMutualInfoScore"]
+            partitionsMetrics["averageAdjustedRandScore"] /= len(metricsHistory)
+            partitionsMetrics["averageAdjustedMutualInfoScore"] /= len(metricsHistory) 
+
+        
+                    
+
         def fn_min_labelsMetricHistory(m): return np.min([h.labelsMetrics[m] for h in history])
         def fn_max_labelsMetricHistory(m): return np.max([h.labelsMetrics[m] for h in history])
         def gradient(m): return progressiveMetrics[m] - history[-1].progressiveMetrics[m]
