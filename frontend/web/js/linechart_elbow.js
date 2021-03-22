@@ -147,6 +147,13 @@ system.linechartElbow = (function() {
         updateRendering()
     }
 
+    this.clearAll = () => {
+        this.div.selectAll('svg')
+            .remove();
+
+        d3.selectAll('.linechart_select').style('display','none')
+    }
+
     let updateRendering = () => {
         that.div.select("g.gLineChart")
             .selectAll('path.lineLineChart')
