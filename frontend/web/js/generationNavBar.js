@@ -55,8 +55,9 @@ function changeElbowLinechart(){
         let onlyDataActualDataset = previous_computations.filter(d => d.dataset == dataset)
 
         let elbowData = []
-        let allKActualDataset = new Set(onlyDataActualDataset.map(d => d.cluster))
-        allKActualDataset.forEach(d=> {
+        let allKActualDataset = onlyDataActualDataset.map(d => parseInt(d.cluster)).sort((a, b) => a - b);
+        let setK = new Set(allKActualDataset)
+        setK.forEach(d=> {
             let value = d3.min(onlyDataActualDataset.filter(ele => ele.cluster == d).map(ele => ele.fastInertia))
             elbowData.push({k: d, value: value})
         })
