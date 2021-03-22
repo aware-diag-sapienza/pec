@@ -537,6 +537,13 @@ system.linechart = (function() {
 
     }
 
+    this.clearAll = () => {
+        this.div.selectAll('svg')
+            .remove();
+
+        d3.selectAll('.linechart_select').style('display','none')
+    }
+
     let drawLegend = () => {
         const svgLegend = that.div.select("g.gLineChart")
 
@@ -572,14 +579,26 @@ system.linechart = (function() {
                 enter => enter
                     .append("line")
                     .attr('class', 'lineVertical')
-                    .attr('x1', d=> that.xScale(d.iteration))
-                    .attr('x2', d=> that.xScale(d.iteration))
+                    .attr('x1', d=> {
+                        if(verticalLines[0].iteration == verticalLines[0].iteration && d.name == "fast"){
+                            return that.xScale(d.iteration) - 3
+                        }else{
+                            return that.xScale(d.iteration)
+                        } 
+                    })
+                    .attr('x2', d=> {
+                        if(verticalLines[0].iteration == verticalLines[0].iteration && d.name == "fast"){
+                            return that.xScale(d.iteration) - 3
+                        }else{
+                            return that.xScale(d.iteration)
+                        }
+                    })
                     .attr("y1", that.height - (that.marginBetweenLineCharts))
                     .attr("y2", 0)
                     .attr("stroke", d=> (d.fill))
                     .attr("stroke-opacity", 0.8)
-                    .attr("stroke-width", 6)
-                    .attr("stroke-dasharray", "2,2")
+                    .attr("stroke-width", 3)
+                    //.attr("stroke-dasharray", "2,2")
                     .attr("display", d=> {
                         if(d.draw) return "block"
                         else return "none"
