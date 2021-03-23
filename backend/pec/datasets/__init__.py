@@ -49,6 +49,7 @@ class Dataset:
         for folder in DATA_FOLDERS:
             for file in folder.joinpath("data").glob("*.csv"):
                 datasetName = file.stem
+                if datasetName.startswith("dim"): continue
                 data = np.loadtxt(file, delimiter=",", skiprows=1, dtype=float)
                 entry = {
                     "name": datasetName,

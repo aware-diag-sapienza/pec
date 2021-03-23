@@ -101,6 +101,11 @@ class ClusteringMetrics:
 
         !!! FUNZIONA SOLO SE prev e curr HANNO LO STESSO NUMERO DI CLUSTER, ALTRIMENTI RITORNA curr !!!
         """
+        if prev is None:
+            return curr.copy()
+        if curr is None:
+            return prev.copy()
+
         unique_prev = np.unique(prev)
         unique_curr = np.unique(curr)
         if len(unique_prev) != len(unique_curr):
