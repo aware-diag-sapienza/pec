@@ -485,6 +485,7 @@ system.timelinepartitions = (function() {
     }
 
     let parse_intertia_runs = (all_data, array_inertia, best_run) =>{
+        console.log("BEST",this.BEST_RUN)
         
       
         let parsed_array_inertia = []
@@ -590,6 +591,7 @@ system.timelinepartitions = (function() {
                             }
                         }
                         else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
+                            console.log(d[2],d[4],d[2] - d[4], d[4]*(that.percentage_similarity/100),that.percentage_similarity)
                             if(that.metric_value === 'inertia'){
                                 return "#ffa500"//"#ffff16" //"#ff9d47"
                             }

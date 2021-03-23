@@ -190,21 +190,7 @@ this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 
 function scaleClusterStability(metrica,cluster,stability){
 
-  if(!$("#stable-check").is(':checked') && stability > 0.80){
-    return '#fff'
-  }
-
-  if(!$("#midstable-check").is(':checked') && (stability > 0.20 && stability <= 0.80 )){
-    return '#fff'
-  }
-
-  if(!$("#unstable-check").is(':checked') && stability <= 0.20){
-    return '#fff'
-  }
-
-
   if(metrica == 'cluster'){
-    
     return that.scale_color[+cluster]
   } else {
     if(stability <= 0.20){
@@ -220,20 +206,17 @@ function scaleClusterStability(metrica,cluster,stability){
 }
 
 function scaleOpacityStability(metrica,cluster,stability){
-
-  if(metrica == 'cluster'){
-    return 1
-  } else {
-    if(stability <= 0.20){
-      return 1
-    }
-    if(stability > 0.20 && stability <= 0.80 ){
-      return 1
-    }
-    if(stability > 0.80){
-      return 0
-    }
+   if(!$("#stable-check").is(':checked') && stability > 0.80){
+    return 0
+  } 
+  if(!$("#midstable-check").is(':checked') && (stability > 0.20 && stability <= 0.80 )){
+    return  0
   }
+
+  if(!$("#unstable-check").is(':checked') && stability <= 0.20){
+    return 0
+  }
+  return 3.5 
 }
 
 
@@ -259,13 +242,14 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
 
         colorlabel = scaleClusterStability(PLOT_SCATTERPLOT,labels[i],stability[i])
         opacitypoint =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+        
       
         let node = new Konva.Circle({
           x: xcoord,
           y: ycoord,
-          radius: 3.5,
+          radius: opacitypoint,
           fill: colorlabel,// + colStr,
-          opacity:opacitypoint,
+          //visible: opacitypoint,
           id: 'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel + '\nx: '+xcoord +
           '\ny:' + ycoord
         });
@@ -277,10 +261,12 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
     
     for (let i = 0; i < numberPoints; i++) {
       nodes[i].attrs.fill = scaleClusterStability(PLOT_SCATTERPLOT,labels[i],stability[i])
-      nodes[i].attrs.opacity =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+      nodes[i].attrs.radius =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+      
     }
   }
   layer.batchDraw();
+  
   d3.selectAll('.scatter')
     .style('border-style', 'solid')
     .style('border-width', '1px')
