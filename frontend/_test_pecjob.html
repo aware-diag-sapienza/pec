@@ -42,7 +42,7 @@
       var seed = 0
       var type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
       
-      const job = await server.createAsyncJob(dname, type, k, r, seed, 2000)
+      const job = await server.createAsyncJob(dname, type, k, r, seed, null)
 
       /*
       una volta creato il job, posso assegnare una callback per i risultati parziali
