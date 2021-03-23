@@ -519,6 +519,8 @@ function updateEarlyTermination(){
 function changeStabilityWindow(){
     stability_window = $('#select-window').val()
     system.scatterplot.updateScatterplot();
+    variableYAxisLinechart = stability_window
+    linechart1.updateYAxisVariable()
 }
 
 function changeSimilarityMetricMatrix(){
@@ -526,7 +528,7 @@ function changeSimilarityMetricMatrix(){
     similarity_metric_matrix= $('#select-similarity-matrix').val()
     average_similarity_metric_matrix = 'averageA'+similarity_metric_matrix.substring(1)
 
-    d3.select('#label-simiarity')
+    d3.selectAll('.label-simiarity')
     .text(()=> {
         if(similarity_metric_matrix=== 'adjustedRandScore') {
           return 'Adjusted Rand Score'
@@ -536,7 +538,7 @@ function changeSimilarityMetricMatrix(){
         }
       })
     
-      d3.select('#label-average-simiarity')
+      d3.selectAll('.label-average-simiarity')
       .text(()=> {
         if(average_similarity_metric_matrix=== 'averageAdjustedRandScore') {
           return 'Average Adjusted Rand Score'
@@ -547,6 +549,9 @@ function changeSimilarityMetricMatrix(){
       })
     system.matrixAdjacency.updateMatrix(partitions,ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[similarity_metric_matrix],ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[average_similarity_metric_matrix]); 
 
-    variableYAxisLinechart = stability_window
-    linechart1.updateYAxisVariable()
+    
+    // AGGIOrNARE ANCHE IL VALORE DELLA matriche se è stato trovato early termination
+
+
+    
 }

@@ -171,7 +171,15 @@ system.matrixAdjacencyFixed = (function() {
       .append("g")
       .attr("transform","translate(" + (that.margin.left+(that.width/2)-10) + "," + (that.height) + ")")
       .append("text")
-      .text('ARI')
+      .attr('class','label-simiarity')
+      .text(()=> {
+        if(similarity_metric_matrix=== 'adjustedRandScore') {
+          return 'Adjusted Rand Score'
+        }
+        if(similarity_metric_matrix=== 'adjustedMutualInfoScore') {
+          return 'Adjusted Mutual Information'
+        }
+      })
       .style("text-anchor","middle")
       .style("font-size","14px")
       
@@ -179,8 +187,16 @@ system.matrixAdjacencyFixed = (function() {
       svg
       .append("g").attr("transform","translate(" + (that.margin.left+that.width-2) + "," + ((that.height/2) -10)+ ")")  
       .append("text")
-      .text('AMI')
-      .style("text-anchor","end")
+      .attr('class', 'label-average-simiarity')
+      .text(()=> {
+        if(average_similarity_metric_matrix=== 'averageAdjustedRandScore') {
+          return 'Average Adjusted Rand Score'
+        }
+        if(average_similarity_metric_matrix=== 'averageAdjustedMutualInfoScore') {
+          return 'Average Adjusted Mutual Information'
+        }
+      })
+      .style("text-anchor","middle")
       .style("font-size","14px") 
       .attr("transform", "rotate(-90)")
 
