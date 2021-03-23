@@ -432,7 +432,7 @@ system.timelinepartitions = (function() {
                     }
                     else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
                         if(that.metric_value === 'inertia'){
-                            return "#ffff16" //"#ff9d47"
+                            return "#ffa500"//"#ffff16" //"#ff9d47"
                         }
                        
                         
