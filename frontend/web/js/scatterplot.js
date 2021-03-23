@@ -153,6 +153,8 @@ this.updateScatterplot = ()=> {
   let stability;
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
 
+  console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
+
   if (PLOT_SCATTERPLOT === 'cluster'){
     labels = ALL_DATA[CURRENT_ITERATION]['labels']
     stability = ALL_DATA[CURRENT_ITERATION]['labels'] // qui la stability la faccio come il cluster label
@@ -228,6 +230,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
   const kWidth = stage.width();
   const kHeight = stage.height();
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
+  console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
   
   if (nodes.length === 0) {
     setupTooltip();
@@ -330,6 +333,8 @@ function plotCoordsKonvaStability(labels) {
       system.scatterplotFixed.initKonva();
       let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
 
+      console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
+
       let stability_cluster;
       if (PLOT_SCATTERPLOT === 'cluster'){
         stability_cluster = labelCluster
@@ -349,6 +354,8 @@ function plotCoordsKonvaStability(labels) {
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
       that.first_iteration = false;
+
+      let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
 
       let stability_cluster;
       if (PLOT_SCATTERPLOT === 'cluster'){

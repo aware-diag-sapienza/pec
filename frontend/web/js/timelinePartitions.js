@@ -102,8 +102,6 @@ system.timelinepartitions = (function() {
 
         this.ITERATION_LAST = obj.info.runs_iterations
         this.BEST_RUN =  obj.info.best_run
-
-        console.log('--',this.ITERATION_LAST,this.BEST_RUN)
         
         // UPDATE THE domain of the dynamic scale
         if (d3.min(obj.metrics.partitionsMetrics['inertia']) < this.DOMAINS['inertia'][0]){
@@ -146,8 +144,6 @@ system.timelinepartitions = (function() {
                 e[0] = obj.iteration
             }
         })
-
-        console.log('****',this.DOMAINS[this.METRICA_LABELING])
         this.render(obj.iteration)
     }
 
@@ -156,6 +152,7 @@ system.timelinepartitions = (function() {
         
     }
    
+    
     
     this.render = () => {
         this.div.selectAll('svg')
@@ -194,13 +191,87 @@ system.timelinepartitions = (function() {
             .call(this.yAxis)
         
         //labels
-        svg.append("text")
+        /*svg.append("text")
             .attr("class", "textXAxis")            
             .attr("transform",
                   "translate(" + (this.width/2) + " ," + 
                                  (this.height + this.margin.top + this.margin_bottom - (this.margin_top) ) + ")")
             .style("text-anchor", "middle")
-            .text("Iterations");
+            .text("Iterations");*/
+
+            // sequential legend
+        console.log('--> voglio disegbare la scala ')
+        let legend = svg
+        .append("g")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+20) + ")")
+        .append("defs")
+        .append("svg:linearGradient")
+        .attr("id", "gradient2")
+        .attr("x1", "0%")
+        .attr("y1", "100%")
+        .attr("x2", "100%")
+        .attr("y2", "100%")
+        .attr("spreadMethod", "pad");
+
+
+        legend.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", calculateColor(CURRENT_ITERATION,0))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "33%")
+        .attr("stop-color",  calculateColor(CURRENT_ITERATION,0.33))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "66%")
+        .attr("stop-color", calculateColor(CURRENT_ITERATION,0.66))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color",  calculateColor(CURRENT_ITERATION,1))
+        .attr("stop-opacity", 1);
+
+        svg
+        .append("g")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+25) + ")")
+        .append("rect")
+        .attr("width", this.width)
+        .attr("height", 5)
+        .style("fill", "url(#gradient2)")
+        
+
+        var y;
+        if(this.metric_value === this.METRICA_LABELING) {
+            y= d3.scaleLinear()
+            .range([this.width, 0])
+            .domain(this.colorScaleCell.domain().reverse())
+        }else {
+            y= d3.scaleLinear()
+            .range([this.width, 0])
+            .domain(this.colorScaleCell.domain())
+        }
+
+        var yAxis = d3.axisBottom()
+        .scale(y)
+        .ticks(5);
+
+        svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+30) + ")")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("axis title");
+      // _________________________-
+
+            /// qui devo sistemare la legenda
+
 
             d3.select('.y.axisTimeline')
                 .selectAll("rect-chechbox")
@@ -318,7 +389,6 @@ system.timelinepartitions = (function() {
             }
             
         }
-        console.log('ALESSIA',parsed_array_inertia);
         return parsed_array_inertia;
     }
 
@@ -339,8 +409,21 @@ system.timelinepartitions = (function() {
         system.timelinepartitions.render();
     }
 
+    function calculateColor (iterazione, valore){
+        console.log(iterazione, valore)
+        if(iterazione<5) {
+            return d3.interpolateGreys(valore)
+        } else {
+            if(that.metric_value === 'inertia'){
+                return d3.interpolateGreens(valore);
+            }
+            if (this.metric_value === this.METRICA_LABELING){
+                return d3.interpolateReds(valore);
+            }
+        }
+    }
+
     updateRendering = () => {
-        console.log(that.ITERATION_LAST, this.ITERATION_LAST)
         // DATI CELLE
         // d[0] iteratione
         // d[1] partizione
@@ -384,15 +467,15 @@ system.timelinepartitions = (function() {
                         }
                         else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
                             if(that.metric_value === 'inertia'){
-                                return "#ffff16" //"#ff9d47"
+                                return "#ffa500"//"#ffff16" //"#ff9d47"
                             }
                         }
                         })
                     .attr('stroke-width',(d)=> {
                         if(d[3] === d[1]) { 
-                            return '1'
+                            return '2'
                         } else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
-                            return '1'
+                            return '2'
                         }
                         })
                     .attr('visibility', (d)=> {
@@ -417,12 +500,10 @@ system.timelinepartitions = (function() {
                             .attr('width', that.xScale.bandwidth())
                             .attr('height',that.yScale.bandwidth())
 
-                        console.log(d3.select(this))
-                        console.log(d3.select(this).node())
+                        
                         let data_rect = d3.select(this).attr('id').split('-')
                         let iteration_clicked = +data_rect[1]
                         let partition_selected = +(data_rect[2].replace('P',''))
-                        console.log(data_rect,iteration_clicked,partition_selected)
                         system.scatterplot.updateScatterplotFromTimeline(iteration_clicked,partition_selected);
 
                     })
@@ -440,7 +521,7 @@ system.timelinepartitions = (function() {
                     }
                     else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
                         if(that.metric_value === 'inertia'){
-                            return "#ffff16" //"#ff9d47"
+                            return "#ffa500"//"#ffff16" //"#ff9d47"
                         }
                        
                         
@@ -461,7 +542,7 @@ system.timelinepartitions = (function() {
                 .attr('id','champion-icon')
                 .attr('font-family', 'FontAwesome')
                 .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN]+1))
-                .attr('y', that.yScale('P'+that.BEST_RUN)+((that.yScale.step()/3)*2))
+                .attr('y', that.yScale('P'+that.BEST_RUN)+(that.yScale.step()/2))
                 .attr('font-size', 15)
                 .attr('fill',()=>{
                     if(that.metric_value === 'inertia'){
@@ -479,8 +560,10 @@ system.timelinepartitions = (function() {
     this.updateSimilarity = () =>{
 
         this.percentage_similarity = +$('#similarity-range').val()
-        console.log($('#similarity-range').val());
+        
         d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
+        updateRendering();
+
         
     }
 
