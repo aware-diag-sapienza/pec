@@ -232,8 +232,8 @@ class ClusteringMetrics:
             return stability
         
         h = len(hist)
-        #w = [math.log(2 + i) for i in range(h-1)] #log weights
-        w = [math.exp(i) for i in range(h-1)] #exp weights
+        w = [math.log(2 + i) for i in range(h-1)] #log weights
+        #w = [math.exp(i) for i in range(h-1)] #exp weights
         for i in range(h-1):
             stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
         return stability
