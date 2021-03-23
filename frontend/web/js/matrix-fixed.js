@@ -18,6 +18,7 @@ system.matrixAdjacencyFixed = (function() {
     
     this.init = function (idDiv){
       system.matrixAdjacencyFixed.reset();
+      //similarity_metric_matrix= $('#select-similarity-matrix').val()
 
       this.g= idDiv+'-g-adiacency';
       this.divname = idDiv;

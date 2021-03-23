@@ -6,6 +6,7 @@ let stability_window;
 var seed = 0;
 let linechart1;
 let timelinePartitions;
+let similarity_metric_matrix;
 let matrix1;
 let matrix2;
 let SVG_HISTORY;
@@ -152,6 +153,9 @@ async function startSelects(){
     d3.select('#id-metrics').style('display','none');
 
     stability_window = $('#select-window').val()
+    similarity_metric_matrix= $('#select-similarity-matrix').val()
+    average_similarity_metric_matrix = 'averageA'+similarity_metric_matrix.substring(1)
+    
    
     $('#chC').html('-');
     $('#dbC').html('--');
@@ -176,6 +180,7 @@ async function startSelects(){
         document.getElementById('elbowLinechartCheck').checked = false
         elbowLinechart = document.getElementById('elbowLinechartCheck').checked
 
+        
         const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
         JOBS.push(job)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
@@ -204,8 +209,8 @@ function readResult(it_res){
     actual_timestamp = it_res.timestamp
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
     d3.selectAll('.linechart_select').style('display','block')
-    d3.select('#button-metric').style('display','block')
-    d3.select('#id-metrics').style('display','block')
+    d3.select('#button-metric').style('display','inline')
+    d3.select('#id-metrics').style('display','flex')
         if(it_res.iteration === 0){
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res]) 
@@ -213,13 +218,13 @@ function readResult(it_res){
                 timelinePartitions.setData([it_res]) 
                 timelinePartitions.render()
                 updateTable(it_res)
-                system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore); 
+                system.matrixAdjacency.adjacency(partitions,it_res.metrics.partitionsMetrics[similarity_metric_matrix],it_res.metrics.partitionsMetrics[average_similarity_metric_matrix]); 
         }else{
                 linechart1.updateData(it_res,it_res.info)
                 timelinePartitions.updateData(it_res,it_res.metrics)
                 updateTable(it_res)
                 system.scatterplot.updateScatterplot();
-                system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics.adjustedRandScore,it_res.metrics.partitionsMetrics.adjustedMutualInfoScore);
+                system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics[similarity_metric_matrix],it_res.metrics.partitionsMetrics[average_similarity_metric_matrix]); 
             }
             updatePinHistory(it_res.iteration,it_res.isLast, it_res.metrics.labelsMetrics.simplifiedSilhouette)
             system.matrixAdjacency.updateBestPartition(it_res.info.best_run)
@@ -233,12 +238,12 @@ function readResult(it_res){
 function visualizeMetricsFunction(){
     
     if(!visualizeMetrics){
-        d3.select('#table-metrics').style('display','block')
-        d3.select('.metrics-dropdown').style('border-width','2px')
+        d3.select('#table-metrics').style('display','inline')
+        //d3.select('.metrics-dropdown').style('border-width','2px')
         visualizeMetrics = true;
     } else {
         d3.select('#table-metrics').style('display','none')
-        d3.select('.metrics-dropdown').style('border-width','0px')
+        //d3.select('.metrics-dropdown').style('border-width','0px')
         visualizeMetrics = false;
     }
     
@@ -512,5 +517,32 @@ function updateEarlyTermination(){
 function changeStabilityWindow(){
     stability_window = $('#select-window').val()
     system.scatterplot.updateScatterplot();
+}
+
+function changeSimilarityMetricMatrix(){
+
+    similarity_metric_matrix= $('#select-similarity-matrix').val()
+    average_similarity_metric_matrix = 'averageA'+similarity_metric_matrix.substring(1)
+
+    d3.select('#label-simiarity')
+    .text(()=> {
+        if(similarity_metric_matrix=== 'adjustedRandScore') {
+          return 'Adjusted Rand Score'
+        }
+        if(similarity_metric_matrix=== 'adjustedMutualInfoScore') {
+          return 'Adjusted Mutual Information'
+        }
+      })
+    
+      d3.select('#label-average-simiarity')
+      .text(()=> {
+        if(average_similarity_metric_matrix=== 'averageAdjustedRandScore') {
+          return 'Average Adjusted Rand Score'
+        }
+        if(average_similarity_metric_matrix=== 'averageAdjustedMutualInfoScore') {
+          return 'Average Adjusted Mutual Information'
+        }
+      })
+    system.matrixAdjacency.updateMatrix(partitions,ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[similarity_metric_matrix],ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[average_similarity_metric_matrix]); 
 
 }
