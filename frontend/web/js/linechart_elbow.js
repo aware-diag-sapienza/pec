@@ -1,45 +1,55 @@
+function changeElbowLinechart(){
+    let cbox = document.getElementById('elbowLinechartCheck');
+    elbowLinechart = cbox.checked
+    
+    if(elbowLinechart){
+        LockUI.lock()
+        linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia')
+        startElbow()
 
-/**
-        let linechart_Elbow1;
-        document.getElementById('elbowLinechartCheck').checked = false
-        let elbowLinechart = document.getElementById('elbowLinechartCheck').checked
+        /*
+        VECCHIA VERSIONE CON DATI DA UTENTE ANALISI
+        let elbowData = []
+        let onlyDataActualDataset = previous_computations.filter(d => d.dataset == dataset)
+        let allKActualDataset = onlyDataActualDataset.map(d => parseInt(d.cluster)).sort((a, b) => a - b);
+        let setK = new Set(allKActualDataset)
+        setK.forEach(d=> {
+            let value = d3.min(onlyDataActualDataset.filter(ele => ele.cluster == d).map(ele => ele.fastInertia))
+            elbowData.push({k: d, value: value})
+        })
+        
+        linechart_Elbow1.setData(elbowData)
+        linechart_Elbow1.render()
+        */
 
-        function changeElbowLinechart(){
-            let cbox = document.getElementById('elbowLinechartCheck');
-            elbowLinechart = cbox.checked
-            
-            if(elbowLinechart){
-                linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia')
-                let onlyDataActualDataset = previous_computations.filter(d => d.dataset == dataset)
+        
+    }else{
+        linechart1.render()
+    }
+}
 
-                let elbowData = []
-                let allKActualDataset = new Set(onlyDataActualDataset.map(d => d.cluster))
-                allKActualDataset.forEach(d=> {
-                    let value = d3.min(onlyDataActualDataset.filter(ele => ele.cluster == d).map(ele => ele.fastInertia))
-                    elbowData.push({k: d, value: value})
-                })
+async function startElbow(){
+    let elbowData = []
+    const dname = 'glass'
+    const kMin = 2
+    const kMax = 10
+    const r = 8
+    const seed = 0
+    const type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
+    
 
-                linechart_Elbow1.setData(elbowData)
-                linechart_Elbow1.render()
-            }else{
-                linechart1.render()
-            }
+    const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed)
+    
+    job.onPartialResult(result => {
+        if(result.k == 2){
+            LockUI.unlock()
         }
-
-
-document.getElementById('elbowLinechartCheck').checked = false
-elbowLinechart = document.getElementById('elbowLinechartCheck').checked
-
-/**
- *         <div class="form-check">
-          <input class="form-check-input linechart_select" type="checkbox" id="elbowLinechartCheck" onclick="changeElbowLinechart()">
-          <label class="form-check-label linechart_select" for="elbowLinechartCheck">
-            Elbow
-          </label>
-        </div>
-
-        <script src="./web/js/linechart_elbow.js"></script>
- */
+        elbowData.push({k: result.k, value: result.inertia})
+        linechart_Elbow1.setData(elbowData)
+        linechart_Elbow1.render()
+    })
+    job.start()
+}
 
 if (window.system == undefined) window.system = {}
 system.linechartElbow = (function() {

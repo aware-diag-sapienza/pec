@@ -62,7 +62,7 @@ class AsyncJob(Process):
 
 
 class ElbowJob(Process):
-    def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, **kwargs):
+    def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, earlyTermination=None, **kwargs):
         super().__init__(**kwargs)
         self.id = f"ElbowJob:{dataset}:{min_n_clusters}:{max_n_clusters}:{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}:{client}"
         self.client = client
@@ -74,6 +74,7 @@ class ElbowJob(Process):
         self.max_n_clusters = max_n_clusters
         self.k_values = list(range(self.min_n_clusters, self.max_n_clusters+1))
         self.random_state_arr = check_random_state(random_state).randint(np.iinfo(np.int32).max, size=len(self.k_values))
+        self.earlyTermination = earlyTermination
         self.partialResultsQueue = partialResultsQueue
         self.data = Dataset(self.dataset).data()
 
@@ -100,19 +101,30 @@ class ElbowJob(Process):
 
     def partialResultCallback(self, pr):
         k = pr.info.n_clusters
-        if pr.metrics.earlyTermination.fast:
-            Log.print(f"{Log.GRAY}k = {k} @ it = {pr.info.iteration} -- {Log.BLUE}FastEarlyTermination{Log.ENDC}")
+        
+        toPrint = f"{Log.GRAY}k = {k} @ it = {pr.info.iteration}"
+        if self.earlyTermination == "fast":
+            if pr.metrics.earlyTermination.fast:
+                toPrint += f" -- {Log.GREEN}Fast EarlyTermination{Log.ENDC}"
+        elif self.earlyTermination == "slow":
+            if pr.metrics.earlyTermination.slow:
+                toPrint += f" -- {Log.BLUE}Slow EarlyTermination{Log.ENDC}"
         else:
-            Log.print(f"{Log.GRAY}k = {k} @ it = {pr.info.iteration}{Log.ENDC}")
+            if pr.info.is_last:
+                toPrint += f" -- {Log.ENDC}Normal Termination{Log.ENDC}"
+        
+        Log.print(toPrint)
 
-        if pr.metrics.earlyTermination.fast:
+                
+
+        if (self.earlyTermination == "fast" and pr.metrics.earlyTermination.fast) or  (self.earlyTermination == "slow" and pr.metrics.earlyTermination.slow) or pr.info.is_last:
             inertia = pr.metrics.labelsMetrics["inertia"]
             labels = pr.labels
             result = Bunch(jobId=self.id, k=k, inertia=inertia, isLast=self.isLastK, labels=labels)
             self.partialResultsQueue.put(Bunch(jobType="ElbowJob", client=self.client, jobId=self.id, pr=result))
-            self.currentPec.stop()
-            
-
+            if not pr.info.is_last: self.currentPec.stop()
+        
+        
     def run(self):
         for i,k in enumerate(self.k_values):
             self.isLastK = (k == self.k_values[-1])

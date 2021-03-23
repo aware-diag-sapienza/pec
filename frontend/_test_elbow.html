@@ -26,8 +26,10 @@
       const r = 8
       const seed = 0
       const type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
+
+      const earlyTermination = "slow" //null, "fast", "slow"
       
-      const job = await server.createElbowJob (dname, type, kMin, kMax, r, seed)
+      const job = await server.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
       /*
       una volta creato il job, posso assegnare una callback per i risultati parziali
       result.isLast dice se è l'ultimo k
