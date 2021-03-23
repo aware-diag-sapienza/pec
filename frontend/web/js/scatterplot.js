@@ -190,6 +190,19 @@ this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
 
 function scaleClusterStability(metrica,cluster,stability){
 
+  if(!$("#stable-check").is(':checked') && stability > 0.80){
+    return '#fff'
+  }
+
+  if(!$("#midstable-check").is(':checked') && (stability > 0.20 && stability <= 0.80 )){
+    return '#fff'
+  }
+
+  if(!$("#unstable-check").is(':checked') && stability <= 0.20){
+    return '#fff'
+  }
+
+
   if(metrica == 'cluster'){
     
     return that.scale_color[+cluster]
@@ -208,7 +221,6 @@ function scaleClusterStability(metrica,cluster,stability){
 
 function scaleOpacityStability(metrica,cluster,stability){
 
-
   if(metrica == 'cluster'){
     return 1
   } else {
@@ -219,7 +231,7 @@ function scaleOpacityStability(metrica,cluster,stability){
       return 1
     }
     if(stability > 0.80){
-      return 1
+      return 0
     }
   }
 }
@@ -234,7 +246,8 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
   console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
   
   if (nodes.length === 0) {
-    setupTooltip();
+    setupTooltip()
+
     for (let i = 0; i < that.tot_rows; i++) {
       
         const xcoord = Math.round((that.scale_x(that.coordData[i][0])))
@@ -246,7 +259,7 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
 
         colorlabel = scaleClusterStability(PLOT_SCATTERPLOT,labels[i],stability[i])
         opacitypoint =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
-        
+      
         let node = new Konva.Circle({
           x: xcoord,
           y: ycoord,
