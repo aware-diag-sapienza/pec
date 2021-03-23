@@ -1,56 +1,3 @@
-function changeElbowLinechart(){
-    let cbox = document.getElementById('elbowLinechartCheck');
-    elbowLinechart = cbox.checked
-    
-    if(elbowLinechart){
-        LockUI.lock()
-        linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia')
-        startElbow()
-
-        /*
-        VECCHIA VERSIONE CON DATI DA UTENTE ANALISI
-        let elbowData = []
-        let onlyDataActualDataset = previous_computations.filter(d => d.dataset == dataset)
-        let allKActualDataset = onlyDataActualDataset.map(d => parseInt(d.cluster)).sort((a, b) => a - b);
-        let setK = new Set(allKActualDataset)
-        setK.forEach(d=> {
-            let value = d3.min(onlyDataActualDataset.filter(ele => ele.cluster == d).map(ele => ele.fastInertia))
-            elbowData.push({k: d, value: value})
-        })
-        
-        linechart_Elbow1.setData(elbowData)
-        linechart_Elbow1.render()
-        */
-
-        
-    }else{
-        linechart1.render()
-    }
-}
-
-async function startElbow(){
-    let elbowData = []
-    const dname = 'glass'
-    const kMin = 2
-    const kMax = 10
-    const r = 8
-    const seed = 0
-    const type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
-    const earlyTermination = "slow" //null, "fast", "slow"
-      
-
-    const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
-    
-    job.onPartialResult(result => {
-        if(result.k == 2){
-            LockUI.unlock()
-        }
-        elbowData.push({k: result.k, value: result.inertia})
-        linechart_Elbow1.setData(elbowData)
-        linechart_Elbow1.render()
-    })
-    job.start()
-}
 
 if (window.system == undefined) window.system = {}
 system.linechartElbow = (function() {
@@ -72,14 +19,14 @@ system.linechartElbow = (function() {
     // Define lines
     this.line = d3.line()
     
-    this.init = (idDiv) => {
+    this.init = (idDiv, mink, maxk) => {
         this.div = d3.select(idDiv)
         this.divName = idDiv
         this.width = parseInt(this.div.style("width")) - this.margin.left - this.margin.right,
         this.height = parseInt(this.div.style("height")) - this.margin.top - this.margin.bottom;
-        this.xScale = d3.scaleLinear().domain([2,20]).range([0, this.width]);
+        this.xScale = d3.scaleLinear().domain([mink,maxk]).range([0, this.width]);
         this.yScale = d3.scaleLinear().range([this.height, 0]);
-        this.xAxis = d3.axisBottom().scale(this.xScale);
+        this.xAxis = d3.axisBottom().scale(this.xScale).ticks(maxk-1);
         this.yAxis = d3.axisLeft().scale(this.yScale).tickFormat(d3.format("~s"));        
         this.line = d3.line()
             .curve(d3.curveMonotoneX)
@@ -133,6 +80,8 @@ system.linechartElbow = (function() {
         this.yScale = d3.scaleLinear()
             .domain([0, d3.max(this.data, function(d) { return Math.abs(+d.value); })])
             .range([ this.height, 0 ]);
+
+        this.yAxis = d3.axisLeft().scale(this.yScale).tickFormat(d3.format("~s"));     
         svg.append("g")
             .attr("class", "y axisLineChart")
             .call(this.yAxis)
