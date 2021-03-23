@@ -36,9 +36,10 @@ async function startElbow(){
     const r = 8
     const seed = 0
     const type = 'I-PecK' // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
-    
+    const earlyTermination = "slow" //null, "fast", "slow"
+      
 
-    const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed)
+    const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
     
     job.onPartialResult(result => {
         if(result.k == 2){
