@@ -184,15 +184,17 @@ system.linechart = (function() {
         this.attributeYAxisThirdLevel3 = variableYAxisLinechart
             
         if(variableYAxisLinechart == "2"){
-            this.labelYAxis3 = "gs-w2"
+            this.labelYAxis3 = "Global stability: w2"
         }else if(variableYAxisLinechart == "3"){
-            this.labelYAxis3 = "gs-w3"
+            this.labelYAxis3 = "Global stability: w3"
         }else if(variableYAxisLinechart == "4"){
-            this.labelYAxis3 = "gs-w4"
+            this.labelYAxis3 = "Global stability: w4"
         }else if(variableYAxisLinechart == "5"){
-            this.labelYAxis3 = "gs-w5"
+            this.labelYAxis3 = "Global stability: w5"
         }else if(variableYAxisLinechart == "10"){
-            this.labelYAxis3 = "gs-w10"
+            this.labelYAxis3 = "Global stability: 10"
+        }else if(variableYAxisLinechart == "all"){
+            this.labelYAxis3 = "Global stability: all"
         }
         
     }
@@ -242,7 +244,7 @@ system.linechart = (function() {
                     previous_computations[current_computation_index][d.name+'Inertia'] = this.lastObj['metrics']['labelsMetrics']['inertia']
                     
                     system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
-                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics.adjustedRandScore,obj.metrics.partitionsMetrics.adjustedMutualInfoScore);
+                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics[similarity_metric_matrix],obj.metrics.partitionsMetrics[average_similarity_metric_matrix]);
 
                 }
             }
@@ -403,7 +405,6 @@ system.linechart = (function() {
             if(removeFromState) globalNumberBrushActually[numberLinechart] = false
             else globalNumberBrushActually[numberLinechart] = true
 
-            //console.log(globalNumberBrushActually)
             d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
                 .style('opacity', 1)
@@ -424,7 +425,7 @@ system.linechart = (function() {
             if(globalNumberBrushActually['third']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
-                .filter( d => d[5][that.attributeYAxisSecondLevel3] < yMin3 || d[5][that.attributeYAxisSecondLevel3] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
+                .filter( d => d[5]['globalStability'+variableYAxisLinechart] < yMin3 || d[5]['globalStability'+variableYAxisLinechart] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
                 .style('opacity', 0.1)
             }
         }
@@ -635,7 +636,10 @@ system.linechart = (function() {
 
     let clearPartition = () => {
         globalNumberBrushActually = {one: false, second:false, third: false}
-
+        /*if (timelinePartitions.LAST_ITERATION !== null && timelinePartitions.BEST_RUN !== null){
+            
+        }
+        timelinePartitions.updateBrushTimeline()*/
         d3.select('#timeline-partitions')
             .selectAll('rect.rect-partition')
             .style('opacity', 1)

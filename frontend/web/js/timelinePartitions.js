@@ -74,7 +74,7 @@ system.timelinepartitions = (function() {
         this.MIN_METRIC = 0;
         this.ITERATION_LAST = Array.from({length:partitions},(_)=> 0)
         // inizializzo la scala per inertia e per l'altra, che poi aggiorno qualora non andasse bene. 
-
+        
         this.DOMAINS['inertia'][0] = d3.max(data[0].metrics.partitionsMetrics['inertia'])
         this.DOMAINS['inertia'][1] = d3.max(data[0].metrics.partitionsMetrics['inertia']);
 
@@ -102,6 +102,8 @@ system.timelinepartitions = (function() {
 
         this.ITERATION_LAST = obj.info.runs_iterations
         this.BEST_RUN =  obj.info.best_run
+
+        console.log('--',this.ITERATION_LAST,this.BEST_RUN)
         
         // UPDATE THE domain of the dynamic scale
         if (d3.min(obj.metrics.partitionsMetrics['inertia']) < this.DOMAINS['inertia'][0]){
@@ -300,8 +302,7 @@ system.timelinepartitions = (function() {
             });
 
             Object.keys(all_data[i].metrics.progressiveMetrics.partitionsGlobalStability).forEach(function(key) {
-                // GIORGIO CAMBIARE IL LABEL DELL'OGGETTO dove KEY p la chiave della finestra. 
-                object_for_brush[key] = all_data[i].metrics.progressiveMetrics.partitionsGlobalStability[key][j];
+                object_for_brush['globalStability'+key] = all_data[i].metrics.progressiveMetrics.partitionsGlobalStability[key][j];
             });
             
             //single_object['P'+j]= +partitios_inertia[j]
@@ -338,7 +339,8 @@ system.timelinepartitions = (function() {
         system.timelinepartitions.render();
     }
 
-    let updateRendering = () => {
+    updateRendering = () => {
+        console.log(that.ITERATION_LAST, this.ITERATION_LAST)
         // DATI CELLE
         // d[0] iteratione
         // d[1] partizione
@@ -479,8 +481,11 @@ system.timelinepartitions = (function() {
         this.percentage_similarity = +$('#similarity-range').val()
         console.log($('#similarity-range').val());
         d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
-        updateRendering();
+        
     }
 
+    this.updateBrushTimeline = () => {
+        updateRendering();
+    }
     return this;
 }).call({})

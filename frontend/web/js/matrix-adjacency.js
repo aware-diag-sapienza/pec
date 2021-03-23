@@ -187,7 +187,7 @@ system.matrixAdjacency = (function() {
       .append("g")
       .attr("transform","translate(" + (that.margin.left+(that.width/2)-10) + "," + (that.height) + ")")
       .append("text")
-      .attr('id', 'label-simiarity')
+      .attr('class', 'label-simiarity')
       .text(()=> {
         if(similarity_metric_matrix=== 'adjustedRandScore') {
           return 'Adjusted Rand Score'
@@ -204,7 +204,7 @@ system.matrixAdjacency = (function() {
       svg
       .append("g").attr("transform","translate(" + (that.margin.left+that.width-2) + "," + ((that.height/2)-10)+ ")")      
       .append("text")
-      .attr('id', 'label-average-simiarity')
+      .attr('class', 'label-average-simiarity')
       .text(()=> {
         if(average_similarity_metric_matrix=== 'averageAdjustedRandScore') {
           return 'Average Adjusted Rand Score'

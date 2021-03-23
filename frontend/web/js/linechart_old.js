@@ -170,7 +170,7 @@ system.linechart = (function() {
                     system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
                     // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 
                     // ALESSIA qui update della matrice 2
-                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics.adjustedRandScore,obj.metrics.partitionsMetrics.adjustedMutualInfoScore);
+                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics[similarity_metric_matrix],obj.metrics.partitionsMetrics[average_similarity_metric_matrix]);
                 }
             }
         })
