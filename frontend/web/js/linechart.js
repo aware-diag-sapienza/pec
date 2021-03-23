@@ -58,6 +58,7 @@ system.linechart = (function() {
     this.yAxis3 = null
     this.attributeYAxisFirstLevel3 = null
     this.attributeYAxisSecondLevel3 = null
+    this.attributeYAxisThirdLevel3 = null
     this.labelYAxis3 = null
     this.line3 = d3.line()
 
@@ -132,7 +133,7 @@ system.linechart = (function() {
                 return that.xScale(d["iteration"]);
             })
             .y(function(d) {
-                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3]['globalStability'][that.attributeYAxisSecondLevel3]));
+                return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]));
             });
         
         return that
@@ -179,7 +180,8 @@ system.linechart = (function() {
         this.labelYAxis2 = "Quality: sim.Silhouette"
 
         this.attributeYAxisFirstLevel3 = "progressiveMetrics"
-        this.attributeYAxisSecondLevel3 = variableYAxisLinechart
+        this.attributeYAxisSecondLevel3 = "globalStability"
+        this.attributeYAxisThirdLevel3 = variableYAxisLinechart
             
         if(variableYAxisLinechart == "2"){
             this.labelYAxis3 = "gs-w2"
@@ -277,7 +279,7 @@ system.linechart = (function() {
                 .domain([minSilouhetteScale, maxSilouhetteScale])
                 .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
             this.yScale3 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3]['globalStability'][that.attributeYAxisSecondLevel3]); }))
+                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]); }))
                 .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
             
         }else{
@@ -427,57 +429,6 @@ system.linechart = (function() {
             }
         }
 
-        //brush
-        // Add brushing
-        /*let onlyYBrush = false
-        var brush1 
-        if (onlyYBrush){
-            brush1 = d3.brushY()                   // Add the brush feature using the d3.brush function
-                .extent( [ [0,0], [this.width, this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-                .on("end", updateBrush1)
-        } else {
-            brush1 = d3.brush()                   // Add the brush feature using the d3.brush function
-                .extent( [ [0,0], [this.width, this.heightSingleLinechart] ] )  // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-                .on("end", updateBrush1)
-        }
-        
-        svg.append("g")
-            .attr("class", "brush")
-            .call(brush1);
-
-        function updateBrush1({selection}) {
-            d3.select('#timeline-partitions')
-                .selectAll('rect.rect-partition')
-                .style('opacity', 1)
-
-            if (selection === null) {
-                
-            } else {
-
-                if(onlyYBrush){
-                    let yMax = that.yScale1.invert(selection[0])
-                    let yMin = that.yScale1.invert(selection[1])
-                    
-                    d3.select('#timeline-partitions')
-                        .selectAll('rect.rect-partition')
-                        .filter( d => d[5][that.attributeYAxisSecondLevel1] < yMin || d[5][that.attributeYAxisSecondLevel1] > yMax)
-                        .style('opacity', 0.1)
-                }else{
-                    let xMin = that.xScale.invert(selection[0][0])
-                    let xMax = that.xScale.invert(selection[1][0])
-                    let yMax = that.yScale1.invert(selection[0][1])
-                    let yMin = that.yScale1.invert(selection[1][1])
-                    
-                    d3.select('#timeline-partitions')
-                        .selectAll('rect.rect-partition')
-                        .filter( d => d[5][that.attributeYAxisSecondLevel1] < yMin || d[5][that.attributeYAxisSecondLevel1] > yMax || d[0] < xMin || d[0] > xMax)
-                        .style('opacity', 0.1)
-                }
-                
-            }
-        }*/
-
-       
         //labels
         svg.append("text")
             .attr("class", "textXAxis")            
