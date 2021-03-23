@@ -31,11 +31,12 @@ function onChangeInputParameter(){
 }
 
 let variableYAxisLinechart = "2"
+/* VECCHIO SELECT SOPRA LINECHART
 $('#select-variableYAxis-linechart').val(variableYAxisLinechart);
 function onChangeVariableYAxisLinechart(){
     variableYAxisLinechart = $( "#select-variableYAxis-linechart" ).val()
     linechart1.updateYAxisVariable()
-}
+}*/
 let relatiYAxisLineCharts = document.getElementById('realtiveYScaleLinechart').checked
 
 function changeRelativeYScale(){
@@ -204,6 +205,7 @@ async function startSelects(){
 let timestamp0;
 let swap_timestamp = 0;
 function readResult(it_res){
+    console.log(it_res)
     timestamp0 = swap_timestamp
     let actual_timestamp;
     actual_timestamp = it_res.timestamp
@@ -545,4 +547,6 @@ function changeSimilarityMetricMatrix(){
       })
     system.matrixAdjacency.updateMatrix(partitions,ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[similarity_metric_matrix],ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[average_similarity_metric_matrix]); 
 
+    variableYAxisLinechart = stability_window
+    linechart1.updateYAxisVariable()
 }

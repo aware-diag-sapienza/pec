@@ -51,8 +51,6 @@ class AsyncJob(Process):
         return pec
 
     def partialResultCallback(self, pr):
-        ##remove partitions in partial result
-        pr.partitions = None
         self.partialResultsQueue.put(Bunch(jobType="AsyncJob", client=self.client, jobId=self.id, pr=pr))
 
     

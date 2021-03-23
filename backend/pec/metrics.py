@@ -215,26 +215,30 @@ class ClusteringMetrics:
 
     @staticmethod
     def entries_stability(labelsHistory, window=None):
-        if window <1:
-            raise RuntimeError(f"Window must me >2")
-        
         hist = None
+
         if window is None:
-            hist = labelsHistory
+            if len(labelsHistory) >= 5:
+                hist = labelsHistory
+        elif window < 2:
+            raise RuntimeError(f"Window must me >=2")
+        
         else:
             hist = labelsHistory[-window:] # last window elements
-
-        h = len(hist)
-        stability = np.full_like(labelsHistory[0], 0, dtype=float)
-        if (window is None and h < 5) or (h < window): 
-            return stability # return all 0
         
+        
+        stability = np.full_like(labelsHistory[0], 0, dtype=float)
+        if hist is None:
+            return stability
+        
+        h = len(hist)
         #w = [math.log(2 + i) for i in range(h-1)] #log weights
         w = [math.exp(i) for i in range(h-1)] #exp weights
         for i in range(h-1):
             stability += ( (labelsHistory[h-1] == labelsHistory[i]).astype(float) * w[i] ) / sum(w)  
         return stability
-    
+
+
     @staticmethod
     def global_stability(labelsHistory, window=None):
         return np.mean(ClusteringMetrics.entries_stability(labelsHistory, window))
