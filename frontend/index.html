@@ -44,7 +44,7 @@
 
         <div class="select-button">
           <div class="btn-group me-2" role="group" aria-label="First group">
-          <button id="start-button" type="button" class="btn btn-outline-dark" onclick="startSelects()"><i class="fa fa-play" aria-hidden="true"></i>
+          <button id="start-button" type="button" class="btn btn-outline-dark" onclick="startComputation()"><i class="fa fa-play" aria-hidden="true"></i>
           </button>
           <button id="pause-button" type="button" class="btn btn-outline-dark" onclick="pauseSelects()"><i class="fa fa-pause" aria-hidden="true"></i>
           </button>
@@ -56,6 +56,24 @@
         <div class=".select-menu">
           <input type="text" class="select-menu-input form-control input-sm" id="select-seed" aria-describedby="seed_number">
         </div>
+
+        <input class="form-check-input" type="checkbox" id="elbowLinechartCheck" onclick="changeElbowLinechart()">
+        <label class="form-check-label" for="elbowLinechartCheck">
+          Elbow
+        </label>
+        
+        <label class="select-label elbowParameter">Termination:</label>
+        <div class="select-menu elbowParameter">
+          <select class="form-select form-select-sm" id="typeElbow">
+            <option value="fast" selected>fast</option>
+            <option value="slow">slow</option>
+            <option value="null">no</option>
+          </select>
+        </div>
+        <label class="select-label elbowParameter">range</label>
+        <input type="number" class="select-menu-input form-control input-sm elbowParameter" id="select-minK-Elbow" min="2" max="20" value="2">
+        <input type="number" class="select-menu-input form-control input-sm elbowParameter" id="select-maxK-Elbow" min="2" max="20" value="20">
+       
     </div>
       <div class="item-iteration" id ='iteration-info' >
         <div id="iteration-label">
@@ -91,13 +109,6 @@
             Relative scale
           </label>
         </div>
-        <div class="form-check">
-          <input class="form-check-input linechart_select" type="checkbox" id="elbowLinechartCheck" onclick="changeElbowLinechart()">
-          <label class="form-check-label linechart_select" for="elbowLinechartCheck">
-            Elbow
-          </label>
-        </div>
-        
       </div>
       <div class="form-check">
         

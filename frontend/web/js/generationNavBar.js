@@ -140,6 +140,65 @@ function getSeed(){
         return Math.ceil(parseInt($( "#select-seed" ).val()));
 }
 
+d3.selectAll('.elbowParameter').style('display','none')
+
+function startComputation(){
+    if(elbowLinechart){
+        d3.selectAll('.elbowParameter').style('display','block')
+        startElbow()
+    }else{
+        d3.selectAll('.elbowParameter').style('display','none')
+        startSelects()
+    }
+}
+
+function changeElbowLinechart(){
+    let cbox = document.getElementById('elbowLinechartCheck');
+    elbowLinechart = cbox.checked
+    if(elbowLinechart){
+        d3.selectAll('.elbowParameter').style('display','block')
+    }else{
+        d3.selectAll('.elbowParameter').style('display','none')
+    }
+    
+}
+
+async function startElbow(){
+    LockUI.lock()
+        
+    let elbowData = []
+    const dname = $( "#select-dataset" ).val()
+    const kMin = parseInt($( "#select-minK-Elbow" ).val())
+    const kMax = parseInt($( "#select-maxK-Elbow" ).val())
+    const r = parseInt($( "#select-partitions" ).val())
+    const seed = parseInt(getSeed())
+    const type = $( "#select-technique" ).val() // I-PecK++ HGPA-Peck HGPA-Peck++ (come chiamati sul paper)
+    let etElbow = $( "#typeElbow" ).val()
+    if(etElbow == "null") etElbow = null
+    const earlyTermination = etElbow //null, "fast", "slow"
+
+    //d3.select('#select-seed').attr('placeholder',seed)
+      
+    if (dname != null && type != null && kMin != null && kMax != null && r != null && kMin<kMax){
+        const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
+
+        linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia', kMin, kMax)
+        job.onPartialResult(result => {
+            if(result.k == 2){
+                LockUI.unlock()
+            }
+            console.log(result)
+            elbowData.push({k: result.k, value: result.inertia})
+            linechart_Elbow1.setData(elbowData)
+            linechart_Elbow1.render()
+        })
+        job.start()
+    } else {
+        alert("Select Dataset, technique, k range, partitions and early termination")
+        LockUI.unlock()
+    }  
+}
+
 async function startSelects(){
     LockUI.lock()
     ALL_DATA = []
