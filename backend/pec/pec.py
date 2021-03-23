@@ -276,7 +276,6 @@ class ProgressiveEnsembleClustering:
             self.__labelsHistory.append(result.labels)
             self.__partitionsHistory.append(result.partitions)
 
-            result.partitions = None
             
             self.on_partial_result(result)
             self.__time_manager.resume()
