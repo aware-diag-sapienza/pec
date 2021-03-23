@@ -74,6 +74,17 @@
             <option value="10">gs-w10</option>
           </select>
         </div>-->
+        <label class="select-label">Stability Window: </label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-window" onchange="changeStabilityWindow()">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="all">all</option>
+          </select>
+        </div>
         <div class="form-check">
           <input class="form-check-input linechart_select" type="checkbox" id="realtiveYScaleLinechart" onclick="changeRelativeYScale()">
           <label class="form-check-label linechart_select" for="realtiveYScaleLinechart">
@@ -86,6 +97,7 @@
             Elbow
           </label>
         </div>
+        
       </div>
       <div class="form-check">
         
@@ -95,16 +107,6 @@
         <label class="select-label">Projection: </label>
         <div class="select-menu">
           <select class="form-select form-select-sm" id="select-projection" onchange="updateProjection()"></select>
-        </div>
-        <label class="select-label">Stability Window: </label>
-        <div class="select-menu">
-          <select class="form-select form-select-sm" id="select-window" onchange="changeStabilityWindow()">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-          </select>
         </div>
         Vis: 
         <input type="radio" id="cluster" name="plot-scatterplot" value="cluster" onclick="system.scatterplot.updateScatterplot();" checked>

@@ -82,6 +82,7 @@ body {
   }
 
 
+
   .item-navbar{
     grid-area: navigation;
     display: flex;

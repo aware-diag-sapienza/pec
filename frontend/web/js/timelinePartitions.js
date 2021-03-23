@@ -198,6 +198,10 @@ system.timelinepartitions = (function() {
             .style("text-anchor", "middle")
             .text("Iterations");
 
+
+            /// qui devo sistemare la legenda
+
+
             d3.select('.y.axisTimeline')
                 .selectAll("rect-chechbox")
                 .data(that.partitions_status)
