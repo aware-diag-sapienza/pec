@@ -20,6 +20,7 @@ system.matrixAdjacency = (function() {
       this.div = d3.select(idDiv)
       this.divname = idDiv
       this.g= idDiv+'-g-adiacency'
+      //similarity_metric_matrix= $('#select-similarity-matrix').val()
       
       
       this.width = d3.min([parseInt(this.div.style("width")),parseInt(this.div.style("height"))])- this.margin.left - this.margin.right;
@@ -91,10 +92,10 @@ system.matrixAdjacency = (function() {
       tippy(tooltRect.nodes(),{  delay: 300});
     }
 
-    this.updateMatrix = (partitions,decision_ars,decision_ami) => {
+    this.updateMatrix = (partitions,decision_similarity,average_decision_similarity) => {
 
-      let ARI = decision_ars//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
-      let AMI = decision_ami//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
+      let SIM = decision_similarity//decision_ars.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r
+      let AVG_SIM = average_decision_similarity//decision_ami.split("||").map(row => row.split("::").map(d => parseFloat(d))) //matrice size r*r  
       this.matrix = []
       
       let i;
@@ -102,12 +103,12 @@ system.matrixAdjacency = (function() {
       for (i=0; i < parseInt(partitions); i++){
         for (j=0; j < parseInt(partitions); j++){
           var grid = {id: 'P'+i+"-"+'P'+j, row: 'P'+i, col: 'P'+j,x:i, y:j, weight: 0, metric: null};
-          if(i<j){ // è la parte sotto della matrice, metto ARI 
-            grid.weight = ARI[i][j];
-            grid.metric = 'ARI';
+          if(i<j){ // è la parte sotto della matrice, metto SIM 
+            grid.weight = SIM[i][j];
+            grid.metric = 'SIM';
           } else if(i>j){
-            grid.weight = AMI[i][j];
-            grid.metric = 'AMI';
+            grid.weight = AVG_SIM[i][j];
+            grid.metric = 'AVG_SIM';
           }
           this.matrix.push(grid)
 
@@ -118,7 +119,7 @@ system.matrixAdjacency = (function() {
     };
 
 
-    this.createAdjacencyMatrix = (partitions,ARI,AMI) => {
+    this.createAdjacencyMatrix = (partitions,SIM,AVG_SIM) => {
 
       this.matrix = []
       let nodes = []
@@ -127,12 +128,12 @@ system.matrixAdjacency = (function() {
       for (i=0; i < parseInt(partitions); i++){
         for (j=0; j < parseInt(partitions); j++){
           var grid = {id: 'P'+i+"-"+'P'+j, row: 'P'+i, col: 'P'+j,x:i, y:j, weight: 0, metric: null};
-          if(i<j){ // è la parte sotto della matrice, metto ARI 
-            grid.weight = ARI[i][j];
-            grid.metric = 'ARI';
+          if(i<j){ // è la parte sotto della matrice, metto SIM 
+            grid.weight = SIM[i][j];
+            grid.metric = 'SIM';
           } else if(i>j){
-            grid.weight = AMI[i][j];
-            grid.metric = 'AMI';
+            grid.weight = AVG_SIM[i][j];
+            grid.metric = 'AVG_SIM';
           }
           this.matrix.push(grid)
 
@@ -186,16 +187,33 @@ system.matrixAdjacency = (function() {
       .append("g")
       .attr("transform","translate(" + (that.margin.left+(that.width/2)-10) + "," + (that.height) + ")")
       .append("text")
-      .text('ARI')
+      .attr('id', 'label-simiarity')
+      .text(()=> {
+        if(similarity_metric_matrix=== 'adjustedRandScore') {
+          return 'Adjusted Rand Score'
+        }
+        if(similarity_metric_matrix=== 'adjustedMutualInfoScore') {
+          return 'Adjusted Mutual Information'
+        }
+      })
       .style("text-anchor","middle")
       .style("font-size","14px")
+
       
       
       svg
       .append("g").attr("transform","translate(" + (that.margin.left+that.width-2) + "," + ((that.height/2)-10)+ ")")      
       .append("text")
-      .text('AMI')
-      .style("text-anchor","end")
+      .attr('id', 'label-average-simiarity')
+      .text(()=> {
+        if(average_similarity_metric_matrix=== 'averageAdjustedRandScore') {
+          return 'Average Adjusted Rand Score'
+        }
+        if(average_similarity_metric_matrix=== 'averageAdjustedMutualInfoScore') {
+          return 'Average Adjusted Mutual Information'
+        }
+      })
+      .style("text-anchor","middle")
       .style("font-size","14px") 
       .attr("transform", "rotate(-90)")
 
@@ -261,7 +279,6 @@ system.matrixAdjacency = (function() {
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text("axis title");
-
 }
 
     this.updateBestPartition = (best)=>{

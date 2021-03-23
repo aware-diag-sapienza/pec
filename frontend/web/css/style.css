@@ -55,8 +55,11 @@ body {
   }
 
   .item-metrics {
-    display:none;
+    display:inline;
     grid-area: metrics;
+    display: flex;
+    flex-direction: row;
+
   }
   .item-timeline-partitions {
     grid-area: partitions;
@@ -120,13 +123,10 @@ body {
   }
 
   .metrics-dropdown{
-    background-color: white;
-    border-style: solid;
-    border-color: #6C757D;
     float: right;
-    border-width: 0px;
     position: relative;
     margin-top: 10px;
+    padding:3px;
     z-index: 9;
   }
 
@@ -136,7 +136,12 @@ body {
 
   #table-metrics{
     display:none;
+    background-color: #ededed;
   }
+  thead, tbody{
+    background-color: #ededed;
+  }
+
 
   .linechart_select{
     display:none;

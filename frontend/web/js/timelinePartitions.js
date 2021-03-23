@@ -296,7 +296,12 @@ system.timelinepartitions = (function() {
             let single_object = [];
             let object_for_brush = new Object();
             Object.keys(all_data[i].metrics.partitionsMetrics).forEach(function(key) {
+
+                /*if (key === 'entriesStability' || key === 'globalStability') {
+                    object_for_brush[key]= all_data[i].metrics.partitionsMetrics[key][j];
+                } else {*/
                 object_for_brush[key]= all_data[i].metrics.partitionsMetrics[key][j];
+                //}
                 
             });
             //single_object['P'+j]= +partitios_inertia[j]
