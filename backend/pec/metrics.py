@@ -215,8 +215,8 @@ class ClusteringMetrics:
 
     @staticmethod
     def entries_stability(labelsHistory, window=None):
-        if window <1:
-            raise RuntimeError(f"Window must me >2")
+        if window is not None and window <2:
+            raise RuntimeError(f"Window must me >=2")
         
         hist = None
         if window is None:
