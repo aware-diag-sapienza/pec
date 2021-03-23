@@ -48,7 +48,8 @@ function changeRelativeYScale(){
 let linechart_Elbow1;
 document.getElementById('elbowLinechartCheck').checked = false
 let elbowLinechart = document.getElementById('elbowLinechartCheck').checked
-
+/*
+VECCHIA VERSIONE GUIDATA DA UTENTE
 function changeElbowLinechart(){
     let cbox = document.getElementById('elbowLinechartCheck');
     elbowLinechart = cbox.checked
@@ -70,7 +71,7 @@ function changeElbowLinechart(){
     }else{
         linechart1.render()
     }
-}
+}*/
 
 function updateSelects(list_dataset){
 

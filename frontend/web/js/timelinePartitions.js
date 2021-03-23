@@ -233,7 +233,7 @@ system.timelinepartitions = (function() {
                     exit=> exit)
 
         //drawLegend()
-        updateRendering()
+        this.updateRendering()
 
         let resize = function () {
             that.width = parseInt(that.div.style("width")) - that.margin.left - that.margin.right,
@@ -300,8 +300,7 @@ system.timelinepartitions = (function() {
             });
 
             Object.keys(all_data[i].metrics.progressiveMetrics.partitionsGlobalStability).forEach(function(key) {
-                // GIORGIO CAMBIARE IL LABEL DELL'OGGETTO dove KEY p la chiave della finestra. 
-                object_for_brush[key] = all_data[i].metrics.progressiveMetrics.partitionsGlobalStability[key][j];
+                object_for_brush['globalStability'+str(key)] = all_data[i].metrics.progressiveMetrics.partitionsGlobalStability[key][j];
             });
             
             //single_object['P'+j]= +partitios_inertia[j]
@@ -338,7 +337,7 @@ system.timelinepartitions = (function() {
         system.timelinepartitions.render();
     }
 
-    let updateRendering = () => {
+    this.updateRendering = () => {
         // DATI CELLE
         // d[0] iteratione
         // d[1] partizione
@@ -479,7 +478,7 @@ system.timelinepartitions = (function() {
         this.percentage_similarity = +$('#similarity-range').val()
         console.log($('#similarity-range').val());
         d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
-        updateRendering();
+        this.updateRendering();
     }
 
     return this;

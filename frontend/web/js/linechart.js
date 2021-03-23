@@ -404,9 +404,7 @@ system.linechart = (function() {
             else globalNumberBrushActually[numberLinechart] = true
 
             //console.log(globalNumberBrushActually)
-            d3.select('#timeline-partitions')
-                .selectAll('rect.rect-partition')
-                .style('opacity', 1)
+            timelinePartitions.updateRendering()
             if(globalNumberBrushActually['one']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
@@ -424,7 +422,7 @@ system.linechart = (function() {
             if(globalNumberBrushActually['third']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
-                .filter( d => d[5][that.attributeYAxisSecondLevel3] < yMin3 || d[5][that.attributeYAxisSecondLevel3] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
+                .filter( d => d[5]['globalStability'+stability_window] < yMin3 || d[5]['globalStability'+stability_window] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
                 .style('opacity', 0.1)
             }
         }
@@ -635,10 +633,7 @@ system.linechart = (function() {
 
     let clearPartition = () => {
         globalNumberBrushActually = {one: false, second:false, third: false}
-
-        d3.select('#timeline-partitions')
-            .selectAll('rect.rect-partition')
-            .style('opacity', 1)
+        timelinePartitions.updateRendering()
     }
 
     return this;
