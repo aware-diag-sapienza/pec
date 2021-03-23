@@ -556,8 +556,6 @@ function changeSimilarityMetricMatrix(){
 
     if (previous_computations[index].earlyTerminationfast !== -1){
         system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,ALL_DATA[previous_computations[index].earlyTerminationfast].metrics.partitionsMetrics[similarity_metric_matrix],ALL_DATA[previous_computations[index].earlyTerminationfast].metrics.partitionsMetrics[average_similarity_metric_matrix]);
-
-
     
     }
     

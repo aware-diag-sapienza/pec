@@ -153,6 +153,7 @@ system.timelinepartitions = (function() {
     }
    
     
+    
     this.render = () => {
         this.div.selectAll('svg')
             .remove();
@@ -190,14 +191,84 @@ system.timelinepartitions = (function() {
             .call(this.yAxis)
         
         //labels
-        svg.append("text")
+        /*svg.append("text")
             .attr("class", "textXAxis")            
             .attr("transform",
                   "translate(" + (this.width/2) + " ," + 
                                  (this.height + this.margin.top + this.margin_bottom - (this.margin_top) ) + ")")
             .style("text-anchor", "middle")
-            .text("Iterations");
+            .text("Iterations");*/
 
+            // sequential legend
+        console.log('--> voglio disegbare la scala ')
+        let legend = svg
+        .append("g")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+20) + ")")
+        .append("defs")
+        .append("svg:linearGradient")
+        .attr("id", "gradient2")
+        .attr("x1", "0%")
+        .attr("y1", "100%")
+        .attr("x2", "100%")
+        .attr("y2", "100%")
+        .attr("spreadMethod", "pad");
+
+
+        legend.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", calculateColor(CURRENT_ITERATION,0))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "33%")
+        .attr("stop-color",  calculateColor(CURRENT_ITERATION,0.33))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "66%")
+        .attr("stop-color", calculateColor(CURRENT_ITERATION,0.66))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color",  calculateColor(CURRENT_ITERATION,1))
+        .attr("stop-opacity", 1);
+
+        svg
+        .append("g")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+25) + ")")
+        .append("rect")
+        .attr("width", this.width)
+        .attr("height", 5)
+        .style("fill", "url(#gradient2)")
+        
+
+        var y;
+        if(this.metric_value === this.METRICA_LABELING) {
+            y= d3.scaleLinear()
+            .range([this.width, 0])
+            .domain(this.colorScaleCell.domain().reverse())
+        }else {
+            y= d3.scaleLinear()
+            .range([this.width, 0])
+            .domain(this.colorScaleCell.domain())
+        }
+
+        var yAxis = d3.axisBottom()
+        .scale(y)
+        .ticks(5);
+
+        svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+30) + ")")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("axis title");
+      // _________________________-
 
             /// qui devo sistemare la legenda
 
@@ -336,6 +407,20 @@ system.timelinepartitions = (function() {
                 .domain([this.DOMAINS[this.metric_value][0], this.DOMAINS[this.metric_value][1]])
         }
         system.timelinepartitions.render();
+    }
+
+    function calculateColor (iterazione, valore){
+        console.log(iterazione, valore)
+        if(iterazione<5) {
+            return d3.interpolateGreys(valore)
+        } else {
+            if(that.metric_value === 'inertia'){
+                return d3.interpolateGreens(valore);
+            }
+            if (this.metric_value === this.METRICA_LABELING){
+                return d3.interpolateReds(valore);
+            }
+        }
     }
 
     updateRendering = () => {
