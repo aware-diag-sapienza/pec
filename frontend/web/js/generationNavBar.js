@@ -552,7 +552,13 @@ function changeSimilarityMetricMatrix(){
 
 
     // AGGIOrNARE ANCHE IL VALORE DELLA matriche se è stato trovato early termination
+    let index = previous_computations.length -1
+
+    if (previous_computations[index].earlyTerminationfast !== -1){
+        system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,ALL_DATA[previous_computations[index].earlyTerminationfast].metrics.partitionsMetrics[similarity_metric_matrix],ALL_DATA[previous_computations[index].earlyTerminationfast].metrics.partitionsMetrics[average_similarity_metric_matrix]);
 
 
+    
+    }
     
 }

@@ -102,8 +102,6 @@ system.timelinepartitions = (function() {
 
         this.ITERATION_LAST = obj.info.runs_iterations
         this.BEST_RUN =  obj.info.best_run
-
-        console.log('--',this.ITERATION_LAST,this.BEST_RUN)
         
         // UPDATE THE domain of the dynamic scale
         if (d3.min(obj.metrics.partitionsMetrics['inertia']) < this.DOMAINS['inertia'][0]){
@@ -146,8 +144,6 @@ system.timelinepartitions = (function() {
                 e[0] = obj.iteration
             }
         })
-
-        console.log('****',this.DOMAINS[this.METRICA_LABELING])
         this.render(obj.iteration)
     }
 
@@ -318,7 +314,6 @@ system.timelinepartitions = (function() {
             }
             
         }
-        console.log('ALESSIA',parsed_array_inertia);
         return parsed_array_inertia;
     }
 
@@ -340,7 +335,6 @@ system.timelinepartitions = (function() {
     }
 
     updateRendering = () => {
-        console.log(that.ITERATION_LAST, this.ITERATION_LAST)
         // DATI CELLE
         // d[0] iteratione
         // d[1] partizione
@@ -384,15 +378,15 @@ system.timelinepartitions = (function() {
                         }
                         else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
                             if(that.metric_value === 'inertia'){
-                                return "#ffff16" //"#ff9d47"
+                                return "#ffa500"//"#ffff16" //"#ff9d47"
                             }
                         }
                         })
                     .attr('stroke-width',(d)=> {
                         if(d[3] === d[1]) { 
-                            return '1'
+                            return '2'
                         } else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
-                            return '1'
+                            return '2'
                         }
                         })
                     .attr('visibility', (d)=> {
@@ -417,12 +411,10 @@ system.timelinepartitions = (function() {
                             .attr('width', that.xScale.bandwidth())
                             .attr('height',that.yScale.bandwidth())
 
-                        console.log(d3.select(this))
-                        console.log(d3.select(this).node())
+                        
                         let data_rect = d3.select(this).attr('id').split('-')
                         let iteration_clicked = +data_rect[1]
                         let partition_selected = +(data_rect[2].replace('P',''))
-                        console.log(data_rect,iteration_clicked,partition_selected)
                         system.scatterplot.updateScatterplotFromTimeline(iteration_clicked,partition_selected);
 
                     })
@@ -461,7 +453,7 @@ system.timelinepartitions = (function() {
                 .attr('id','champion-icon')
                 .attr('font-family', 'FontAwesome')
                 .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN]+1))
-                .attr('y', that.yScale('P'+that.BEST_RUN)+((that.yScale.step()/3)*2))
+                .attr('y', that.yScale('P'+that.BEST_RUN)+(that.yScale.step()/2))
                 .attr('font-size', 15)
                 .attr('fill',()=>{
                     if(that.metric_value === 'inertia'){
@@ -479,8 +471,10 @@ system.timelinepartitions = (function() {
     this.updateSimilarity = () =>{
 
         this.percentage_similarity = +$('#similarity-range').val()
-        console.log($('#similarity-range').val());
+        
         d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
+        updateRendering();
+
         
     }
 
