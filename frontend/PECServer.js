@@ -148,14 +148,20 @@ class __PECServer {
     return job
   }
 
-  async createElbowJob (dataset, type, kMin, kMax, r, s) {
+  async createElbowJob (dataset, type, kMin, kMax, r, s, earlyTermination=null) {
+    if( earlyTermination !== null && earlyTermination !== "slow" && earlyTermination !== "fast"){
+      console.error(`EarlyTermination must be in {null, 'slow', 'fast'} not ${earlyTermination}`)
+      return 
+    }
+    
     const req = {
       dataset: dataset,
       type: type,
       kMin: kMin,
       kMax: kMax,
       r: r,
-      s: s
+      s: s,
+      et: earlyTermination
     }
     const jobId = await this.ws.sendRequest(`createElbowJob:${JSON.stringify(req)}`)
     const job = new AsyncJob(jobId, req, this, "Elbow")

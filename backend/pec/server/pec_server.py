@@ -85,7 +85,7 @@ class PECServer:
         return job.id
     
     def createElbowJob(self, client, requestId, d):
-        job = ElbowJob(d.type, d.dataset, d.kMin, d.kMax, d.r, d.s, self.partialResultsQueue, client=client)
+        job = ElbowJob(d.type, d.dataset, d.kMin, d.kMax, d.r, d.s, self.partialResultsQueue, client=client, earlyTermination=d.et)
         self.jobs[job.id] = job
         Log.print(f"{Log.PINK}Created ElbowJob {job.id}")
         return job.id
