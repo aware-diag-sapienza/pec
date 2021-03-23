@@ -550,7 +550,7 @@ function changeSimilarityMetricMatrix(){
       })
     system.matrixAdjacency.updateMatrix(partitions,ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[similarity_metric_matrix],ALL_DATA[CURRENT_ITERATION].metrics.partitionsMetrics[average_similarity_metric_matrix]); 
 
-    
+
     // AGGIOrNARE ANCHE IL VALORE DELLA matriche se è stato trovato early termination
 
 

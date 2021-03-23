@@ -404,7 +404,7 @@ system.linechart = (function() {
             else globalNumberBrushActually[numberLinechart] = true
 
             //console.log(globalNumberBrushActually)
-            timelinePartitions.updateRendering()
+            timelinePartitions.updateBrushTimeline()
             if(globalNumberBrushActually['one']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
@@ -633,7 +633,9 @@ system.linechart = (function() {
 
     let clearPartition = () => {
         globalNumberBrushActually = {one: false, second:false, third: false}
-        timelinePartitions.updateRendering()
+        if (timelinePartitions.LAST_ITERATION !== null && timelinePartitions.BEST_RUN !== null){
+        timelinePartitions.updateBrushTimeline()
+        }
     }
 
     return this;
