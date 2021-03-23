@@ -134,13 +134,14 @@ class __PECServer {
     return d
   }
 
-  async createAsyncJob (dataset, type, k, r, s) {
+  async createAsyncJob (dataset, type, k, r, s, resultsMinFreq=null) {
     const req = {
       dataset: dataset,
       type: type,
       k: k,
       r: r,
-      s: s
+      s: s,
+      resultsMinFreq: resultsMinFreq == null ? null : resultsMinFreq/1000 // python wants seconds 
     }
     const jobId = await this.ws.sendRequest(`createAsyncJob:${JSON.stringify(req)}`)
     const job = new AsyncJob(jobId, req, this, "PEC")

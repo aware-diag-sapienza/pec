@@ -13,7 +13,7 @@ from ..log import Log
 
 
 class AsyncJob(Process):
-    def __init__(self, type, dataset, n_clusters, n_runs, random_state, partialResultsQueue, client=None, **kwargs):
+    def __init__(self, type, dataset, n_clusters, n_runs, random_state, partialResultsQueue, client=None, resultsMinFreq=None, **kwargs):
         super().__init__(**kwargs)
         template_id = f"AsyncJob:{TEPMLATE_ID_PLACEHOLDER}:{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
         if client is not None: template_id += f":{client}"
@@ -29,6 +29,7 @@ class AsyncJob(Process):
         self.pec = self.instantiatePec(self.partialResultCallback, template_id)
         self.id = self.pec.job_id
         self.client = client
+        self.resultsMinFreq = resultsMinFreq
 
     
     def instantiatePec(self, callback, template_id):
@@ -62,7 +63,7 @@ class AsyncJob(Process):
 
 
 class ElbowJob(Process):
-    def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, earlyTermination=None, **kwargs):
+    def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, earlyTermination=None, resultsMinFreq=None, **kwargs):
         super().__init__(**kwargs)
         self.id = f"ElbowJob:{dataset}:{min_n_clusters}:{max_n_clusters}:{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}:{client}"
         self.client = client
@@ -77,6 +78,7 @@ class ElbowJob(Process):
         self.earlyTermination = earlyTermination
         self.partialResultsQueue = partialResultsQueue
         self.data = Dataset(self.dataset).data()
+        self.resultsMinFreq = resultsMinFreq
 
         self.currentPec = None
         self.isLastK = False

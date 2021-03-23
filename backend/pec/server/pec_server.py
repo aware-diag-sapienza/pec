@@ -2,6 +2,7 @@ import json
 from threading import Thread
 import traceback
 import psutil
+import time
 from multiprocessing import Queue
 from sklearn.utils import Bunch
 
@@ -19,6 +20,7 @@ class PECServer:
         self.socketServer = JsonWebSocketServer(self.port, host=self.host, fn_onMessage=self.onMessage, fn_onRequest=self.onRequest)
         self.partialResultListener = Thread(target=self.fn_partialResultListener)
         self.jobs = {}
+        self.jobsLastPartialResultTimestamp = {}
 
     def onMessage(self, client, messageId, message):
         try:
@@ -79,14 +81,16 @@ class PECServer:
             self.socketServer.sendMessage(client, traceback.format_exc())
     
     def createAsyncJob(self, client, requestId, d):
-        job = AsyncJob(d.type, d.dataset, d.k, d.r, d.s, self.partialResultsQueue, client=client)
+        job = AsyncJob(d.type, d.dataset, d.k, d.r, d.s, self.partialResultsQueue, client=client, resultsMinFreq=d.resultsMinFreq)
         self.jobs[job.id] = job
+        self.jobsLastPartialResultTimestamp[job.id] = None
         Log.print(f"{Log.PINK}Created AsyncJob {job.id}")
         return job.id
     
     def createElbowJob(self, client, requestId, d):
         job = ElbowJob(d.type, d.dataset, d.kMin, d.kMax, d.r, d.s, self.partialResultsQueue, client=client, earlyTermination=d.et)
         self.jobs[job.id] = job
+        self.jobsLastPartialResultTimestamp[job.id] = None
         Log.print(f"{Log.PINK}Created ElbowJob {job.id}")
         return job.id
     
@@ -95,20 +99,40 @@ class PECServer:
             data = self.partialResultsQueue.get()
 
             if data.jobType == "AsyncJob":
-                if not data.pr.info.is_last: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {data.pr.job_id}")
-                else: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {data.pr.job_id} -- {Log.RED}last{Log.ENDC}")
+                jobId = data.pr.job_id
+                t = time.time()
+                if not data.pr.info.is_last: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {jobId}")
+                else: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {jobId} -- {Log.RED}last{Log.ENDC}")
+                
+                if jobId in self.jobs: self.resultsDelay(jobId, minFreq=self.jobs[jobId].resultsMinFreq) #dealy
+                
                 self.socketServer.sendMessage(data.client, {
                     "type": "partial-result",
                     "data": data.pr
                 })
+
             elif data.jobType == "ElbowJob":
-                if not data.pr.isLast: Log.print(f"{Log.GRAY}Sending elbow partial result K={data.pr.k} of {data.pr.jobId}")
-                else: Log.print(f"{Log.GRAY}Sending elbow partial result k={data.pr.k} of {data.pr.jobId} -- {Log.RED}last{Log.ENDC}")
+                jobId = data.pr.jobId
+                if not data.pr.isLast: Log.print(f"{Log.GRAY}Sending elbow partial result K={data.pr.k} of {jobId}")
+                else: Log.print(f"{Log.GRAY}Sending elbow partial result k={data.pr.k} of {jobId} -- {Log.RED}last{Log.ENDC}")
                 self.socketServer.sendMessage(data.client, {
                     "type": "elbow-partial-result",
                     "data": data.pr
                 })
     
+
+    def resultsDelay(self, jobId, minFreq=None):
+        lastTime = self.jobsLastPartialResultTimestamp[jobId]
+        if minFreq is None or lastTime is None:
+            self.jobsLastPartialResultTimestamp[jobId] = time.time()
+            return
+        currentTime = time.time()
+        delay = max( 0 , minFreq - (currentTime - lastTime) )
+        print(f"delay", delay, minFreq)
+        time.sleep(delay)
+        self.jobsLastPartialResultTimestamp[jobId] = time.time()
+
+
     def start(self):
         Log.print(f"Starting PEC Server on {Log.BLUE}ws://{self.host}:{self.port}")
         self.partialResultListener.start()
