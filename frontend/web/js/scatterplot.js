@@ -118,7 +118,8 @@ system.scatterplot = (function() {
       tooltip.hide();
       tooltipLayer.draw();
     });
-    let scaleBy = 1.05;
+    //
+    /*let scaleBy = 1.05;
     window.addEventListener('wheel', (e) => {
       e.preventDefault();
       let oldScale = stage.scaleX();
@@ -146,7 +147,7 @@ system.scatterplot = (function() {
       }
       stage.position(newPos);
       stage.batchDraw();
-    });
+    });*/
   }
 this.updateScatterplot = ()=> {
   let labels;

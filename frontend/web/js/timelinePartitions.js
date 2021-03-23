@@ -47,7 +47,7 @@ system.timelinepartitions = (function() {
         this.matrix_height = d3.min([parseInt(d3.select('#id-matrix-1').style("width")),parseInt(d3.select('#id-matrix-1').style("height"))])- this.margin_matrix.top - this.margin_matrix.bottom;
         this.all_cell = (d3.min([this.matrix_width,this.matrix_height])-this.margin_matrix.top)
         this.matrix_cell_size = (d3.min([this.matrix_width,this.matrix_height])-this.margin_matrix.top)/partitions
-        this.partitions_status=Array.from({length:partitions},(_,i)=> [0,'P'+i,true])
+        this.partitions_status=Array.from({length:partitions},(_,i)=> [0,'P'+i,true]) // iteration for the status| partition | status | iteration finish
         this.metric_value = $('input[name="metric-timeline"]:checked').val();
         this.percentage_similarity = +$('#similarity-range').val()
         d3.select('#information-linechart').style('visibility','visible');
@@ -139,10 +139,12 @@ system.timelinepartitions = (function() {
                     .domain([this.DOMAINS[this.metric_value][0], this.DOMAINS[this.metric_value][1]])
             }
         }
-        that.partitions_status.forEach((e)=> {
+        that.partitions_status.forEach((e,i)=> {
             if(e[2]){
                 e[0] = obj.iteration
             }
+
+            //e[3]=
         })
         this.render(obj.iteration)
     }
@@ -200,7 +202,7 @@ system.timelinepartitions = (function() {
             .text("Iterations");*/
 
             // sequential legend
-        console.log('--> voglio disegbare la scala ')
+        
         let legend = svg
         .append("g")
         .attr("transform","translate(" + 0 + "," + (that.all_cell+20) + ")")
@@ -242,16 +244,17 @@ system.timelinepartitions = (function() {
         .attr("height", 5)
         .style("fill", "url(#gradient2)")
         
-
+        
         var y;
         if(this.metric_value === this.METRICA_LABELING) {
+            
             y= d3.scaleLinear()
             .range([this.width, 0])
-            .domain(this.colorScaleCell.domain().reverse())
+            .domain(that.colorScaleCell.domain().reverse())
         }else {
             y= d3.scaleLinear()
             .range([this.width, 0])
-            .domain(this.colorScaleCell.domain())
+            .domain(that.colorScaleCell.domain())
         }
 
         var yAxis = d3.axisBottom()
@@ -274,7 +277,7 @@ system.timelinepartitions = (function() {
 
 
             d3.select('.y.axisTimeline')
-                .selectAll("rect-chechbox")
+                .selectAll("rect.checkbox")
                 .data(that.partitions_status)
                 .each()
                 .join(
@@ -303,12 +306,73 @@ system.timelinepartitions = (function() {
                         }),
                     update => update
                         .attr('fill','green'),
-                    exit=> exit)
+                    exit=> exit);
+            
+
+                    //f70c
+
+                    /*.append('text')
+                .attr('id','champion-icon')
+                .attr('font-family', 'FontAwesome')
+                .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN]+1))
+                .attr('y', that.yScale('P'+that.BEST_RUN)+(that.yScale.step()/2))
+                .attr('font-size', 15)
+                .attr('fill',()=>{
+                    if(that.metric_value === 'inertia'){
+                        return '#ff0090'
+                    }
+                    if (that.metric_value === that.METRICA_LABELING){
+                        return '#0094db'
+                    }
+                })
+                .text('\uf091' ); */ 
+                console.log('SUSHI',ALL_DATA[CURRENT_ITERATION].info.completed_runs_status)
+                    d3.select('.y.axisTimeline')
+                    .selectAll("rect.status-partition")
+                    .data(ALL_DATA[CURRENT_ITERATION].info.completed_runs_status)
+                    .join(
+                        enter => enter
+                            .append('text')
+                            .attr('id',(d,i) => 'status-partition-P'+i)
+                            .attr('font-family', 'FontAwesome')
+                            .attr('x', 0 - (this.margin.left-12))
+                            .attr('y',(d,i) => that.yScale('P'+i) + (that.yScale.bandwidth()/2) +6  )
+                            .attr('font-size', 12)
+                            .text('\uf110' )
+                            .style("text-anchor", "end")
+                            .attr('fill',(d)=> {if(d) return 'white'; else { return '#00a0a0';}})
+                            //.append("rect")
+                            //.attr('id',(d) => 'status-partition-'+d[1])
+                            //.attr('x', 0 - (this.margin.left))
+                            //.attr('y',(d,i) => that.yScale(d[1]) + (that.yScale.bandwidth()/2) -5 )
+                            //.attr('width',() => {if(that.yScale.bandwidth()<=10) return that.yScale.bandwidth(); else return 10;})
+                            //.attr('height',() => {if(that.yScale.bandwidth()<=10) return that.yScale.bandwidth(); else return 10;})
+                            
+                            //.attr('stroke-width',3)
+                            //.attr('stroke',(d)=> {if(d[2]) return '#000'; else {return'#6C757D'}})
+                            //.on('click',function(d){
+                                
+                            //    let index_checkbox = parseInt(d3.select(this).attr('id').replace('checkbox-P',''))
+                                
+                            //    if (that.partitions_status[index_checkbox][2]){
+                            //        that.partitions_status[index_checkbox][2] = false
+                                    
+                            //        d3.select(this)
+                            //        .attr('fill','#fff')
+                            //        .attr('stroke-width',3)
+                            //        .attr('stroke','#6C757D')
+                            //    }
+                            ,
+                        update => update
+                            .attr('fill','green'),
+                        exit=> exit);
+                
+            
 
         //drawLegend()
         updateRendering()
 
-        let resize = function () {
+        function resize () {
             that.width = parseInt(that.div.style("width")) - that.margin.left - that.margin.right,
             that.height = parseInt(that.div.style("height")) - that.margin.top - that.margin.bottom;
             that.xScale.range([0, that.width]);
@@ -330,12 +394,72 @@ system.timelinepartitions = (function() {
             
             svg.select(".y.axisTimeline").call(that.yAxis);
 
-            svg.select(".textXAxis")             
-                .attr("transform",
-                    "translate(" + (that.width/2) + " ," + 
-                                    (that.height + that.margin.top ) + ")")
-                .style("text-anchor", "left")
-                .text("Iterations");
+        let legend = svg
+        .append("g")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+20) + ")")
+        .append("defs")
+        .append("svg:linearGradient")
+        .attr("id", "gradient2")
+        .attr("x1", "0%")
+        .attr("y1", "100%")
+        .attr("x2", "100%")
+        .attr("y2", "100%")
+        .attr("spreadMethod", "pad");
+
+
+        legend.append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", calculateColor(CURRENT_ITERATION,0))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "33%")
+        .attr("stop-color",  calculateColor(CURRENT_ITERATION,0.33))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "66%")
+        .attr("stop-color", calculateColor(CURRENT_ITERATION,0.66))
+        .attr("stop-opacity", 1);
+
+        legend.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color",  calculateColor(CURRENT_ITERATION,1))
+        .attr("stop-opacity", 1);
+
+        svg
+        .append("g")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+25) + ")")
+        .append("rect")
+        .attr("width", that.width)
+        .attr("height", 5)
+        .style("fill", "url(#gradient2)")
+
+        var y;
+        if(that.metric_value === that.METRICA_LABELING) {
+            y= d3.scaleLinear()
+            .range([that.width, 0])
+            .domain(that.colorScaleCell.domain())
+        }else {
+            y= d3.scaleLinear()
+            .range([that.width, 0])
+            .domain(that.colorScaleCell.domain())
+        }
+
+        var yAxis = d3.axisBottom()
+        .scale(y)
+        .ticks(5);
+
+        svg.append("g")
+        .attr("class", "y axis")
+        .attr("transform","translate(" + 0 + "," + (that.all_cell+30) + ")")
+        .call(yAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("axis title");
 
             svg.select(".textYAxis")
                 .attr("transform", "rotate(-90)")
@@ -357,7 +481,7 @@ system.timelinepartitions = (function() {
         d3.select(window).on('resize', resize);
 
         // Call the resize function
-        resize();
+        //resize();
     }
 
     let parse_intertia_runs = (all_data, array_inertia, best_run) =>{
@@ -410,7 +534,7 @@ system.timelinepartitions = (function() {
     }
 
     function calculateColor (iterazione, valore){
-        console.log(iterazione, valore)
+        
         if(iterazione<5) {
             return d3.interpolateGreys(valore)
         } else {
@@ -523,8 +647,6 @@ system.timelinepartitions = (function() {
                         if(that.metric_value === 'inertia'){
                             return "#ffa500"//"#ffff16" //"#ff9d47"
                         }
-                       
-                        
                     }
                     })
                 
@@ -541,7 +663,7 @@ system.timelinepartitions = (function() {
                 .append('text')
                 .attr('id','champion-icon')
                 .attr('font-family', 'FontAwesome')
-                .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN]+1))
+                .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN])+15)
                 .attr('y', that.yScale('P'+that.BEST_RUN)+(that.yScale.step()/2))
                 .attr('font-size', 15)
                 .attr('fill',()=>{

@@ -104,6 +104,8 @@ function setupTooltip() {
     tooltip.hide();
     tooltipLayer.draw();
   });
+  //
+  /*
   let scaleBy = 1.05;
   window.addEventListener('wheel', (e) => {
     e.preventDefault();
@@ -132,7 +134,7 @@ function setupTooltip() {
     }
     stage.position(newPos);
     stage.batchDraw();
-  });
+  });*/
 }
 
 this.updateScatterplot = (useScale,useColor, scaleX,scaleY,labels)=> {
