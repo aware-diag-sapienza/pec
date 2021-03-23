@@ -407,26 +407,52 @@ system.linechart = (function() {
 
             d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
-                .style('opacity', 1)
+                .style('opacity', (d)=> {
+                    let current_index = parseInt(d[1].replace('P',''))
+
+                    if(system.timelinepartitions.partitions_status[current_index][2])
+                        return 1;
+                    else
+                        return 0;
+                    })
             if(globalNumberBrushActually['one']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
                 .filter( d => d[5][that.attributeYAxisSecondLevel1] < yMin1 || d[5][that.attributeYAxisSecondLevel1] > yMax1 || d[0] < xMin1 || d[0] > xMax1)
-                .style('opacity', 0.1)
+                .style('opacity', (d)=> {
+                let current_index = parseInt(d[1].replace('P',''))
+                if(system.timelinepartitions.partitions_status[current_index][2])
+                    return 0.1;
+                else
+                    return 0;
+                })
             }
 
             if(globalNumberBrushActually['second']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
                 .filter( d => d[5][that.attributeYAxisSecondLevel2] < yMin2 || d[5][that.attributeYAxisSecondLevel2] > yMax2 || d[0] < xMin2 || d[0] > xMax2)
-                .style('opacity', 0.1)
+                .style('opacity', (d)=> {
+                let current_index = parseInt(d[1].replace('P',''))
+                if(system.timelinepartitions.partitions_status[current_index][2])
+                    return 0.1;
+                else
+                    return 0;
+                })
             }
 
             if(globalNumberBrushActually['third']){
                 d3.select('#timeline-partitions')
                 .selectAll('rect.rect-partition')
                 .filter( d => d[5]['globalStability'+variableYAxisLinechart] < yMin3 || d[5]['globalStability'+variableYAxisLinechart] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
-                .style('opacity', 0.1)
+                .style('opacity', (d)=> {
+                let current_index = parseInt(d[1].replace('P',''))
+                console.log(current_index, system.timelinepartitions.partitions_status[current_index][2])
+                if(system.timelinepartitions.partitions_status[current_index][2])
+                    return 0.1;
+                else
+                    return 0;
+                })
             }
         }
 
@@ -639,10 +665,19 @@ system.linechart = (function() {
         /*if (timelinePartitions.LAST_ITERATION !== null && timelinePartitions.BEST_RUN !== null){
             
         }
+        console.log()
         timelinePartitions.updateBrushTimeline()*/
+        console.log("sono qui ", system.timelinepartitions.partitions_status)
         d3.select('#timeline-partitions')
             .selectAll('rect.rect-partition')
-            .style('opacity', 1)
+            .style('opacity', (d)=> {
+                let current_index = parseInt(d[1].replace('P',''))
+                if(system.timelinepartitions.partitions_status[current_index][2])
+                    return 1;
+                else
+                    return 0;
+                })
+            //.style('opacity', 1)
     }
 
     return this;
