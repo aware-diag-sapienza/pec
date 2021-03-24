@@ -17,11 +17,8 @@ system.initialization = (function() {
         Promise.all([
           d3.json("./web/js/timeseries_linechart.json"),
         ]).then(function(files) {
-
           linechart1 = system.linechart.init('#linechart_inertia')
-          
           partitions = system.partitions.init('#timeline-partitions')
-
           const data = files[0]
           const sleepNow = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
           async function repeatedGreetingsLoop(){
@@ -30,7 +27,6 @@ system.initialization = (function() {
               if(i == 0){
                 linechart1.setData([data[i]]) 
                 linechart1.render()
-                
               }else{
                 linechart1.updateData(data[i])
                 if(i == 3 || i == 8 || i == 10 || i == 15) 
@@ -40,7 +36,6 @@ system.initialization = (function() {
               }
             }
           }
-
           repeatedGreetingsLoop()
          })
         

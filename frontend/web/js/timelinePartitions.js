@@ -96,6 +96,9 @@ system.timelinepartitions = (function() {
     
     }
 
+    this.updateDataForHistory = () =>{
+
+    }
     
     this.updateData = (obj,data_matrix) => {
         this.data = this.data.concat(obj)
@@ -146,6 +149,11 @@ system.timelinepartitions = (function() {
 
             //e[3]=
         })
+
+        JOBS[JOBS.length -1]['partitions_status'] =  that.partitions_status
+        JOBS[JOBS.length -1]['DOMAINS'] =  that.DOMAINS
+        JOBS[JOBS.length -1]['ITERATION_LAST'] =  that.ITERATION_LAST
+        
         this.render(obj.iteration)
     }
 
@@ -286,10 +294,10 @@ system.timelinepartitions = (function() {
                         .attr('id',(d) => 'checkbox-'+d[1])
                         .attr('x', 0 - (this.margin.left/3)*2)
                         .attr('y',(d,i) => that.yScale(d[1]) + (that.yScale.bandwidth()/2) -5 )
-                        .attr('width',() => {if(that.yScale.bandwidth()<=10) return that.yScale.bandwidth(); else return 10;})
-                        .attr('height',() => {if(that.yScale.bandwidth()<=10) return that.yScale.bandwidth(); else return 10;})
-                        .attr('fill',(d)=> {if(d[2]) return '#000'; else { return '#fff';}})
-                        .attr('stroke-width',3)
+                        .attr('width',() => {if(that.yScale.bandwidth()<=11) return that.yScale.bandwidth(); else return 11;})
+                        .attr('height',() => {if(that.yScale.bandwidth()<=11) return that.yScale.bandwidth(); else return 11;})
+                        .attr('fill',(d)=> {if(d[2]) return '#30d5c8'; else { return '#fff';}})
+                        .attr('stroke-width',1)
                         .attr('stroke',(d)=> {if(d[2]) return '#000'; else {return'#6C757D'}})
                         .on('click',function(d){
                             
@@ -300,7 +308,7 @@ system.timelinepartitions = (function() {
                                 
                                 d3.select(this)
                                 .attr('fill','#fff')
-                                .attr('stroke-width',3)
+                                .attr('stroke-width',2)
                                 .attr('stroke','#6C757D')
                             }
                         }),
@@ -326,7 +334,7 @@ system.timelinepartitions = (function() {
                     }
                 })
                 .text('\uf091' ); */ 
-                console.log('SUSHI',ALL_DATA[CURRENT_ITERATION].info.completed_runs_status)
+                
                     d3.select('.y.axisTimeline')
                     .selectAll("rect.status-partition")
                     .data(ALL_DATA[CURRENT_ITERATION].info.completed_runs_status)
@@ -485,7 +493,7 @@ system.timelinepartitions = (function() {
     }
 
     let parse_intertia_runs = (all_data, array_inertia, best_run) =>{
-        console.log("BEST",this.BEST_RUN)
+        
         
       
         let parsed_array_inertia = []
@@ -591,7 +599,6 @@ system.timelinepartitions = (function() {
                             }
                         }
                         else if((d[2] - d[4] <= d[4]*(that.percentage_similarity/100)) && (d[3] !== d[1])){ 
-                            console.log(d[2],d[4],d[2] - d[4], d[4]*(that.percentage_similarity/100),that.percentage_similarity)
                             if(that.metric_value === 'inertia'){
                                 return "#ffa500"//"#ffff16" //"#ff9d47"
                             }

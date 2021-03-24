@@ -135,9 +135,14 @@ system.linechart = (function() {
             .y(function(d) {
                 return that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]));
             });
-        
         return that
     } 
+
+    this.updateEarlyTerminationFromHistory = (obj) =>{
+        that.lastObj = obj
+        this.updateVerticalLinesHistory(obj)
+        
+    }
 
     this.computeYAxisVariable = () => {
         switch(this.technique) {
@@ -220,30 +225,42 @@ system.linechart = (function() {
         this.segmentedData = ret
     }
      
-    this.updateData = (obj,data_matrix) => {
+    this.updateData = (obj) => {
         this.lastObj = obj
         this.data = this.data.concat(obj)
         this.segmentData(this.data)
-        //[X GIORGIO] aggiungo qui il passaggio dell'oggetto essendo labels. 
-        that.updateVerticalLines(obj,data_matrix)
+        this.updateVerticalLines(obj)
         
         this.render()
     }
 
-    this.updateVerticalLines = (obj,data_matrix) => {
+    this.updateVerticalLines = (obj) => {
         verticalLines.map(d => {
             if(!d.draw) {
-                if(this.lastObj['metrics']['earlyTermination'][d.name]){ 
+                if(that.lastObj['metrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
-                    d["iteration"] = this.lastObj.iteration
-                    console.log('***earlyTermination'+ d.name)
+                    d["iteration"] = that.lastObj.iteration
                     d3.select('.item-information').style('visibility','visible');
                     let current_computation_index = previous_computations.length-1
                     previous_computations[current_computation_index]['earlyTermination'+ d.name] = this.lastObj.iteration
-
                     previous_computations[current_computation_index][d.name+'Inertia'] = this.lastObj['metrics']['labelsMetrics']['inertia']
+                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore,that.lastObj.iteration);
+                    system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics[similarity_metric_matrix],obj.metrics.partitionsMetrics[average_similarity_metric_matrix]);
+                }
+            }
+        })
+    }
+
+    this.updateVerticalLinesHistory = (obj) => {
+        verticalLines.map(d => {
+            if(!d.draw) {
+                if(that.lastObj['metrics']['earlyTermination'][d.name]){ 
+                    d["draw"] = true
+                    d["iteration"] = that.lastObj.iteration
                     
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
+                    d3.select('.item-information').style('visibility','visible');
+                    
+                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore,that.lastObj.iteration);
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics[similarity_metric_matrix],obj.metrics.partitionsMetrics[average_similarity_metric_matrix]);
 
                 }
@@ -447,7 +464,6 @@ system.linechart = (function() {
                 .filter( d => d[5]['globalStability'+variableYAxisLinechart] < yMin3 || d[5]['globalStability'+variableYAxisLinechart] > yMax3 || d[0] < xMin3 || d[0] > xMax3)
                 .style('opacity', (d)=> {
                 let current_index = parseInt(d[1].replace('P',''))
-                console.log(current_index, system.timelinepartitions.partitions_status[current_index][2])
                 if(system.timelinepartitions.partitions_status[current_index][2])
                     return 0.1;
                 else
@@ -662,12 +678,6 @@ system.linechart = (function() {
 
     let clearPartition = () => {
         globalNumberBrushActually = {one: false, second:false, third: false}
-        /*if (timelinePartitions.LAST_ITERATION !== null && timelinePartitions.BEST_RUN !== null){
-            
-        }
-        console.log()
-        timelinePartitions.updateBrushTimeline()*/
-        console.log("sono qui ", system.timelinepartitions.partitions_status)
         d3.select('#timeline-partitions')
             .selectAll('rect.rect-partition')
             .style('opacity', (d)=> {

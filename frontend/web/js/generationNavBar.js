@@ -14,8 +14,9 @@ let SVG_SILOUETTE;
 let previous_computations = [];
 let width_rect;
 let USED_SEED = []
-const SCALE_SILOUHETTE =  d3.scaleLinear().domain([-1,1]).range([0, 1]) 
+const SCALE_SILOUHETTE =  d3.scaleLinear().domain([0,1]).range([0, 1]) 
 const LIMIT_IT = 100;
+let CURRENT_HISTORY = 0;
 
 
 
@@ -26,7 +27,6 @@ let verticalLines = []
 let ITERAZIONE_PER_MATRICE = 1
 
 function onChangeInputParameter(){
-    //document.getElementById('runButton').style.display = "none"
     d3.select('#iteration-label').html('');
 }
 
@@ -176,8 +176,6 @@ async function startElbow(){
     let etElbow = $( "#typeElbow" ).val()
     if(etElbow == "null") etElbow = null
     const earlyTermination = etElbow //null, "fast", "slow"
-
-    //d3.select('#select-seed').attr('placeholder',seed)
       
     if (dname != null && type != null && kMin != null && kMax != null && r != null && kMin<kMax){
         const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
@@ -187,7 +185,6 @@ async function startElbow(){
             if(result.k == 2){
                 LockUI.unlock()
             }
-            console.log(result)
             elbowData.push({k: result.k, value: result.inertia})
             linechart_Elbow1.setData(elbowData)
             linechart_Elbow1.render()
@@ -265,7 +262,6 @@ async function startSelects(){
 let timestamp0;
 let swap_timestamp = 0;
 function readResult(it_res){
-    console.log(it_res)
     timestamp0 = swap_timestamp
     let actual_timestamp;
     actual_timestamp = it_res.timestamp
@@ -295,6 +291,56 @@ function readResult(it_res){
             } else{
                 ITERAZIONE_PER_MATRICE +=1
             }
+}
+
+
+function readHistoryResult(li_data,all_data,job, slowData, fastData){
+    
+    timestamp0 = swap_timestamp
+    let actual_timestamp;
+    actual_timestamp = li_data.timestamp
+
+    matrix1 = system.matrixAdjacency.init('#id-matrix-1');
+    matrix2 = system.matrixAdjacencyFixed.init('#id-matrix-2');
+    linechart1 = system.linechart.init('#linechart_inertia', technique)
+    timelinePartitions = system.timelinepartitions.init('#timeline-partitions', technique,partitions)
+    
+
+    d3.select('#info-scatterplot-1').style('visibility','visible');
+    document.getElementById('elbowLinechartCheck').checked = false
+    elbowLinechart = document.getElementById('elbowLinechartCheck').checked
+
+    d3.select('#iteration-label').html('Iteration #'+li_data.iteration)
+    d3.selectAll('.linechart_select').style('display','block')
+    d3.select('#button-metric').style('display','inline')
+    d3.select('#id-metrics').style('display','flex')
+    linechart1.setData(all_data) 
+    
+    timelinePartitions.setData(all_data) 
+    system.timelinepartitions.partitions_status = job.partitions_status
+    system.timelinepartitions.DOMAINS = job.DOMAINS
+    system.timelinepartitions.ITERATION_LAST = job.ITERATION_LAST
+    if (system.timelinepartitions.metric_value === 'inertia'){
+        system.timelinepartitions.colorScaleCell = d3.scaleLinear()
+            .range([1,0])
+            .domain([system.timelinepartitions.DOMAINS[system.timelinepartitions.metric_value][0], system.timelinepartitions.DOMAINS[system.timelinepartitions.metric_value][1]])
+        }
+    if (system.timelinepartitions.metric_value === system.timelinepartitions.METRICA_LABELING) {
+        system.timelinepartitions.colorScaleCell = d3.scaleLinear()
+            .range([0,1])
+            .domain([system.timelinepartitions.DOMAINS[system.timelinepartitions.metric_value][0], system.timelinepartitions.DOMAINS[system.timelinepartitions.metric_value][1]])
+    }
+
+    timelinePartitions.render()
+    updateTable(li_data)
+    system.matrixAdjacency.adjacency(partitions,li_data.metrics.partitionsMetrics[similarity_metric_matrix],li_data.metrics.partitionsMetrics[average_similarity_metric_matrix]); 
+    system.scatterplot.updateScatterplot(); 
+    system.matrixAdjacency.updateBestPartition(li_data.info.best_run)
+    system.scatterplot.early_termination = null;
+    linechart1.updateEarlyTerminationFromHistory(slowData)
+    linechart1.updateEarlyTerminationFromHistory(fastData)
+
+    linechart1.render()
 }
 
 function visualizeMetricsFunction(){
@@ -373,6 +419,7 @@ function addPinHistory() {
         d3.select('#name-dataset-history').remove('*');
         previous_computations = [];
         SVG_HISTORY = null
+        CURRENT_HISTORY = 0;
     } 
 
     let width_history = $("#listhistory").width()
@@ -394,14 +441,16 @@ function addPinHistory() {
             .attr('width',width_history)
             .attr('height', height_history-margin_history.top-margin_history.bottom)
             .attr("transform","translate(" + margin_history.left + "," + margin_history.top + ")")
+            
     }
 
     let tentative = previous_computations.length
+    CURRENT_HISTORY = tentative;
 
     previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'simplifiedSilhouette':-1, 'iteration':0, 'earlyTerminationslow':-1, 'slowInertia': -1, 'earlyTerminationfast':-1, 'fastInertia':-1})
 
     scaleHistory = d3.scaleBand()
-
+    
        
     SVG_HISTORY.selectAll(".bar-history")
         .data(previous_computations)
@@ -414,6 +463,7 @@ function addPinHistory() {
         .attr('width', width_history-margin_history.right)
         .attr('height', height_pin)
         .attr('stroke', 'black')
+        .attr('stroke-width', '1')
         .attr('fill', 'white')
     
     width_rect = (width_history-margin_history.right)/LIMIT_IT
@@ -429,6 +479,8 @@ function addPinHistory() {
         .attr('width', 0)
         .attr('height', height_pin)
         .attr('fill', colorPin())
+       
+
 
     SVG_HISTORY.selectAll(".bar-history-early-slow")
         .data(previous_computations)
@@ -440,8 +492,9 @@ function addPinHistory() {
         .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', 0)
         .attr('height', height_pin)
-        .attr('fill', '#c0c0c0')    
-    SVG_HISTORY.selectAll(".bar-history-early-fast")
+        .attr('fill', '#c0c0c0')
+
+        SVG_HISTORY.selectAll(".bar-history-early-fast")
         .data(previous_computations)
         .enter()
         .append('rect')
@@ -451,7 +504,11 @@ function addPinHistory() {
         .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', 0)
         .attr('height', height_pin)
-        .attr('fill', '#ffd700')    
+        .attr('fill', '#ffd700')
+    
+        //    .attr("data-tippy-content", d => "Early Termination Fast \nat iteration " + d.iteration)  
+    //tippy(hetf.nodes(),{delay: 300,placement: 'right', arrow:false});
+    
     let text = SVG_HISTORY.selectAll(".text-history")
         .data(previous_computations)
         .enter()
@@ -505,52 +562,87 @@ function addPinHistory() {
             .attr('height', height_pin)
             .attr('stroke', 'black')
             .attr('fill', (d) => d3.interpolateReds(SCALE_SILOUHETTE(d.simplifiedSilhouette)))
+        
+        SVG_HISTORY.selectAll(".bar-border")
+            .data(previous_computations)
+            .enter()
+            .append('rect')
+            .attr('class','bar-border')
+            .attr('id',(d) => 'border-' + d.tentative)
+            .attr('x', 0)
+            .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
+            .attr('width', width_history-margin_history.right + 10)
+            .attr('height', height_pin)
+            .attr('stroke', 'black')
+            .attr('stroke-width',1)
+            .attr('fill','transparent')
+            .on('click',function (element,d) {
+                d3.selectAll('.bar-border').attr('stroke-width', '1')
+                d3.select('#border-'+d.tentative).attr('stroke-width', '2')
+                uploadPreviousData(d,JOBS[d.tentative])
+            })
+            
         }
 
 function updatePinHistory(iteration,isLast,valore_silouette){
+    let CURRENT_HISTORY = previous_computations.length-1
+    previous_computations[CURRENT_HISTORY]['simplifiedSilhouette'] = valore_silouette
+    previous_computations[CURRENT_HISTORY]['iteration'] = iteration
 
-    //previous_computations.length
-    let current_computation_index = previous_computations.length-1
+    SVG_HISTORY.selectAll(".bar-silouette").data(previous_computations)
+    SVG_HISTORY.selectAll(".bar-history-improvement").data(previous_computations)
 
-
-    previous_computations[current_computation_index]['simplifiedSilhouette'] = valore_silouette
-
-    d3.select('#silouette-' + current_computation_index)
+    d3.select('#silouette-' + CURRENT_HISTORY)
         .attr('fill', (d) => d3.interpolateReds(SCALE_SILOUHETTE(d.simplifiedSilhouette)))
     
     if(isLast){
-        d3.select('#improvement-'+(current_computation_index))
+        d3.select('#improvement-'+(CURRENT_HISTORY))
         .attr('width',width_rect*LIMIT_IT)
         let width_iteration = (width_rect*LIMIT_IT)/iteration
-        
             // ho trovato la early termination slow 
-            d3.select('#early-slow-'+current_computation_index)
-            .attr('width',5)
-            .attr('x',width_iteration*previous_computations[current_computation_index]['earlyTerminationslow']+5)
+            d3.select('#early-slow-'+CURRENT_HISTORY)
+                .attr('width',5)
+                .attr('x',width_iteration*previous_computations[CURRENT_HISTORY]['earlyTerminationslow']+5)
             // ho trovato la early termination fast 
-            d3.select('#early-fast-'+current_computation_index)
-            .attr('width',5)
-            .attr('x',width_iteration*previous_computations[current_computation_index]['earlyTerminationslow'])
-        
+            d3.select('#early-fast-'+CURRENT_HISTORY)
+                .attr('width',5)
+                .attr('x',width_iteration*previous_computations[CURRENT_HISTORY]['earlyTerminationslow'])
     } else {
-        d3.select('#improvement-'+(current_computation_index))
-        .attr('width',width_rect*iteration)
+        d3.select('#improvement-'+(CURRENT_HISTORY))
+            .attr('width',width_rect*iteration)
 
-        if (previous_computations[current_computation_index]['earlyTerminationslow'] === iteration){
+        if (previous_computations[CURRENT_HISTORY]['earlyTerminationslow'] === iteration){
             // ho trovato la early termination slow 
-            d3.select('#early-slow-'+current_computation_index)
+            d3.select('#early-slow-'+CURRENT_HISTORY)
             .attr('width',5)
             .attr('x',width_rect*iteration+5)
         }
 
-        if (previous_computations[current_computation_index]['earlyTerminationfast'] === iteration){
+        if (previous_computations[CURRENT_HISTORY]['earlyTerminationfast'] === iteration){
             // ho trovato la early termination fast 
-            d3.select('#early-fast-'+current_computation_index)
+            d3.select('#early-fast-'+CURRENT_HISTORY)
             .attr('width',5)
             .attr('x',width_rect*iteration)
         }
 
+        
+
     }
+
+    let hetf = d3.selectAll(".bar-history-early-fast")
+        .data(previous_computations)
+        .attr("data-tippy-content", d => "Early Termination Fast \nat iteration " + d.earlyTerminationfast)  
+        tippy(hetf.nodes(),{delay: 300,placement: 'right', arrow:false});
+    
+    let hets = d3.selectAll(".bar-history-early-slow")
+    .data(previous_computations)
+        .attr("data-tippy-content", d => "Early Termination Slow \nat iteration " + d.earlyTerminationslow)  
+        tippy(hets.nodes(),{delay: 300,placement: 'right', arrow:false});
+    
+    let sil = d3.selectAll(".bar-silouette")
+        .data(previous_computations)
+        .attr("data-tippy-content", d => "Simplified Silouette\n " + d.simplifiedSilhouette.toFixed(4))  
+        tippy(sil.nodes(),{delay: 300,placement: 'right', arrow:false});
 
 }      
 
@@ -618,4 +710,20 @@ function changeSimilarityMetricMatrix(){
     
     }
     
+}
+
+
+function uploadPreviousData(d,jobdata){
+
+    ALL_DATA = jobdata.results
+    CURRENT_ITERATION = jobdata.results.length -1
+    ITERAZIONE_PER_MATRICE = 1
+    dataset = d.dataset
+    technique =  d.technique
+    cluster = d.cluster
+    partitions = d.partitions
+    seed = d.seed
+    readHistoryResult(ALL_DATA[CURRENT_ITERATION],ALL_DATA, jobdata, ALL_DATA[d.earlyTerminationslow], ALL_DATA[d.earlyTerminationfast])
+
+
 }

@@ -154,11 +154,9 @@ this.updateScatterplot = ()=> {
   let stability;
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
 
-  console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
-
   if (PLOT_SCATTERPLOT === 'cluster'){
     labels = ALL_DATA[CURRENT_ITERATION]['labels']
-    stability = ALL_DATA[CURRENT_ITERATION]['labels'] // qui la stability la faccio come il cluster label
+    stability = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics.entriesStability[stability_window] // qui la stability la faccio come il cluster label
   }
   else {
 
@@ -177,11 +175,10 @@ this.updateScatterplotFromTimeline = (iteration, partition)=> {
 }
 
 
-this.updateScatterplotEarlyTermination= (labels,final_ars)=> {
-
+this.updateScatterplotEarlyTermination= (labels,final_ars,iteration_ET)=> {
   if ( this.early_termination === null){
     this.LABEL_EARLY_TERMINATION = labels;
-    d3.select('#information-info').html("Early Termination Fast - " + $('#iteration-label').text() + '   <b>ARI<b/>: ' + final_ars.toFixed(4))
+    d3.select('#information-info').html("Early Termination Fast - " + iteration_ET + '   <b>ARI<b/>: ' + final_ars.toFixed(4)) // devo aggiornare qui 
     system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,this.LABEL_EARLY_TERMINATION);//useScale,useColor, scaleX,ScaleY
 
   this.early_termination = true;
@@ -226,7 +223,6 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
   const kWidth = stage.width();
   const kHeight = stage.height();
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
-  console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
   
   if (nodes.length === 0) {
     setupTooltip()
@@ -332,8 +328,6 @@ function plotCoordsKonvaStability(labels) {
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
       let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
-
-      console.log('PLOT_SCATTERPLOT',PLOT_SCATTERPLOT)
 
       let stability_cluster;
       if (PLOT_SCATTERPLOT === 'cluster'){
