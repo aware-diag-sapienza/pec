@@ -564,7 +564,7 @@ system.timelinepartitions = (function() {
         // d[3] best run
         // d[4] best valore metrica
         // d[5] altre metriche
-        that.div.select("g.gTimeLine")
+        let rect_timeline = that.div.select("g.gTimeLine")
             .selectAll('rect.rect-partition')
             .data(parse_intertia_runs(this.data,this.data.map(d=> d.metrics.partitionsMetrics[that.metric_value]),this.data.map(f => f.info.best_run)))
             .join(
@@ -638,8 +638,8 @@ system.timelinepartitions = (function() {
                         let iteration_clicked = +data_rect[1]
                         let partition_selected = +(data_rect[2].replace('P',''))
                         system.scatterplot.updateScatterplotFromTimeline(iteration_clicked,partition_selected);
-
                     })
+                    .attr("data-tippy-content", d => "" + d.slice(",")[1] +" iteration #" + d.slice(",")[0] + " "+ that.metric_value  + " "+ d.slice(",")[2] )//+ " at iteration " + d.slice(",")[0] + "\n" + that.metric_value + " ", d.slice(",")[2].toFixed(4)+"")
                   ,
                 update => update
                 .attr('stroke',(d)=> {
@@ -667,6 +667,8 @@ system.timelinepartitions = (function() {
                         .remove()
                     )
                 )
+
+                tippy(rect_timeline.nodes(),{delay: 300});
 
                 that.div.select("g.gTimeLine")
                 .append('text')
