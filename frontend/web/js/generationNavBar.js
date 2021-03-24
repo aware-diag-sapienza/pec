@@ -579,10 +579,31 @@ function addPinHistory() {
             .attr('stroke-width',1)
             .attr('fill','transparent')
             .on('click',function (element,d) {
+                console.log(d)
                 d3.selectAll('.bar-border').attr('stroke-width', '1')
                 d3.select('#border-'+d.tentative).attr('stroke-width', '2')
                 uploadPreviousData(d,JOBS[d.tentative])
             })
+            .on("mouseover", function(event,i) {
+
+                console.log(event)
+                
+
+                let div = d3.select('#history-tooltip')
+
+                div.transition()		
+                    .duration(200)		
+                    .style("opacity", .9);		
+                div.html( "Seed "+ previous_computations[i.tentative].seed+"<br/> Simplified Silhouette "+ previous_computations[i.tentative].simplifiedSilhouette.toFixed(4))	
+                    .style("left", (event.clientX) + "px")		
+                    .style("top", (event.clientY - 28) + "px");	
+                })					
+            .on("mouseout", function(d,i) {	
+                let div = d3.select('#history-tooltip')	
+                div.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
+            });
             
         }
 
