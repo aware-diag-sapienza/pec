@@ -9,6 +9,7 @@ from ..datasets import Dataset
 from ..pec_instances import I_PecK, I_PecKPP, MCLA_PecK, MCLA_PecKPP, HGPA_PecK, HGPA_PecKPP
 from ..pec_instances import TEPMLATE_ID_PLACEHOLDER
 from ..log import Log
+from ..utils import TimeManager
 
 
 
@@ -65,7 +66,7 @@ class AsyncJob(Process):
 class ElbowJob(Process):
     def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, earlyTermination=None, resultsMinFreq=None, **kwargs):
         super().__init__(**kwargs)
-        self.id = f"ElbowJob:{dataset}:{min_n_clusters}:{max_n_clusters}:{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}:{client}"
+        self.id = f"ElbowJob:{dataset}-k[{min_n_clusters}:{max_n_clusters}]-s{random_state}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}-{client}"
         self.client = client
        
         self.type = type
@@ -74,12 +75,14 @@ class ElbowJob(Process):
         self.min_n_clusters = min_n_clusters
         self.max_n_clusters = max_n_clusters
         self.k_values = list(range(self.min_n_clusters, self.max_n_clusters+1))
-        self.random_state_arr = check_random_state(random_state).randint(np.iinfo(np.int32).max, size=len(self.k_values))
+        self.random_state = random_state #elbow random state
+        self.random_state_arr = check_random_state(random_state).randint(np.iinfo(np.int32).max, size=len(self.k_values)) # pec random state
         self.earlyTermination = earlyTermination
         self.partialResultsQueue = partialResultsQueue
         self.data = Dataset(self.dataset).data()
         self.resultsMinFreq = resultsMinFreq
 
+        self.timeManager = None
         self.currentPec = None
         self.isLastK = False
     
@@ -117,17 +120,26 @@ class ElbowJob(Process):
         
         Log.print(toPrint)
 
-                
-
         if (self.earlyTermination == "fast" and pr.metrics.earlyTermination.fast) or  (self.earlyTermination == "slow" and pr.metrics.earlyTermination.slow) or pr.info.is_last:
             inertia = pr.metrics.labelsMetrics["inertia"]
-            labels = pr.labels
-            result = Bunch(jobId=self.id, k=k, inertia=inertia, isLast=self.isLastK, labels=labels)
+            simplifiedSilhouette = pr.metrics.labelsMetrics["simplifiedSilhouette"]
+            #labels = pr.labels
+            result = Bunch(
+                jobId=self.id,
+                timestamp=self.timeManager.timestamp(2),
+                k=k,
+                elbowSeed=self.random_state,
+                seed=self.currentPec.random_state,
+                inertia=inertia, 
+                simplifiedSilhouette=simplifiedSilhouette,
+                isLast=self.isLastK
+                #labels=labels
+            )
             self.partialResultsQueue.put(Bunch(jobType="ElbowJob", client=self.client, jobId=self.id, pr=result))
             if not pr.info.is_last: self.currentPec.stop()
         
-        
     def run(self):
+        self.timeManager = TimeManager()
         for i,k in enumerate(self.k_values):
             self.isLastK = (k == self.k_values[-1])
             self.currentPec = self.instantiatePec(k, self.random_state_arr[i], self.partialResultCallback)
