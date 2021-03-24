@@ -674,6 +674,90 @@ system.linechart = (function() {
                     .remove()
                 )
             )  
+
+        let format7 = d3.format(".7f");
+
+        let circle1 = that.div.select("g.gLineChart")
+            .selectAll('circle.circle1')
+            .data(that.data)
+            .join(
+                enter => enter
+                    .append('circle')
+                    .attr('class', 'circle1')
+                    .style("fill", d=> { return d3.interpolateGreens(0.75)})
+                    .attr("r", 2)
+                    .attr("cx", d => that.xScale(d.iteration))
+                    .attr("cy", d => that.yScale1(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1])))
+                    .attr("data-tippy-content", d => "" +that.labelYAxis1+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1])),
+                update => update
+                .call(update => update
+                    .transition()
+                    .duration(0)
+                    //.style("stroke", 'red')
+                ),
+                exit => exit
+                .call(exit => exit
+                    .transition()
+                    .duration(0)
+                    .remove()
+                )
+            )  
+        tippy(circle1.nodes(),{delay: 300});
+
+        let circle2 = that.div.select("g.gLineChart")
+            .selectAll('circle.circle2')
+            .data(that.data)
+            .join(
+                enter => enter
+                    .append('circle')
+                    .attr('class', 'circle2')
+                    .style("fill", d => { return d3.interpolateReds(0.75)})
+                    .attr("r", 2)
+                    .attr("cx", d => that.xScale(d.iteration))
+                    .attr("cy", d => that.yScale2(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]))
+                    .attr("data-tippy-content", d => "" +that.labelYAxis2+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2])),
+                update => update
+                .call(update => update
+                    .transition()
+                    .duration(0)
+                    //.style("stroke", 'red')
+                ),
+                exit => exit
+                .call(exit => exit
+                    .transition()
+                    .duration(0)
+                    .remove()
+                )
+            )  
+        tippy(circle2.nodes(),{delay: 300});
+
+        let circle3 = that.div.select("g.gLineChart")
+            .selectAll('circle.circle3')
+            .data(that.data)
+            .join(
+                enter => enter
+                    .append('circle')
+                    .attr('class', 'circle3')
+                    .style("fill", 'steelblue')
+                    .attr("r", 2)
+                    .attr("cx", d => that.xScale(d.iteration))
+                    .attr("cy", d => that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3])))
+                    .attr("data-tippy-content", d => "" +that.labelYAxis3+": "+ format7(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]))),
+                update => update
+                .call(update => update
+                    .transition()
+                    .duration(0)
+                    //.style("stroke", 'red')
+                ),
+                exit => exit
+                .call(exit => exit
+                    .transition()
+                    .duration(0)
+                    .remove()
+                )
+            )  
+        tippy(circle3.nodes(),{delay: 300});
+        
     }
 
     let clearPartition = () => {
