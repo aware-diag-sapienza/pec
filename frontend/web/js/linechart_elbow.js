@@ -136,6 +136,34 @@ system.linechartElbow = (function() {
                     .remove()
                 )
             )  
+
+        let format7 = d3.format(".7f");
+        let circleElbow = that.div.select("g.gLineChart")
+            .selectAll('circle.circleElbow')
+            .data(that.data)
+            .join(
+                enter => enter
+                    .append('circle')
+                    .attr('class', 'circleElbow')
+                    .style("fill", 'steelblue')
+                    .attr("r", 2)
+                    .attr("cx", d => that.xScale(d.k))
+                    .attr("cy", d => that.yScale(d.value))
+                    .attr("data-tippy-content", d => "Inertia: " + format7(d.value)),
+                update => update
+                .call(update => update
+                    .transition()
+                    .duration(0)
+                    //.style("stroke", 'red')
+                ),
+                exit => exit
+                .call(exit => exit
+                    .transition()
+                    .duration(0)
+                    .remove()
+                )
+            )  
+        tippy(circleElbow.nodes(),{delay: 300});
     }
 
     return this;

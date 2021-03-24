@@ -157,8 +157,10 @@ function changeElbowLinechart(){
     elbowLinechart = cbox.checked
     if(elbowLinechart){
         d3.selectAll('.elbowParameter').style('display','block')
+        if(linechart_Elbow1 !== undefined) linechart_Elbow1.render()
     }else{
         d3.selectAll('.elbowParameter').style('display','none')
+        if(linechart1 !== undefined) linechart1.render()
     }
     
 }
