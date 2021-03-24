@@ -178,9 +178,8 @@ this.updateScatterplotFromTimeline = (iteration, partition)=> {
 this.updateScatterplotEarlyTermination= (labels,final_ars,iteration_ET)=> {
   if ( this.early_termination === null){
     this.LABEL_EARLY_TERMINATION = labels;
-    d3.select('#information-info').html("Early Termination Fast - " + iteration_ET + '   <b>ARI<b/>: ' + final_ars.toFixed(4)) // devo aggiornare qui 
+    d3.select('#information-info').html("Early Termination Fast - Iteration " + iteration_ET + '   <b>ARI<b/>: ' + final_ars.toFixed(4)) // devo aggiornare qui 
     system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,this.LABEL_EARLY_TERMINATION);//useScale,useColor, scaleX,ScaleY
-
   this.early_termination = true;
   }
 }
