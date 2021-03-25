@@ -66,7 +66,7 @@ class AsyncJob(Process):
 class ElbowJob(Process):
     def __init__(self, type, dataset, min_n_clusters, max_n_clusters, n_runs, random_state, partialResultsQueue, client=None, earlyTermination=None, resultsMinFreq=None, **kwargs):
         super().__init__(**kwargs)
-        self.id = f"ElbowJob:{dataset}-k[{min_n_clusters}:{max_n_clusters}]-s{random_state}-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}-{client}"
+        self.id = f"ElbowJob:{dataset}-k[{min_n_clusters}:{max_n_clusters}]-r{n_runs}-s{random_state}-t{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}-c{client}--et[{earlyTermination}]"
         self.client = client
        
         self.type = type
