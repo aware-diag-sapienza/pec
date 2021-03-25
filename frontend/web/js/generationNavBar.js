@@ -585,15 +585,11 @@ function addPinHistory() {
                 uploadPreviousData(d,JOBS[d.tentative])
             })
             .on("mouseover", function(event,i) {
-
                 console.log(event)
-                
-
                 let div = d3.select('#history-tooltip')
-
                 div.transition()		
                     .duration(200)		
-                    .style("opacity", .9);		
+                    .style("opacity", 1);		
                 div.html( "Seed "+ previous_computations[i.tentative].seed+"<br/> Simplified Silhouette "+ previous_computations[i.tentative].simplifiedSilhouette.toFixed(4))	
                     .style("left", (event.clientX) + "px")		
                     .style("top", (event.clientY - 28) + "px");	

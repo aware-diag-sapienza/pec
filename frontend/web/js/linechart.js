@@ -688,7 +688,24 @@ system.linechart = (function() {
                     .attr("r", 2)
                     .attr("cx", d => that.xScale(d.iteration))
                     .attr("cy", d => that.yScale1(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1])))
-                    .attr("data-tippy-content", d => "" +that.labelYAxis1+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1])),
+                    //.attr("data-tippy-content", d => "" +that.labelYAxis1+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1])),
+                    .on("mouseover", function(event,d) {
+
+                        console.log(event)
+                        let div = d3.select('#history-tooltip')
+                        div.transition()		
+                            .duration(200)		
+                            .style("opacity", 1);		
+                        div.html( "" +that.labelYAxis1+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]))
+                            .style("left", (event.clientX) + "px")		
+                            .style("top", (event.clientY - 28) + "px");	
+                        })					
+                    .on("mouseout", function(d,i) {	
+                        let div = d3.select('#history-tooltip')	
+                        div.transition()		
+                            .duration(500)		
+                            .style("opacity", 0);	
+                    }),
                 update => update
                 .call(update => update
                     .transition()
@@ -702,7 +719,7 @@ system.linechart = (function() {
                     .remove()
                 )
             )  
-        tippy(circle1.nodes(),{delay: 300});
+        //tippy(circle1.nodes(),{delay: 300});
 
         let circle2 = that.div.select("g.gLineChart")
             .selectAll('circle.circle2')
@@ -715,7 +732,23 @@ system.linechart = (function() {
                     .attr("r", 2)
                     .attr("cx", d => that.xScale(d.iteration))
                     .attr("cy", d => that.yScale2(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]))
-                    .attr("data-tippy-content", d => "" +that.labelYAxis2+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2])),
+                    //.attr("data-tippy-content", d => "" +that.labelYAxis2+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2])),
+                    .on("mouseover", function(event,d) {
+                        console.log(event)
+                        let div = d3.select('#history-tooltip')
+                        div.transition()		
+                            .duration(200)		
+                            .style("opacity", 1);		
+                        div.html( "" +that.labelYAxis2+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]))
+                            .style("left", (event.clientX) + "px")		
+                            .style("top", (event.clientY - 28) + "px");	
+                        })					
+                    .on("mouseout", function(d,i) {	
+                        let div = d3.select('#history-tooltip')	
+                        div.transition()		
+                            .duration(500)		
+                            .style("opacity", 0);	
+                    }),
                 update => update
                 .call(update => update
                     .transition()
@@ -729,7 +762,7 @@ system.linechart = (function() {
                     .remove()
                 )
             )  
-        tippy(circle2.nodes(),{delay: 300});
+        //tippy(circle2.nodes(),{delay: 300});
 
         let circle3 = that.div.select("g.gLineChart")
             .selectAll('circle.circle3')
@@ -742,8 +775,24 @@ system.linechart = (function() {
                     .attr("r", 2)
                     .attr("cx", d => that.xScale(d.iteration))
                     .attr("cy", d => that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3])))
-                    .attr("data-tippy-content", d => "" +that.labelYAxis3+": "+ format7(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]))),
-                update => update
+                    //.attr("data-tippy-content", d => "" +that.labelYAxis3+": "+ format7(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]))),
+                    .on("mouseover", function(event,d) {
+                        console.log(event)
+                        let div = d3.select('#history-tooltip')
+                        div.transition()		
+                            .duration(200)		
+                            .style("opacity", 1);		
+                        div.html( "" +that.labelYAxis3+": "+ format7(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3])))
+                            .style("left", (event.clientX) + "px")		
+                            .style("top", (event.clientY - 28) + "px");	
+                        })					
+                    .on("mouseout", function(d,i) {	
+                        let div = d3.select('#history-tooltip')	
+                        div.transition()		
+                            .duration(500)		
+                            .style("opacity", 0);	
+                    }),
+                    update => update
                 .call(update => update
                     .transition()
                     .duration(0)
@@ -756,7 +805,7 @@ system.linechart = (function() {
                     .remove()
                 )
             )  
-        tippy(circle3.nodes(),{delay: 300});
+        //tippy(circle3.nodes(),{delay: 300});
         
     }
 

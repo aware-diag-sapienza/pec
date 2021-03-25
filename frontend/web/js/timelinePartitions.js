@@ -639,7 +639,24 @@ system.timelinepartitions = (function() {
                         let partition_selected = +(data_rect[2].replace('P',''))
                         system.scatterplot.updateScatterplotFromTimeline(iteration_clicked,partition_selected);
                     })
-                    .attr("data-tippy-content", d => "" + d.slice(",")[1] +" iteration #" + d.slice(",")[0] + " "+ that.metric_value  + " "+ d.slice(",")[2] )//+ " at iteration " + d.slice(",")[0] + "\n" + that.metric_value + " ", d.slice(",")[2].toFixed(4)+"")
+                    .on("mouseover", function(event,i) {
+
+                        console.log(event)
+                        let div = d3.select('#history-tooltip')
+                        div.transition()		
+                            .duration(200)		
+                            .style("opacity", 1);		
+                        div.html( ""+ i[1]+" at iteration #" + i[1] + "<br/> "+ that.metric_value + " "+ i[2].toFixed(4))	
+                            .style("left", (event.clientX) + "px")		
+                            .style("top", (event.clientY - 28) + "px");	
+                        })					
+                    .on("mouseout", function(d,i) {	
+                        let div = d3.select('#history-tooltip')	
+                        div.transition()		
+                            .duration(500)		
+                            .style("opacity", 0);	
+                    })
+                    //.attr("data-tippy-content", d => "" + d.slice(",")[1] +" iteration #" + d.slice(",")[0] + " "+ that.metric_value  + " "+ d.slice(",")[2] )//+ " at iteration " + d.slice(",")[0] + "\n" + that.metric_value + " ", d.slice(",")[2].toFixed(4)+"")
                   ,
                 update => update
                 .attr('stroke',(d)=> {
@@ -668,7 +685,7 @@ system.timelinepartitions = (function() {
                     )
                 )
 
-                tippy(rect_timeline.nodes(),{delay: 300});
+                //tippy(rect_timeline.nodes(),{delay: 300});
 
                 that.div.select("g.gTimeLine")
                 .append('text')
