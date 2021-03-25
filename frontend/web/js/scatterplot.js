@@ -218,10 +218,18 @@ function scaleOpacityStability(metrica,cluster,stability){
 
 function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
   
+  if (stability != 0){
+    d3.select('#number-stable').html('('+(stability.filter(d=>  d>0.8)).length + ')')
+    d3.select('#number-midstable').html('('+(stability.filter(d=> d > 0.20 && d <= 0.80)).length + ')')
+    d3.select('#number-unstable').html('('+stability.filter(d=>  d <= 0.20).length + ')')
+  }
   // first time create the points
   const kWidth = stage.width();
   const kHeight = stage.height();
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
+
+  // UPDATE NUMBER OF STABLE POINTS
+  
   
   if (nodes.length === 0) {
     setupTooltip()

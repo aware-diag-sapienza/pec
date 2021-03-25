@@ -117,11 +117,9 @@
       <div class="item-history" id="listhistory"></div>
       <div class="item-information-scatterplot-1" id="info-scatterplot-1">
         <div class="item-menu-scatterplot" id="info-menu-scatterplot">
-        <label class="select-label">Projection: </label>
         <div class="select-menu">
           <select class="form-select form-select-sm" id="select-projection" onchange="updateProjection()"></select>
         </div>
-        Vis: 
         <input type="radio" id="cluster" name="plot-scatterplot" value="cluster" onclick="system.scatterplot.updateScatterplot();" checked>
         <label for="cluster">cluster</label>
         <input type="radio" id="stability" name="plot-scatterplot" value="stability" onclick="system.scatterplot.updateScatterplot();" checked>
@@ -131,14 +129,17 @@
       <label class="container stable">STABLE
         <input type="checkbox" id="stable-check" onclick="system.scatterplot.updateScatterplot();" checked="checked">
         <span class="checkmark"></span>
+        <text id ='number-stable'>(0)</text>
       </label>
       <label class="container-mid-stable">MID-STABLE
         <input type="checkbox" id="midstable-check" onclick="system.scatterplot.updateScatterplot();" checked="checked">
         <span class="checkmark-mid-stable"></span>
+        <text id ='number-midstable'>(0)</text>
       </label>
       <label class="container-unstable">UNSTABLE
         <input type="checkbox" id="unstable-check" onclick="system.scatterplot.updateScatterplot();" checked="checked">
         <span class="checkmark-unstable"></span>
+        <text id ='number-unstable'>(0)</text>
       </label>
 </div>
   <div class="item-metrics" id ="id-metrics">
