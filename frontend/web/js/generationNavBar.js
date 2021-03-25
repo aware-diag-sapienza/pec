@@ -164,7 +164,7 @@ function changeElbowLinechart(){
     }
     
 }
-
+let elbowJob = null
 async function startElbow(){
     LockUI.lock()
         
@@ -180,10 +180,10 @@ async function startElbow(){
     const earlyTermination = etElbow //null, "fast", "slow"
       
     if (dname != null && type != null && kMin != null && kMax != null && r != null && kMin<kMax){
-        const job = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
+        elbowJob = await SERVER.createElbowJob (dname, type, kMin, kMax, r, seed, earlyTermination)
 
         linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia', kMin, kMax)
-        job.onPartialResult(result => {
+        elbowJob.onPartialResult(result => {
             if(result.k == 2){
                 LockUI.unlock()
             }
@@ -191,7 +191,7 @@ async function startElbow(){
             linechart_Elbow1.setData(elbowData)
             linechart_Elbow1.render()
         })
-        job.start()
+        elbowJob.start()
     } else {
         alert("Select Dataset, technique, k range, partitions and early termination")
         LockUI.unlock()

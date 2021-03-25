@@ -212,7 +212,7 @@ class AsyncJob {
     this.type = type
     this.__req = req
     this.__ws = ws
-    this.__onPartialResultCallback = (res) => {}
+    this.__onPartialResultCallback = (res, job) => {}
     
     this.status = null // running, paused, stopped, completed
     this.results = []
@@ -220,7 +220,7 @@ class AsyncJob {
 
   __addPartialResult (pr) {
     this.results.push(pr)
-    this.__onPartialResultCallback(pr)
+    this.__onPartialResultCallback(pr, this)
     
     
   }
@@ -285,7 +285,8 @@ class AsyncJob {
  *
  */
 class PECPartialResult {
-  constructor (data) {
+  constructor (data, job) {
+    this.job = job
     this.jobId = data.job_id
     this.iteration = data.info.iteration
     this.timestamp = data.info.timestamp
@@ -307,11 +308,16 @@ class PECPartialResult {
  *
  */
  class ElbowPartialResult {
-  constructor (data) {
+  constructor (data, job) {
+    this.job = job
     this.jobId = data.jobId
+    this.timestamp = data.timestamp
     this.k = data.k
+    this.seed = data.seed
+    this.elbowSeed = data.elbowSeed
     this.inertia = data.inertia
-    this.labels = data.labels
+    this.simplifiedSilhouette = data.simplifiedSilhouette
+    //this.labels = data.labels
     this.isLast = data.isLast
   }
 }
