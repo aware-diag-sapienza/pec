@@ -165,6 +165,19 @@ function changeElbowLinechart(){
     
 }
 let elbowJob = null
+let normalJob = null
+
+
+function stopSelects(){
+    if(elbowJob !== null) {
+        if(elbowJob.status !== 'stopped') elbowJob.stop()
+    } 
+
+    if(normalJob !== null) {
+        if(normalJob.status !== 'stopped') normalJob.stop()
+    } 
+}
+
 async function startElbow(){
     LockUI.lock()
         
@@ -241,10 +254,10 @@ async function startSelects(){
         elbowLinechart = document.getElementById('elbowLinechartCheck').checked
 
         
-        const job = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
-        JOBS.push(job)
+        normalJob = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
+        JOBS.push(normalJob)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
-        job.onPartialResult(result => {
+        normalJob.onPartialResult(result => {
             ALL_DATA.push(result)
             CURRENT_ITERATION = result.iteration
             if(result.iteration == 0){
@@ -254,7 +267,7 @@ async function startSelects(){
             readResult(result)
             d3.select('#iteration-label').html("Iteration " + result.iteration)
         })
-        job.start()
+        normalJob.start()
         addPinHistory()
     } else {
         alert("Select Dataset, technique e clusters to perform the query")
