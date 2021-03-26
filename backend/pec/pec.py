@@ -3,18 +3,17 @@ import time
 import signal
 import traceback
 import numpy as np
-from numpy.core.numeric import full, full_like
 import pandas as pd
 import h5py
 import uuid
 from pathlib import Path
 from multiprocessing import SimpleQueue, Lock
-from sklearn import metrics
+
 from sklearn.utils import Bunch, check_random_state
 
 from .utils import SharedArray, TimeManager, best_labels_dtype, ProgressiveResultMetrics
 from .clustering import ProgressiveKMeansRun, InertiaBased_ProgressiveKMeansRun
-from .decision import InertiaBased_ProgressiveDecisionWorker, HGPA_ProgressiveDecisionWorker, MCLA_ProgressiveDecisionWorker
+from .decision import InertiaBased_ProgressiveDecisionWorker#, HGPA_ProgressiveDecisionWorker, MCLA_ProgressiveDecisionWorker
 from .metrics import ClusteringMetrics
 
 
@@ -104,18 +103,26 @@ class ProgressiveEnsembleClustering:
         )
     
     def __new_HGPA_ProgressiveDecisionWorker(self):
+        pass
+        ## uncomment if using mcla-hgpa
+        '''
         return HGPA_ProgressiveDecisionWorker(
             self.__data_sh_obj, self.__partitions_sh_obj, self.n_clusters, self.__partial_results_queue, 
             self.__clustering_runs_results_queue_arr, self.__clustering_runs_ack_queue_arr, self.__clustering_runs_lock_arr,
             start_time=self.__start_time, verbose=self.verbose
         )
+        '''
 
     def __new_MCLA_ProgressiveDecisionWorker(self):
+        pass
+        ## uncomment if using mcla-hgpa
+        '''
         return MCLA_ProgressiveDecisionWorker(
             self.__data_sh_obj, self.__partitions_sh_obj, self.n_clusters, self.__partial_results_queue, 
             self.__clustering_runs_results_queue_arr, self.__clustering_runs_ack_queue_arr, self.__clustering_runs_lock_arr,
             start_time=self.__start_time, verbose=self.verbose
         )
+        '''
     
     def __new_arr_InertiaBased_ProgressiveKMeansRun(self, alg, **kwargs):
         arr = []
