@@ -128,8 +128,9 @@ class PECServer:
             return
         currentTime = time.time()
         delay = max( 0 , minFreq - (currentTime - lastTime) )
-        #print(f"delay", delay, minFreq)
-        time.sleep(delay)
+        if delay > 0:
+            Log.print(f"Sleeping {delay} sec")
+            time.sleep(delay)
         self.jobsLastPartialResultTimestamp[jobId] = time.time()
 
 
