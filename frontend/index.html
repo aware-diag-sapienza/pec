@@ -325,7 +325,7 @@
 <script src="./web/js/main.js"></script>
 <script src="./PECServer.js"></script>
 <script src="./web/js/LockUI.js"></script>
-
+<script src="./config.js"></script>
 
 
 <script>
@@ -341,7 +341,7 @@
     async function test(){
       LockUI.lock()
       console.log('inizio a connettermi')
-      SERVER = await PECServer('ws://localhost:6789')
+      SERVER = await PECServer(CONFIG.serverAddress)
       LIST = await SERVER.getDatasetsInfo();
       console.log(LIST)
       updateSelects(LIST);
