@@ -93,15 +93,24 @@
             <option value="10">gs-w10</option>
           </select>
         </div>-->
-        <label class="select-label">Stability Window: </label>
+        <label class="select-label"><b>STABILITY WINDOW</b>: </label>
         <div class="select-menu">
-          <select class="form-select form-select-sm" id="select-window" onchange="changeStabilityWindow()">
+          <select class="form-select form-select-sm" id="select-window-stability" onchange="changeStabilityWindow()">
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
             <option value="5">5</option>
             <option value="10">10</option>
-            <option value="all">all</option>
+            <option value="all" checked >all</option>
+          </select>
+        </div>
+        <label class="select-label"><b>QUALITY</b>:</label>
+        <div class="select-menu">
+          <select class="form-select form-select-sm" id="select-quality" onchange="changeQuality()">
+            <option value="calinskyHarabasz">Calinsky Harabasz</option>
+            <option value="dbIndex" checked>DB Index</option>
+            <option value="dunnIndex">Dunn Index</option>
+            <option value="simplifiedSilhouette">Simplified Silhouette</option>
           </select>
         </div>
         <div class="form-check">

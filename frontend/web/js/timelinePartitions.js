@@ -613,7 +613,8 @@ system.timelinepartitions = (function() {
                         })
                     .attr('visibility', (d)=> {
                         let current_i = parseInt(d[1].replace('P',''))
-                        if (d[0]>that.ITERATION_LAST[current_i]|| that.partitions_status[current_i][0]<=d[0]) //if(that.partitions_status[current_i][0]<d[0])
+                        console.log()
+                        if (d[0]>that.ITERATION_LAST[current_i]|| that.partitions_status[current_i][0]<d[0]) //if(that.partitions_status[current_i][0]<d[0])
                             return 'hidden';
                         else
                             return 'visible';

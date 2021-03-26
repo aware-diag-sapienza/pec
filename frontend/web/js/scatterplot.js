@@ -153,6 +153,8 @@ this.updateScatterplot = ()=> {
   let labels;
   let stability;
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
+  stability_window = $('#select-window-stability').val()
+  console.log('stability_window',stability_window)
 
   if (PLOT_SCATTERPLOT === 'cluster'){
     labels = ALL_DATA[CURRENT_ITERATION]['labels']

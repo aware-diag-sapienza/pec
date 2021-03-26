@@ -18,6 +18,9 @@ const SCALE_SILOUHETTE =  d3.scaleLinear().domain([0,1]).range([0, 1])
 const LIMIT_IT = 100;
 let CURRENT_HISTORY = 0;
 
+let variableYAxisLinechart;
+let qualityYAxisLinechart; 
+
 
 
 let visualizeMetrics = false;
@@ -30,7 +33,8 @@ function onChangeInputParameter(){
     d3.select('#iteration-label').html('');
 }
 
-let variableYAxisLinechart = "2"
+console.log('------',$('#select-window-stability').val(),$('#select-quality').val())
+
 /* VECCHIO SELECT SOPRA LINECHART
 $('#select-variableYAxis-linechart').val(variableYAxisLinechart);
 function onChangeVariableYAxisLinechart(){
@@ -41,9 +45,12 @@ let relatiYAxisLineCharts = document.getElementById('realtiveYScaleLinechart').c
 
 function changeRelativeYScale(){
     let cbox = document.getElementById('realtiveYScaleLinechart');
+    console.log('cbox',cbox)
     relatiYAxisLineCharts = cbox.checked
     linechart1.updateYAxisVariable()
 }
+
+
 
 let linechart_Elbow1;
 document.getElementById('elbowLinechartCheck').checked = false
@@ -225,7 +232,10 @@ async function startSelects(){
     d3.select('#iteration-label').html('');
     d3.select('#id-metrics').style('display','none');
 
-    stability_window = $('#select-window').val()
+    variableYAxisLinechart = $('#select-window-stability').val()
+    qualityYAxisLinechart = $('#select-quality').val()
+    stability_window = $('#select-window-stability').val()
+    console.log('cazzoooo',stability_window , $('#select-window-stability').val())
     similarity_metric_matrix= $('#select-similarity-matrix').val()
     average_similarity_metric_matrix = 'averageA'+similarity_metric_matrix.substring(1)
     
@@ -701,9 +711,14 @@ function updateEarlyTermination(){
 }
 
 function changeStabilityWindow(){
-    stability_window = $('#select-window').val()
+    stability_window = $('#select-window-stability').val()
     system.scatterplot.updateScatterplot();
     variableYAxisLinechart = stability_window
+    linechart1.updateYAxisVariable()
+}
+
+function changeQuality(){
+    qualityYAxisLinechart = $('#select-quality').val()
     linechart1.updateYAxisVariable()
 }
 

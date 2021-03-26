@@ -145,6 +145,8 @@ system.linechart = (function() {
     }
 
     this.computeYAxisVariable = () => {
+
+
         switch(this.technique) {
             case 'I-PecK':
                 this.attributeYAxisFirstLevel1 = "labelsMetrics"
@@ -181,13 +183,23 @@ system.linechart = (function() {
         }
 
         this.attributeYAxisFirstLevel2 = "labelsMetrics"
-        this.attributeYAxisSecondLevel2 = "simplifiedSilhouette"
-        this.labelYAxis2 = "Quality: sim.Silhouette"
+        this.attributeYAxisSecondLevel2 = $("#select-quality").val()
+        //this.labelYAxis2 = "Quality: sim.Silhouette"
+
+        if(qualityYAxisLinechart == "calinskyHarabasz"){
+            this.labelYAxis2 = "Quality: Calinsky H."
+        }else if(qualityYAxisLinechart == "dbIndex"){
+            this.labelYAxis2 = "Quality: DB Index"
+        }else if(qualityYAxisLinechart == "dunnIndex"){
+            this.labelYAxis2 = "Quality: Dunn Index"
+        }else if(qualityYAxisLinechart == "simplifiedSilhouette"){
+            this.labelYAxis2 = "Quality: sim. Silhouette"
+        }
+
 
         this.attributeYAxisFirstLevel3 = "progressiveMetrics"
         this.attributeYAxisSecondLevel3 = "globalStability"
-        this.attributeYAxisThirdLevel3 = variableYAxisLinechart
-            
+        this.attributeYAxisThirdLevel3 = $("#select-window-stability").val()
         if(variableYAxisLinechart == "2"){
             this.labelYAxis3 = "Global stability: w2"
         }else if(variableYAxisLinechart == "3"){
@@ -278,37 +290,60 @@ system.linechart = (function() {
         .append("g")
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
             .attr("class", "gLineChart")
-              
+        console.log('relatiYAxisLineCharts',relatiYAxisLineCharts)
         // Add Y axis
         if(relatiYAxisLineCharts){
+
             this.yScale1 = d3.scaleLinear()
                 .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); }))
                 .range([ this.heightSingleLinechart, 0 ]);
-            let minMaxSilouhette = d3.extent(this.data, function(d) { return d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]; })
+            let minMaxSilouhette;//= d3.extent(this.data, function(d) { return d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]; })
             let minSilouhetteScale;
             let maxSilouhetteScale;
-            if(Math.abs(minMaxSilouhette[0]) > Math.abs(minMaxSilouhette[1])) {
-                minSilouhetteScale = - Math.abs(minMaxSilouhette[0])
-                maxSilouhetteScale = Math.abs(minMaxSilouhette[0])
-            }else{
-                minSilouhetteScale = - Math.abs(minMaxSilouhette[1])
-                maxSilouhetteScale = Math.abs(minMaxSilouhette[1])
+            if (this.attributeYAxisSecondLevel2  === 'simplifiedSilhouette'){
+                // quando ho la simplified silhouette il dominio deve essere [-val,val]
+                minMaxSilouhette = d3.extent(this.data, function(d) { return d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]; })
+                if(Math.abs(minMaxSilouhette[0]) > Math.abs(minMaxSilouhette[1])) {
+                    minSilouhetteScale = - Math.abs(minMaxSilouhette[0])
+                    maxSilouhetteScale = Math.abs(minMaxSilouhette[0])
+                }else{
+                    minSilouhetteScale = - Math.abs(minMaxSilouhette[1])
+                    maxSilouhetteScale = Math.abs(minMaxSilouhette[1])
+                }
+                this.yScale2 = d3.scaleLinear()
+                    .domain([minSilouhetteScale, maxSilouhetteScale])
+                    .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+                
+            } else { // le altre metriche possono avere il min-max dei valori raccolti. 
+                 this.yScale2 = d3.scaleLinear()
+                    .domain( d3.extent(this.data, function(d) { return d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]; }))
+                    .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);            
             }
-            this.yScale2 = d3.scaleLinear()
-                .domain([minSilouhetteScale, maxSilouhetteScale])
-                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
             this.yScale3 = d3.scaleLinear()
-                .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]); }))
-                .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
-            
+                    .domain(d3.extent(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]); }))
+                    .range([ 2*this.heightSingleLinechartArea + this.heightSingleLinechart, 2 * this.heightSingleLinechartArea ]);
         }else{
             this.yScale1 = d3.scaleLinear()
                 .domain([0, d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1]); })])
                 .range([ this.heightSingleLinechart, 0 ]);
 
-            this.yScale2 = d3.scaleLinear()
-                .domain([-1, 1])
-                .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+                let max2 = d3.max(this.data, function(d) { return Math.abs(+d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]);})
+                if (qualityYAxisLinechart == "simplifiedSilhouette"){ // il dominio della simplifiedShljouette varia tra [-1,1]
+                    this.yScale2 = d3.scaleLinear()
+                    .domain([-1,1])
+                    .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+                } else { // le altre metriche hanno un altro dominio, [0,max] al massimo ho aggiunto un 10% per aumentare la visibilità
+                    if (max2 > 1){
+                        this.yScale2 = d3.scaleLinear()
+                        .domain([0,max2*1.10])
+                        .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+                    } else {
+                        this.yScale2 = d3.scaleLinear()
+                        .domain([0,1])
+                        .range([ this.heightSingleLinechartArea + this.heightSingleLinechart, this.heightSingleLinechartArea ]);
+                    
+                    }
+                }
             
             this.yScale3 = d3.scaleLinear()
                 .domain([0, 1])
@@ -335,7 +370,9 @@ system.linechart = (function() {
 
         svg.append("g")
             .attr("class", "x axisLineChart")
-            .attr("transform", "translate(0," + (this.yScale2(0))  + ")")
+            .attr("transform", () => {if (this.attributeYAxisSecondLevel2  === 'simplifiedSilhouette')
+            return"translate(0," + (this.yScale2(0))  + ")";
+            else return "translate(0," + (2*this.heightSingleLinechartArea) + ")";})
             .call(this.xAxis2);
         
         svg.append("g")
@@ -400,7 +437,7 @@ system.linechart = (function() {
                 yMin2 = that.yScale2.invert(selection[1][1])
                 
                 updateTimeBarDown('second', false)
-            }
+            }jb
         }
 
         function updateBrush3({selection}) {
