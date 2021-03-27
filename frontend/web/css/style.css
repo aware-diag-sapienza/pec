@@ -19,6 +19,10 @@ body {
 
   }
 
+  .item-navbar {
+    align-items: center;
+  }
+
   .item-information {
     display: flex;
     flex-direction: row;
@@ -83,6 +87,7 @@ body {
     display: flex;
     flex-direction: row;
     line-height: 2;
+    align-items: center;
   }
 
 
