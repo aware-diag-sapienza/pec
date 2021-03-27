@@ -14,7 +14,7 @@ def parseArgument():
 
 def startServer():
     args = parseArgument()
-    port = args["port"]
+    port = int(args["port"])
     
     server = PECServer(port)
     server.start()
