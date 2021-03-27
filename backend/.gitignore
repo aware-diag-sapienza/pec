@@ -308,10 +308,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-pec/backend/pec/datasets/custom/data/*
-pec/backend/pec/datasets/custom/projections/*
 
-!pec/backend/pec/datasets/custom/data/expandedParkinson.csv
 
 # End of https://www.toptal.com/developers/gitignore/api/osx,windows,vscode,python,pycharm
 
