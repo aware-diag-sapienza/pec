@@ -16,6 +16,8 @@ let yMax3
 let yMin3
 
 
+
+
 if (window.system == undefined) window.system = {}
 system.linechart = (function() {
     const that = this;
@@ -290,7 +292,7 @@ system.linechart = (function() {
         .append("g")
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")")
             .attr("class", "gLineChart")
-        console.log('relatiYAxisLineCharts',relatiYAxisLineCharts)
+        
         // Add Y axis
         if(relatiYAxisLineCharts){
 
@@ -728,7 +730,7 @@ system.linechart = (function() {
                     //.attr("data-tippy-content", d => "" +that.labelYAxis1+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel1][that.attributeYAxisSecondLevel1])),
                     .on("mouseover", function(event,d) {
 
-                        console.log(event)
+                        
                         let div = d3.select('#history-tooltip')
                         div.transition()		
                             .duration(200)		
@@ -771,7 +773,7 @@ system.linechart = (function() {
                     .attr("cy", d => that.yScale2(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2]))
                     //.attr("data-tippy-content", d => "" +that.labelYAxis2+": "+ format7(d['metrics'][that.attributeYAxisFirstLevel2][that.attributeYAxisSecondLevel2])),
                     .on("mouseover", function(event,d) {
-                        console.log(event)
+                        
                         let div = d3.select('#history-tooltip')
                         div.transition()		
                             .duration(200)		
@@ -814,7 +816,6 @@ system.linechart = (function() {
                     .attr("cy", d => that.yScale3(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3])))
                     //.attr("data-tippy-content", d => "" +that.labelYAxis3+": "+ format7(Math.abs(+d['metrics'][that.attributeYAxisFirstLevel3][that.attributeYAxisSecondLevel3][that.attributeYAxisThirdLevel3]))),
                     .on("mouseover", function(event,d) {
-                        console.log(event)
                         let div = d3.select('#history-tooltip')
                         div.transition()		
                             .duration(200)		

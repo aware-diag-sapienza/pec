@@ -165,7 +165,7 @@ system.linechart = (function() {
                 if(this.lastObj['metrics']['earlyTermination'][d.name]){ 
                     d["draw"] = true
                     d["iteration"] = this.lastObj.iteration
-                    console.log('ALESSIA SUSHI',obj)
+                    
                     //[X GIORGIO] MI SERVE LEGARMI A QUESTA FUNZIONE PER FOTOGRAFARE LO SCATTERPLOT O LA TABELLA
                     system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore);
                     // qiui me ne disegna 3 perchè entra 3 volte in questo ciclo. 

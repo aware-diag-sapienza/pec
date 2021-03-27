@@ -613,7 +613,7 @@ system.timelinepartitions = (function() {
                         })
                     .attr('visibility', (d)=> {
                         let current_i = parseInt(d[1].replace('P',''))
-                        console.log()
+                        
                         if (d[0]>that.ITERATION_LAST[current_i]|| that.partitions_status[current_i][0]<d[0]) //if(that.partitions_status[current_i][0]<d[0])
                             return 'hidden';
                         else
@@ -642,7 +642,7 @@ system.timelinepartitions = (function() {
                     })
                     .on("mouseover", function(event,i) {
 
-                        console.log(event)
+                        
                         let div = d3.select('#history-tooltip')
                         div.transition()		
                             .duration(200)		

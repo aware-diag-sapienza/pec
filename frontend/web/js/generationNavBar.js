@@ -14,10 +14,11 @@ let SVG_SILOUETTE;
 let previous_computations = [];
 let width_rect;
 let USED_SEED = []
-const SCALE_SILOUHETTE =  d3.scaleLinear().domain([0,1]).range([0, 1]) 
+const SCALE_METRIC_QUALITY=  d3.scaleLinear().domain([0,1]).range([0, 1])
+let MAX_QUALITY = -1
 const LIMIT_IT = 100;
 let CURRENT_HISTORY = 0;
-
+let LABEL_METRICHE = { 'calinskyHarabasz' : 'Calinsky Harabasz','dbIndex':'DB Index','dunnIndex':'Dunn Index','simplifiedSilhouette':'Simplified Silhouette'}
 let variableYAxisLinechart;
 let qualityYAxisLinechart; 
 
@@ -33,7 +34,7 @@ function onChangeInputParameter(){
     d3.select('#iteration-label').html('');
 }
 
-console.log('------',$('#select-window-stability').val(),$('#select-quality').val())
+
 
 /* VECCHIO SELECT SOPRA LINECHART
 $('#select-variableYAxis-linechart').val(variableYAxisLinechart);
@@ -45,7 +46,7 @@ let relatiYAxisLineCharts = document.getElementById('realtiveYScaleLinechart').c
 
 function changeRelativeYScale(){
     let cbox = document.getElementById('realtiveYScaleLinechart');
-    console.log('cbox',cbox)
+
     relatiYAxisLineCharts = cbox.checked
     linechart1.updateYAxisVariable()
 }
@@ -235,7 +236,6 @@ async function startSelects(){
     variableYAxisLinechart = $('#select-window-stability').val()
     qualityYAxisLinechart = $('#select-quality').val()
     stability_window = $('#select-window-stability').val()
-    console.log('cazzoooo',stability_window , $('#select-window-stability').val())
     similarity_metric_matrix= $('#select-similarity-matrix').val()
     average_similarity_metric_matrix = 'averageA'+similarity_metric_matrix.substring(1)
     
@@ -244,15 +244,19 @@ async function startSelects(){
     $('#dbC').html('--');
     $('#diC').html('--');
     $('#ineC').html('--');
+    $('#sseC').html('--');
+    
     $('#chE').html('-');
     $('#dbE').html('--');
     $('#diE').html('--');
     $('#ineE').html('--');
+    $('#sseE').html('--');
 
     $('#chP').html('-');
     $('#dbP').html('--');
     $('#diP').html('--');
     $('#ineP').html('--');
+    $('#sseP').html('--');
 
     if (dataset != null && technique != null && cluster != null){
         matrix1 = system.matrixAdjacency.init('#id-matrix-1');
@@ -294,6 +298,8 @@ function readResult(it_res){
     d3.selectAll('.linechart_select').style('display','block')
     d3.select('#button-metric').style('display','inline')
     d3.select('#id-metrics').style('display','flex')
+    let metric_quality_selected = $('#select-quality').val();
+
         if(it_res.iteration === 0){
                 timestamp0 = it_res.timestamp
                 linechart1.setData([it_res]) 
@@ -309,7 +315,7 @@ function readResult(it_res){
                 system.scatterplot.updateScatterplot();
                 system.matrixAdjacency.updateMatrix(partitions,it_res.metrics.partitionsMetrics[similarity_metric_matrix],it_res.metrics.partitionsMetrics[average_similarity_metric_matrix]); 
             }
-            updatePinHistory(it_res.iteration,it_res.isLast, it_res.metrics.labelsMetrics.simplifiedSilhouette)
+            updatePinHistory(it_res.iteration,it_res.isLast, it_res.metrics.labelsMetrics)
             system.matrixAdjacency.updateBestPartition(it_res.info.best_run)
             if (it_res.is_last){
                 ITERAZIONE_PER_MATRICE = ITERAZIONE_PER_MATRICE
@@ -390,6 +396,7 @@ function updateTable(obj){
             $('#dbE').html(arrotondaNumero(obj.metrics.labelsMetrics.dbIndex));
             $('#diE').html(arrotondaNumero(obj.metrics.labelsMetrics.dunnIndex));
             $('#ineE').html(arrotondaNumero(obj.metrics.labelsMetrics.inertia));
+            $('#sseE').html(arrotondaNumero(obj.metrics.labelsMetrics.simplifiedSilhouette));
         }
     }
 
@@ -397,17 +404,22 @@ function updateTable(obj){
     $('#dbC').html(arrotondaNumero(obj.metrics.labelsMetrics.dbIndex));
     $('#diC').html(arrotondaNumero(obj.metrics.labelsMetrics.dunnIndex));
     $('#ineC').html(arrotondaNumero(obj.metrics.labelsMetrics.inertia));
+    $('#sseC').html(arrotondaNumero(obj.metrics.labelsMetrics.simplifiedSilhouette));
+
+    
 
     if(verticalLines.filter(d => d.draw).length>0){
         let chE = Number.parseFloat($("#chE").text());
         let dbE = Number.parseFloat($("#dbE").text());
         let diE = Number.parseFloat($("#diE").text());
         let ineE = Number.parseFloat($("#ineE").text());
+        let sseE = Number.parseFloat($("#sseE").text());
         
         $('#chP').html(computeRatioPerc(obj.metrics.labelsMetrics.calinskyHarabasz, chE));
         $('#dbP').html(computeRatioPerc(obj.metrics.labelsMetrics.dbIndex, dbE));
         $('#diP').html(computeRatioPerc(obj.metrics.labelsMetrics.dunnIndex, diE));
         $('#ineP').html(computeRatioPerc(obj.metrics.labelsMetrics.inertia, ineE));
+        $('#sseP').html(computeRatioPerc(obj.metrics.labelsMetrics.simplifiedSilhouette, sseE));
     }
 }
 
@@ -419,7 +431,23 @@ function computeRatioPerc(final,initial){
     return Math.abs(Number.parseFloat( (1 - Number.parseFloat(initial).toFixed(4)/Number.parseFloat(final).toFixed(4)) * 100 ).toFixed(4))
 }
 
-    function colorPin(){
+    function colorPin(tentative){
+
+        
+
+        if (previous_computations[tentative]['partitions']<=6){
+            return '#afeeee' // azzurro
+        } 
+        if (previous_computations[tentative]['partitions']<=12 && previous_computations[tentative]['partitions']>6 ){
+            return '#f1ac7f'// pesca
+        } 
+        if (previous_computations[tentative]['partitions']>12){
+            return '#a6c6a5' // verde
+        } 
+        
+
+        // vecchio encoding
+        /*
         if (previous_computations.length === 1){
             // sono alla prima iterazione e restituisco il verde chiaro
             return '#a6c6a5';
@@ -435,9 +463,10 @@ function computeRatioPerc(final,initial){
                 return '#f1ac7f' // pesca
             
             return '#a6c6a5' // verde
-        }   
+        } */ 
     }
 function addPinHistory() {
+    let metric_quality_selected = $('#select-quality').val();
     // SE IL dataset selezionato non è nella struttura dati presente allora riazzero l'svg e lla struttura dati. 
     if (previous_computations.map(d=> d.dataset).indexOf(dataset)=== -1){
         d3.select("#svg-list-history").remove('*');
@@ -472,7 +501,7 @@ function addPinHistory() {
     let tentative = previous_computations.length
     CURRENT_HISTORY = tentative;
 
-    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'simplifiedSilhouette':-1, 'iteration':0, 'earlyTerminationslow':-1, 'slowInertia': -1, 'earlyTerminationfast':-1, 'fastInertia':-1})
+    previous_computations.push({'dataset':dataset, 'technique':technique, 'cluster':cluster, 'partitions':partitions, 'tentative': tentative, 'seed':seed, 'metric_quality':-1, 'iteration':0, 'earlyTerminationslow':-1, 'slowInertia': -1, 'earlyTerminationfast':-1, 'fastInertia':-1, 'calinskyHarabasz' : -1,'dbIndex':-1,'dunnIndex':-1,'simplifiedSilhouette':-1})
 
     scaleHistory = d3.scaleBand()
     
@@ -503,7 +532,7 @@ function addPinHistory() {
         .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
         .attr('width', 0)
         .attr('height', height_pin)
-        .attr('fill', colorPin())
+        .attr('fill', d=> colorPin(d.tentative))
        
 
 
@@ -575,18 +604,18 @@ function addPinHistory() {
             .attr("dy", 12)
             .attr('font-size', 'smaller')*/
     
-        SVG_HISTORY.selectAll(".bar-silouette")
+        SVG_HISTORY.selectAll(".bar-metric-quality")
             .data(previous_computations)
             .enter()
             .append('rect')
-            .attr('class','bar-silouette')
-            .attr('id',(d) => 'silouette-' + d.tentative)
+            .attr('class','bar-metric-quality')
+            .attr('id',(d) => 'metric-quality-' + d.tentative)
             .attr('x', width_history-margin_history.right)
             .attr('y', (d)=> {return (d.tentative*(height_pin+4))})
             .attr('width', 10)
             .attr('height', height_pin)
             .attr('stroke', 'black')
-            .attr('fill', (d) => d3.interpolateReds(SCALE_SILOUHETTE(d.simplifiedSilhouette)))
+            .attr('fill', (d) => d3.interpolateReds(SCALE_METRIC_QUALITY(d[metric_quality_selected])))
         
         SVG_HISTORY.selectAll(".bar-border")
             .data(previous_computations)
@@ -602,18 +631,18 @@ function addPinHistory() {
             .attr('stroke-width',1)
             .attr('fill','transparent')
             .on('click',function (element,d) {
-                console.log(d)
                 d3.selectAll('.bar-border').attr('stroke-width', '1')
                 d3.select('#border-'+d.tentative).attr('stroke-width', '2')
                 uploadPreviousData(d,JOBS[d.tentative])
             })
             .on("mouseover", function(event,i) {
-                console.log(event)
+                
                 let div = d3.select('#history-tooltip')
                 div.transition()		
                     .duration(200)		
-                    .style("opacity", 1);		
-                div.html( "Seed "+ previous_computations[i.tentative].seed+"<br/> Simplified Silhouette "+ previous_computations[i.tentative].simplifiedSilhouette.toFixed(4))	
+                    .style("opacity", 1);	
+                    
+                div.html( "Seed "+ previous_computations[i.tentative].seed+"<br/>" +LABEL_METRICHE[metric_quality_selected]+ ": "+ previous_computations[i.tentative][metric_quality_selected].toFixed(4))	
                     .style("left", (event.clientX) + "px")		
                     .style("top", (event.clientY - 28) + "px");	
                 })					
@@ -626,16 +655,32 @@ function addPinHistory() {
             
         }
 
-function updatePinHistory(iteration,isLast,valore_silouette){
+function updatePinHistory(iteration,isLast,valori_metriche){
+    let metric_quality_selected = $('#select-quality').val();
+   
+   
+
+    
     let CURRENT_HISTORY = previous_computations.length-1
-    previous_computations[CURRENT_HISTORY]['simplifiedSilhouette'] = valore_silouette
+    //'calinskyHarabasz' : -1,'dbIndex':-1,'dunnIndex':-1,'simplifiedSilhouette':-1
+    previous_computations[CURRENT_HISTORY]['calinskyHarabasz'] = valori_metriche['calinskyHarabasz']
+    previous_computations[CURRENT_HISTORY]['dbIndex'] = valori_metriche['dbIndex'] 
+    previous_computations[CURRENT_HISTORY]['dunnIndex'] = valori_metriche['dunnIndex'] 
+    previous_computations[CURRENT_HISTORY]['simplifiedSilhouette'] = valori_metriche['simplifiedSilhouette'] 
     previous_computations[CURRENT_HISTORY]['iteration'] = iteration
 
-    SVG_HISTORY.selectAll(".bar-silouette").data(previous_computations)
+    if ( valori_metriche[metric_quality_selected]>SCALE_METRIC_QUALITY.domain()[1]){
+        SCALE_METRIC_QUALITY.domain([0, valori_metriche[metric_quality_selected]])
+        d3.selectAll('.bar-metric-quality')
+        .attr('fill', (d) => d3.interpolateReds(SCALE_METRIC_QUALITY(d[metric_quality_selected])))
+        
+    }
+
+    SVG_HISTORY.selectAll(".bar-metric-quality").data(previous_computations)
     SVG_HISTORY.selectAll(".bar-history-improvement").data(previous_computations)
 
-    d3.select('#silouette-' + CURRENT_HISTORY)
-        .attr('fill', (d) => d3.interpolateReds(SCALE_SILOUHETTE(d.simplifiedSilhouette)))
+    d3.select('#metric-quality-' + CURRENT_HISTORY)
+        .attr('fill', (d) => d3.interpolateReds(SCALE_METRIC_QUALITY(d[metric_quality_selected])))
     
     if(isLast){
         d3.select('#improvement-'+(CURRENT_HISTORY))
@@ -643,12 +688,12 @@ function updatePinHistory(iteration,isLast,valore_silouette){
         let width_iteration = (width_rect*LIMIT_IT)/iteration
             // ho trovato la early termination slow 
             d3.select('#early-slow-'+CURRENT_HISTORY)
-                .attr('width',5)
-                .attr('x',width_iteration*previous_computations[CURRENT_HISTORY]['earlyTerminationslow']+5)
+                .attr('width',3)
+                .attr('x',width_iteration*previous_computations[CURRENT_HISTORY]['earlyTerminationslow']+3)
             // ho trovato la early termination fast 
             d3.select('#early-fast-'+CURRENT_HISTORY)
-                .attr('width',5)
-                .attr('x',width_iteration*previous_computations[CURRENT_HISTORY]['earlyTerminationslow'])
+                .attr('width',3)
+                .attr('x',width_iteration*previous_computations[CURRENT_HISTORY]['earlyTerminationfast'])
     } else {
         d3.select('#improvement-'+(CURRENT_HISTORY))
             .attr('width',width_rect*iteration)
@@ -656,35 +701,20 @@ function updatePinHistory(iteration,isLast,valore_silouette){
         if (previous_computations[CURRENT_HISTORY]['earlyTerminationslow'] === iteration){
             // ho trovato la early termination slow 
             d3.select('#early-slow-'+CURRENT_HISTORY)
-            .attr('width',5)
+            .attr('width',3)
             .attr('x',width_rect*iteration+5)
         }
 
         if (previous_computations[CURRENT_HISTORY]['earlyTerminationfast'] === iteration){
             // ho trovato la early termination fast 
             d3.select('#early-fast-'+CURRENT_HISTORY)
-            .attr('width',5)
+            .attr('width',3)
             .attr('x',width_rect*iteration)
         }
 
         
 
     }
-
-    let hetf = d3.selectAll(".bar-history-early-fast")
-        .data(previous_computations)
-        .attr("data-tippy-content", d => "Early Termination Fast \nat iteration " + d.earlyTerminationfast)  
-        tippy(hetf.nodes(),{delay: 300,placement: 'right', arrow:false});
-    
-    let hets = d3.selectAll(".bar-history-early-slow")
-    .data(previous_computations)
-        .attr("data-tippy-content", d => "Early Termination Slow \nat iteration " + d.earlyTerminationslow)  
-        tippy(hets.nodes(),{delay: 300,placement: 'right', arrow:false});
-    
-    let sil = d3.selectAll(".bar-silouette")
-        .data(previous_computations)
-        .attr("data-tippy-content", d => "Simplified Silouette\n " + d.simplifiedSilhouette.toFixed(4))  
-        tippy(sil.nodes(),{delay: 300,placement: 'right', arrow:false});
 
 }      
 
@@ -711,14 +741,38 @@ function updateEarlyTermination(){
 }
 
 function changeStabilityWindow(){
+    
     stability_window = $('#select-window-stability').val()
     system.scatterplot.updateScatterplot();
     variableYAxisLinechart = stability_window
+    // modifico il mouse over sulle history e ricoloro i rettangoli
+    
     linechart1.updateYAxisVariable()
 }
 
 function changeQuality(){
+    SCALE_METRIC_QUALITY.domain([0,1])
     qualityYAxisLinechart = $('#select-quality').val()
+    d3.selectAll('.bar-metric-quality')
+        .attr('fill', (d) => d3.interpolateReds(SCALE_METRIC_QUALITY(d[qualityYAxisLinechart])))
+    
+    d3.selectAll('.bar-border')
+        .on("mouseover", function(event,i) {       
+            let div = d3.select('#history-tooltip')
+            div.transition()		
+                .duration(200)		
+                .style("opacity", 1);	
+                
+            div.html( "Seed "+ previous_computations[i.tentative].seed+"<br/>" +LABEL_METRICHE[qualityYAxisLinechart]+ ": "+ previous_computations[i.tentative][qualityYAxisLinechart].toFixed(4))	
+                .style("left", (event.clientX) + "px")		
+                .style("top", (event.clientY - 28) + "px");	
+            })					
+        .on("mouseout", function(d,i) {	
+            let div = d3.select('#history-tooltip')	
+            div.transition()		
+                .duration(500)		
+                .style("opacity", 0);	
+        });
     linechart1.updateYAxisVariable()
 }
 

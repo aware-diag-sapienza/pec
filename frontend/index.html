@@ -101,16 +101,16 @@
             <option value="4">4</option>
             <option value="5">5</option>
             <option value="10">10</option>
-            <option value="all" checked >all</option>
+            <option value="all" selected >all</option>
           </select>
         </div>
         <label class="select-label"><b>QUALITY</b>:</label>
         <div class="select-menu">
           <select class="form-select form-select-sm" id="select-quality" onchange="changeQuality()">
-            <option value="calinskyHarabasz">Calinsky Harabasz</option>
-            <option value="dbIndex" checked>DB Index</option>
-            <option value="dunnIndex">Dunn Index</option>
-            <option value="simplifiedSilhouette">Simplified Silhouette</option>
+            <option value="calinskyHarabasz">Calinsky Harabasz<i class="fas fa-sort-up"></i></option>
+            <option value="dbIndex" selected>DB Index <i class="fas fa-sort-down"></i></option>
+            <option value="dunnIndex">Dunn Index <i class="fas fa-sort-up"></i></option>
+            <option value="simplifiedSilhouette">Simplified Silhouette <i class="fas fa-sort-up"></i></option>
           </select>
         </div>
         <div class="form-check">
@@ -195,6 +195,12 @@
           <td id="ineE">-</td>
           <td id="ineC">--</td>
           <td id="ineP">--</td>
+        </tr>
+        <tr>
+          <th scope="row">Sim.Silhouette</th>
+          <td id="sseE">-</td>
+          <td id="sseC">--</td>
+          <td id="sseP">--</td>
         </tr>
       </tbody>
     </table>
