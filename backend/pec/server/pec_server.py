@@ -27,22 +27,26 @@ class PECServer:
             if message.startswith("startJob:"):
                 jobId = message.replace("startJob:", "")
                 Log.print(f"{Log.GREEN}Starting {jobId}")
+                Log.save("START", self.jobs[jobId], clientAddress=self.socketServer.getClientAddress(client))
                 self.jobs[jobId].start() 
             ##
             elif message.startswith("stopJob:"):
                 jobId = message.replace("stopJob:", "")
                 Log.print(f"{Log.RED}Stopping {jobId}")
+                Log.save("STOP", self.jobs[jobId])
                 psutil.Process(pid=self.jobs[jobId].pid).terminate()
                 del self.jobs[jobId]
             ##
             elif message.startswith("pauseJob:"):
                 jobId = message.replace("pauseJob:", "")
                 Log.print(f"{Log.YELLOW}Pausing {jobId}")
+                Log.save("PAUSE", self.jobs[jobId])
                 psutil.Process(pid=self.jobs[jobId].pid).suspend()
             ##
             elif message.startswith("resumeJob:"):
                 jobId = message.replace("resumeJob:", "")
                 Log.print(f"{Log.BLUE}Resuming {jobId}")
+                Log.save("RESUME", self.jobs[jobId])
                 psutil.Process(pid=self.jobs[jobId].pid).resume()
             ##
             else:
@@ -100,9 +104,13 @@ class PECServer:
 
             if data.jobType == "AsyncJob":
                 jobId = data.pr.job_id
-                t = time.time()
-                if not data.pr.info.is_last: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {jobId}")
-                else: Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {jobId} -- {Log.RED}last{Log.ENDC}")
+                if not data.pr.info.is_last: 
+                    Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {jobId}")
+                    if data.pr.metrics.earlyTermination.fast: Log.save("ET_FAST", self.jobs[jobId], iteration=data.pr.info.iteration, clientAddress=self.socketServer.getClientAddress(data.client))
+                    if data.pr.metrics.earlyTermination.slow: Log.save("ET_SLOW", self.jobs[jobId], iteration=data.pr.info.iteration, clientAddress=self.socketServer.getClientAddress(data.client))
+                else: 
+                    Log.print(f"{Log.GRAY}Sending partial result #{data.pr.info.iteration} of {jobId} -- {Log.RED}last{Log.ENDC}")
+                    Log.save("END", self.jobs[jobId], iteration=data.pr.info.iteration, clientAddress=self.socketServer.getClientAddress(data.client))
                 
                 if jobId in self.jobs: self.resultsDelay(jobId, minFreq=self.jobs[jobId].resultsMinFreq) #dealy
                 
@@ -113,8 +121,13 @@ class PECServer:
 
             elif data.jobType == "ElbowJob":
                 jobId = data.pr.jobId
-                if not data.pr.isLast: Log.print(f"{Log.GRAY}Sending elbow partial result K={data.pr.k} of {jobId}")
-                else: Log.print(f"{Log.GRAY}Sending elbow partial result k={data.pr.k} of {jobId} -- {Log.RED}last{Log.ENDC}")
+                if not data.pr.isLast: 
+                    Log.print(f"{Log.GRAY}Sending elbow partial result K={data.pr.k} of {jobId}")
+                    Log.save("ELBOW_PR", self.jobs[jobId], clientAddress=self.socketServer.getClientAddress(data.client), elbowK=data.pr.k)
+                else: 
+                    Log.print(f"{Log.GRAY}Sending elbow partial result k={data.pr.k} of {jobId} -- {Log.RED}last{Log.ENDC}")
+                    Log.save("END", self.jobs[jobId], clientAddress=self.socketServer.getClientAddress(data.client))
+                
                 self.socketServer.sendMessage(data.client, {
                     "type": "elbow-partial-result",
                     "data": data.pr
