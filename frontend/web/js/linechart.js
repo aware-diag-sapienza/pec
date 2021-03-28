@@ -258,7 +258,7 @@ system.linechart = (function() {
                     let current_computation_index = previous_computations.length-1
                     previous_computations[current_computation_index]['earlyTermination'+ d.name] = this.lastObj.iteration
                     previous_computations[current_computation_index][d.name+'Inertia'] = this.lastObj['metrics']['labelsMetrics']['inertia']
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore,that.lastObj.iteration);
+                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore,that.lastObj.iteration,that.lastObj.metrics.progressiveMetrics.entriesStability[stability_window]);
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics[similarity_metric_matrix],obj.metrics.partitionsMetrics[average_similarity_metric_matrix]);
                 }
             }
@@ -274,7 +274,7 @@ system.linechart = (function() {
                     
                     d3.select('.item-information').style('visibility','visible');
                     
-                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore,that.lastObj.iteration);
+                    system.scatterplot.updateScatterplotEarlyTermination(obj.labels, obj.metrics.progressiveMetrics.adjustedRandScore,that.lastObj.iteration,obj.metrics.progressiveMetrics.entriesStability[stability_window]);
                     system.matrixAdjacencyFixed.updateMatrixplotEarlyTermination(partitions,obj.metrics.partitionsMetrics[similarity_metric_matrix],obj.metrics.partitionsMetrics[average_similarity_metric_matrix]);
 
                 }

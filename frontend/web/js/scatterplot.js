@@ -18,6 +18,8 @@ system.scatterplot = (function() {
   this.tensorResultComputation= {};
   this.datasetComputed = [];
   this.LABEL_EARLY_TERMINATION = [];
+  this.STABILITY_EARLY_TERMINATION = [];
+  this.scatterplot_early;
 
   let stage;
   let layer;
@@ -149,12 +151,18 @@ system.scatterplot = (function() {
       stage.batchDraw();
     });*/
   }
+
 this.updateScatterplot = ()=> {
   let labels;
   let stability;
   let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
   stability_window = $('#select-window-stability').val()
   
+ 
+  if(!this.scatterplot_early && ALL_DATA[CURRENT_ITERATION].metrics.earlyTermination.fast){
+    this.scatterplot_early = true;
+    this.STABILITY_EARLY_TERMINATION = ALL_DATA[CURRENT_ITERATION].metrics.progressiveMetrics.entriesStability[stability_window]
+  }
 
   if (PLOT_SCATTERPLOT === 'cluster'){
     labels = ALL_DATA[CURRENT_ITERATION]['labels']
@@ -168,20 +176,26 @@ this.updateScatterplot = ()=> {
 
   plotCoordsKonva(that.tot_rows,'#b3b3b3',false,labels,stability)
 
+  if (this.early_termination){
+    system.scatterplotFixed.updateScatterplot(false,true, system.scatterplot.scale_x,system.scatterplot.scale_y,system.scatterplot.LABEL_EARLY_TERMINATION,system.scatterplot.STABILITY_EARLY_TERMINATION);
+  }
+
 }
 
 this.updateScatterplotFromTimeline = (iteration, partition)=> {
-  d3.select('#information-info').html("Partition P"+partition + "at iteration "+iteration)
+  d3.select('#information-info').html("Partition P"+partition + " at iteration "+iteration)
     
-  system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,ALL_DATA[iteration]['partitions'][partition]);//useScale,useColor, scaleX,ScaleY
+  system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,ALL_DATA[iteration]['partitions'][partition], ALL_DATA[iteration].metrics.progressiveMetrics.entriesStability[stability_window]);//useScale,useColor, scaleX,ScaleY
 }
 
 
-this.updateScatterplotEarlyTermination= (labels,final_ars,iteration_ET)=> {
+this.updateScatterplotEarlyTermination= (labels,final_ars,iteration_ET,stability)=> {
   if ( this.early_termination === null){
     this.LABEL_EARLY_TERMINATION = labels;
-    d3.select('#information-info').html("Early Termination Fast - Iteration " + iteration_ET + '   <b>ARI<b/>: ' + final_ars.toFixed(4)) // devo aggiornare qui 
-    system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,this.LABEL_EARLY_TERMINATION);//useScale,useColor, scaleX,ScaleY
+    this.STABILITY_EARLY_TERMINATION = stability;
+    
+    d3.select('#information-info').html(" Early Termination Fast - Iteration #" + iteration_ET + '   <b>ARI<b/>: ' + (1-final_ars).toFixed(4)) // devo aggiornare qui 
+    system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,this.LABEL_EARLY_TERMINATION, this.STABILITY_EARLY_TERMINATION);//useScale,useColor, scaleX,ScaleY
   this.early_termination = true;
   }
 }
@@ -322,11 +336,11 @@ function plotCoordsKonvaStability(labels) {
 
       if(that.first_iteration){ 
         plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration,stability);
-        system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
+        system.scatterplotFixed.updateScatterplot(true,false, that.scale_x,that.scale_y,labelIteration,stability);//useScale,useColor, scaleX,ScaleY
         that.first_iteration = false
       } else {
         plotCoordsKonva(that.tot_rows, '#b3b3b3',true,labelIteration,stability);
-        system.scatterplotFixed.updateScatterplot(true,true, that.scale_x,that.scale_y,labelIteration);//useScale,useColor, scaleX,ScaleY
+        system.scatterplotFixed.updateScatterplot(true,true, that.scale_x,that.scale_y,labelIteration,stability);//useScale,useColor, scaleX,ScaleY
       }
       
     }
@@ -337,6 +351,7 @@ function plotCoordsKonvaStability(labels) {
       system.scatterplot.initKonva();
       system.scatterplotFixed.initKonva();
       let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
+      this.scatterplot_early = false;
 
       let stability_cluster;
       if (PLOT_SCATTERPLOT === 'cluster'){

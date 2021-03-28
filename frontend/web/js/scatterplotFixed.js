@@ -11,13 +11,10 @@ system.scatterplotFixed = (function() {
 
   this.scale_color = ['#3366cc', '#dc3912','#ff9900','#109618','#d6616b','#990099','#0099c6','#dd4477','#66aa00','#b82e2e','#17becf','#bcbd22','#9467bd','#8c564b','#e377c2','#759EF1','#FFD40B','#52DA2E','#0ED1E3','#0C292B','#697374']
 
-
   let stage;
   let layer;
   let nodes = [];
   let tooltipLayer;
-
-
 
   let tooltip;
 
@@ -137,12 +134,49 @@ function setupTooltip() {
   });*/
 }
 
-this.updateScatterplot = (useScale,useColor, scaleX,scaleY,labels)=> {
+this.updateScatterplot = (useScale,useColor, scaleX,scaleY,labels,stability)=> {
   
-  plotCoordsKonva(that.tot_rows,'colori',useScale,useColor,scaleX,scaleY,labels)
+  plotCoordsKonva(that.tot_rows,'colori',useScale,useColor,scaleX,scaleY,labels,stability)
 }
 
-function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labels) {
+
+function scaleClusterStability(usescale,metrica,cluster,stability){
+  if(!usescale){
+    return '#F0F0F0';
+  }
+  
+
+  if(metrica == 'cluster'){
+    return that.scale_color[+cluster]
+  } else {
+    if(stability <= 0.20){
+      return '#a0a0a0'
+    }
+    if(stability > 0.20 && stability <= 0.80 ){
+      return '#808080'
+    }
+    if(stability > 0.80){
+      return that.scale_color[+cluster]
+    }
+  }
+}
+
+function scaleOpacityStability(metrica,cluster,stability){
+   if(!$("#stable-check").is(':checked') && stability > 0.80){
+    return 0
+  } 
+  if(!$("#midstable-check").is(':checked') && (stability > 0.20 && stability <= 0.80 )){
+    return  0
+  }
+
+  if(!$("#unstable-check").is(':checked') && stability <= 0.20){
+    return 0
+  }
+  return 3.5 
+}
+
+function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labels,stability) {
+  let PLOT_SCATTERPLOT = $('input[name="plot-scatterplot"]:checked').val();
 
   if (useScale){
   that.scale_x = d3.scaleLinear()
@@ -157,64 +191,38 @@ function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labe
   // first time create the points
   const kWidth = stage.width();
   const kHeight = stage.height();
-  
+  let  colorlabel, opacitypoint;
 
   if (nodes.length === 0) {
     setupTooltip();
     for (let i = 0; i < numberPoints; i++) {
 
-      let  colorlabel;
-      if (useScale){
-        const xcoord = Math.round((that.scale_x(that.coordData[i][0]))) //* (kWidth - 1));
-        const ycoord = Math.round((that.scale_y(that.coordData[i][1]))) //* (kHeight - 1));
-        if(useColor){
-          colorlabel= that.scale_color[labels[i]];
-        } else {
-          colorlabel= '#F0F0F0';
-        }
-        
-        let node = new Konva.Circle({
-          x: xcoord,
-          y: ycoord,
-          radius: 3.5,
-          fill: colorlabel,// + colStr,
-          id: 'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel + '\nx: '+xcoord +
-          '\ny:' + ycoord
-        });
-        layer.add(node);
-        nodes.push(node);
-      } else {
-      const xcoord = Math.round((that.coordData[i][0]) * (kWidth - 10));
-      const ycoord = Math.round((that.coordData[i][1]) * (kHeight - 10));
-      if(useColor){
-        colorlabel= that.scale_color[labels[i]];
-      } else {
-        colorlabel= '#F0F0F0';
-      }
+      const xcoord = Math.round((that.scale_x(that.coordData[i][0]))) //* (kWidth - 1));
+      const ycoord = Math.round((that.scale_y(that.coordData[i][1]))) //* (kHeight - 1));
+      
+      colorlabel = scaleClusterStability(useColor,PLOT_SCATTERPLOT,labels[i],stability[i])
+      opacitypoint =  scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
       
       let node = new Konva.Circle({
         x: xcoord,
         y: ycoord,
-        radius: 3.5,
+        radius: opacitypoint,
         fill: colorlabel,// + colStr,
-        id: 'fixed'+i
+        id: 'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel + '\nx: '+xcoord +'\ny:' + ycoord
       });
       layer.add(node);
       nodes.push(node);
-      }
-
-      
     }
   }
   else {
     //const labels = Array.from({length: numberPoints}, () => Math.floor((Math.random()*numberPoints)%10));
     for (let i = 0; i < numberPoints; i++) {
-      //const xcoord = Math.round(that.coordData[i*2] * (kWidth - 1));
-      //const ycoord = Math.round(that.coordData[i*2 + 1] * (kHeight - 1));
-      //nodes[i].position({x: xcoord, y: ycoord});
-      const colorlabel = that.scale_color[labels[i]];
-      
-      nodes[i].attrs.fill = colorlabel
+      let cc = scaleClusterStability(useColor,PLOT_SCATTERPLOT,labels[i],stability[i])
+
+      let sc = scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
+
+      nodes[i].attrs.fill = scaleClusterStability(useColor,PLOT_SCATTERPLOT,labels[i],stability[i])
+      nodes[i].attrs.radius = scaleOpacityStability(PLOT_SCATTERPLOT,labels[i],stability[i])
       nodes[i].id =  'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel 
     }
   }

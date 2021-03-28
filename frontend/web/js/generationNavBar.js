@@ -89,13 +89,13 @@ function updateSelects(list_dataset){
     const tech = ['I-PecK','I-PecK++']//,'HGPA-PecK','HGPA-PecK++','MCLA-PecK','MCLA-PecK++']
     const clusters = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 ]
     const partition = [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ]
-    const projections = ['tsne','pca']
+    const projections = ['pca','tsne']
 
     $("#select-dataset").empty()
     $("#select-technique").empty()
     $("#select-cluster").empty()
     $("#select-partitions").empty()
-    $("#select-projection").val('tsne')
+    $("#select-projection").val('pca')
 
     const selectDataset = document.getElementById('select-dataset');
     const selectTechnique = document.getElementById('select-technique');
@@ -126,8 +126,10 @@ function updateSelects(list_dataset){
     document.getElementById("select-technique").value = ""
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
-    document.getElementById("select-projection").value = 'tsne'
+    document.getElementById("select-projection").value = 'pca'
     document.getElementById("similarity-range").value = 1
+    document.getElementById("select-window-stability").value = 3
+    document.getElementById("select-quality").value = 'simplifiedSilhouette'
     d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
 }
 
@@ -136,8 +138,10 @@ function resetSelects(){
     document.getElementById("select-technique").value = ""
     document.getElementById("select-cluster").value = ""
     document.getElementById("select-partitions").value = ""
-    document.getElementById("select-projection").value = 'tsne'
+    document.getElementById("select-projection").value = 'pca'
     document.getElementById("similarity-range").value = 1
+    document.getElementById("select-window-stability").value = 3
+    document.getElementById("select-quality").value = 'simplifiedSilhouette'
     d3.select('#selected_similarity').html($('#similarity-range').val() + '%')
 }
 function getSeed(){
@@ -269,6 +273,7 @@ async function startSelects(){
 
         
         normalJob = await SERVER.createAsyncJob(dataset, technique, parseInt(cluster), parseInt(partitions), parseInt(seed))
+        
         JOBS.push(normalJob)
         DATASET_SELECTED = await SERVER.getDataset(dataset);
         normalJob.onPartialResult(result => {
@@ -327,10 +332,6 @@ function readResult(it_res){
 
 function readHistoryResult(li_data,all_data,job, slowData, fastData){
     
-    timestamp0 = swap_timestamp
-    let actual_timestamp;
-    actual_timestamp = li_data.timestamp
-
     matrix1 = system.matrixAdjacency.init('#id-matrix-1');
     matrix2 = system.matrixAdjacencyFixed.init('#id-matrix-2');
     linechart1 = system.linechart.init('#linechart_inertia', technique)
@@ -368,8 +369,10 @@ function readHistoryResult(li_data,all_data,job, slowData, fastData){
     system.scatterplot.updateScatterplot(); 
     system.matrixAdjacency.updateBestPartition(li_data.info.best_run)
     system.scatterplot.early_termination = null;
-    linechart1.updateEarlyTerminationFromHistory(slowData)
+
     linechart1.updateEarlyTerminationFromHistory(fastData)
+    linechart1.updateEarlyTerminationFromHistory(slowData)
+    
 
     linechart1.render()
 }
@@ -495,7 +498,6 @@ function addPinHistory() {
             .attr('width',width_history)
             .attr('height', height_history-margin_history.top-margin_history.bottom)
             .attr("transform","translate(" + margin_history.left + "," + margin_history.top + ")")
-            
     }
 
     let tentative = previous_computations.length
@@ -505,6 +507,11 @@ function addPinHistory() {
 
     scaleHistory = d3.scaleBand()
     
+    if(previous_computations.length !== JOBS.length){
+        let new_JOB = JOBS[JOBS.length-1]
+        JOBS = []
+        JOBS.push(new_JOB)
+    }
        
     SVG_HISTORY.selectAll(".bar-history")
         .data(previous_computations)
@@ -631,6 +638,7 @@ function addPinHistory() {
             .attr('stroke-width',1)
             .attr('fill','transparent')
             .on('click',function (element,d) {
+                CURRENT_HISTORY=d.tentative
                 d3.selectAll('.bar-border').attr('stroke-width', '1')
                 d3.select('#border-'+d.tentative).attr('stroke-width', '2')
                 uploadPreviousData(d,JOBS[d.tentative])
@@ -735,8 +743,8 @@ function updateEarlyTermination(){
     let index = previous_computations.length -1
     let iterationFast = +previous_computations[index].earlyTerminationfast
     
-    d3.select('#information-info').html("Early Termination Fast - Iteration #" + iterationFast + '   <b>ARI<b/>: ' + ALL_DATA[iterationFast].metrics.progressiveMetrics.adjustedRandScore.toFixed(4))
-    system.scatterplotFixed.updateScatterplot(false,true, system.scatterplot.scale_x,system.scatterplot.scale_y,system.scatterplot.LABEL_EARLY_TERMINATION);
+    d3.select('#information-info').html(" Early Termination Fast - Iteration #" + iterationFast + '   <b>ARI<b/>: ' + (1-ALL_DATA[iterationFast].metrics.progressiveMetrics.adjustedRandScore).toFixed(4))
+    system.scatterplotFixed.updateScatterplot(false,true, system.scatterplot.scale_x,system.scatterplot.scale_y,system.scatterplot.LABEL_EARLY_TERMINATION,system.scatterplot.STABILITY_EARLY_TERMINATION);
 
 }
 
@@ -815,9 +823,9 @@ function changeSimilarityMetricMatrix(){
 
 
 function uploadPreviousData(d,jobdata){
-
     ALL_DATA = jobdata.results
     CURRENT_ITERATION = jobdata.results.length -1
+    CURRENT_HISTORY=d.tentative
     ITERAZIONE_PER_MATRICE = 1
     dataset = d.dataset
     technique =  d.technique
@@ -825,6 +833,4 @@ function uploadPreviousData(d,jobdata){
     partitions = d.partitions
     seed = d.seed
     readHistoryResult(ALL_DATA[CURRENT_ITERATION],ALL_DATA, jobdata, ALL_DATA[d.earlyTerminationslow], ALL_DATA[d.earlyTerminationfast])
-
-
 }
