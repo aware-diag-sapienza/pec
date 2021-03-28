@@ -59,8 +59,7 @@ body {
   }
 
   .item-metrics {
-    display:inline;
-    display: flex;
+    display:flex;
     flex-direction: row;
 
   }
@@ -75,6 +74,7 @@ body {
   .item-information-linechart{
     grid-area: infolinechart;
     padding-top: 5px;
+    visibility: hidden;
   }
   
   .item-information-scatterplot-1{
@@ -130,6 +130,7 @@ body {
     grid-area: dropdownmetrics;
     display: flex;
     flex-direction: row;
+    visibility:hidden;
   }
 
   .metrics-dropdown{
@@ -504,4 +505,9 @@ div.tooltipHistory {
   border-radius: 8px;			
   pointer-events: none;	
   opacity: 0;		
+}
+
+
+#select-similarity-matrix,#info-menu-scatterplot,.interactive-legend,#id-metrics,#id-scatterplot-1,#id-scatterplot-2{
+  visibility:hidden;
 }

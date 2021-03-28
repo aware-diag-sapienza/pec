@@ -50,7 +50,7 @@ system.timelinepartitions = (function() {
         this.partitions_status=Array.from({length:partitions},(_,i)=> [0,'P'+i,true]) // iteration for the status| partition | status | iteration finish
         this.metric_value = $('input[name="metric-timeline"]:checked').val();
         this.percentage_similarity = +$('#similarity-range').val()
-        d3.select('#information-linechart').style('visibility','visible');
+        //d3.select('#information-linechart').style('visibility','visible');
 
         
         this.DOMAINS = {inertia: [0,0], simplifiedSilhouette: [-1,1]}
@@ -158,7 +158,7 @@ system.timelinepartitions = (function() {
     }
 
     this.reset = () => {
-        d3.select('#information-linechart').style('visibility','hidden');
+        //d3.select('#information-linechart').style('visibility','hidden');
         
     }
    

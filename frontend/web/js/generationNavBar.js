@@ -235,7 +235,23 @@ async function startSelects(){
     seed = getSeed()
     d3.select('#select-seed').attr('placeholder',seed)
     d3.select('#iteration-label').html('');
-    d3.select('#id-metrics').style('display','none');
+    d3.select('#id-metrics').style('visibility','hidden');
+
+
+
+    
+    d3.select('#info-scatterplot-1').style('visibility','hidden');
+    d3.select('#select-similarity-matrix').style('visibility','hidden')
+    d3.select('#info-menu-scatterplot').style('visibility','hidden')
+    d3.select('.interactive-legend').style('visibility','hidden')
+    d3.select('.item-dropdown-metrics').style('visibility','hidden')
+    d3.select('#information-linechart').style('visibility','hidden')
+    d3.select('.item-information').style('visibility','hidden');
+    d3.select('#id-metrics').style('visibility','hidden')
+    d3.selectAll('.linechart_select').style('display','none')
+    d3.select('#button-metric').style('display','none')
+    d3.select('#id-scatterplot-1').style('visibility','hidden')
+    d3.select('#id-scatterplot-2').style('visibility','hidden')
 
     variableYAxisLinechart = $('#select-window-stability').val()
     qualityYAxisLinechart = $('#select-quality').val()
@@ -267,7 +283,7 @@ async function startSelects(){
         matrix2 = system.matrixAdjacencyFixed.init('#id-matrix-2');
         linechart1 = system.linechart.init('#linechart_inertia', technique)
         timelinePartitions = system.timelinepartitions.init('#timeline-partitions', technique,partitions)
-        d3.select('#info-scatterplot-1').style('visibility','visible');
+        
         document.getElementById('elbowLinechartCheck').checked = false
         elbowLinechart = document.getElementById('elbowLinechartCheck').checked
 
@@ -300,9 +316,20 @@ function readResult(it_res){
     let actual_timestamp;
     actual_timestamp = it_res.timestamp
     d3.select('#iteration-label').html('Iteration #'+it_res.iteration)
+    d3.select('#info-scatterplot-1').style('visibility','visible');
+    d3.select('#select-similarity-matrix').style('visibility','visible')
+    d3.select('#info-menu-scatterplot').style('visibility','visible')
+    d3.select('.interactive-legend').style('visibility','visible')
+    d3.select('.item-dropdown-metrics').style('visibility','visible')
+    d3.select('#id-metrics').style('visibility','visible')
+    d3.select('#information-linechart').style('visibility','visible')
     d3.selectAll('.linechart_select').style('display','block')
+    d3.select('#id-scatterplot-1').style('visibility','visible')
+    d3.select('#id-scatterplot-2').style('visibility','visible')
+    
     d3.select('#button-metric').style('display','inline')
-    d3.select('#id-metrics').style('display','flex')
+    
+    //d3.select('#id-metrics').style('display','flex')
     let metric_quality_selected = $('#select-quality').val();
 
         if(it_res.iteration === 0){
@@ -345,7 +372,7 @@ function readHistoryResult(li_data,all_data,job, slowData, fastData){
     d3.select('#iteration-label').html('Iteration #'+li_data.iteration)
     d3.selectAll('.linechart_select').style('display','block')
     d3.select('#button-metric').style('display','inline')
-    d3.select('#id-metrics').style('display','flex')
+    //d3.select('#id-metrics').style('display','flex')
     linechart1.setData(all_data) 
     
     timelinePartitions.setData(all_data) 
