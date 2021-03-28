@@ -77,12 +77,10 @@ class ProgressiveEnsembleClustering:
         self.__metricsHistory = []
         self.__labelsHistory = []
         self.__partitionsHistory = []
-        '''
-        self.__result_csv = None
-        self.__result_hdf5 = None
-        self.__result_hdf5_labels = None
-        self.__partial_results_info_arr = None
-        '''
+        
+        self.__earlyTerminationFast = None
+        self.__earlyTerminationSlow = None
+        
 
     def __check_alg_type(self, alg):
         if alg == "k-means": return alg
@@ -397,10 +395,12 @@ class ProgressiveEnsembleClustering:
         
         earlyTermination = Bunch(slow=False, fast=False)
         if not firstIteration:
-            if progressiveMetrics["inertia_improvementGradient"] < 1e-4 or prevResult.metrics.earlyTermination.fast:
+            if progressiveMetrics["inertia_improvementGradient"] < 1e-4 and self.__earlyTerminationFast is None:
                 earlyTermination.fast = True
-            if progressiveMetrics["inertia_improvementGradient"] < 1e-5 or prevResult.metrics.earlyTermination.slow:
+                self.__earlyTerminationFast = currentResult.info.iteration
+            if progressiveMetrics["inertia_improvementGradient"] < 1e-5 and self.__earlyTerminationSlow is None:
                 earlyTermination.slow = True
+                self.__earlyTerminationSlow = currentResult.info.iteration
    
    
         currentResult.metrics = ProgressiveResultMetrics(labelsMetrics=labelsMetrics, partitionsMetrics=partitionsMetrics, progressiveMetrics=progressiveMetrics, earlyTermination=earlyTermination)

@@ -75,6 +75,11 @@ class JsonWebSocketServer:
         messageString = json.dumps(message, cls=NumpyEncoder)
         return messageId, messageString
     
+    def getClientAddress(self, clientId):
+        client = self.__clients[clientId]
+        addr = f"{client['address'][0]}:{client['address'][1]}"
+        return addr
+        
     def start(self):
         self.__server.run_forever()
 
