@@ -316,24 +316,6 @@ system.timelinepartitions = (function() {
                         .attr('fill','green'),
                     exit=> exit);
             
-
-                    //f70c
-
-                    /*.append('text')
-                .attr('id','champion-icon')
-                .attr('font-family', 'FontAwesome')
-                .attr('x', that.xScale(that.ITERATION_LAST[that.BEST_RUN]+1))
-                .attr('y', that.yScale('P'+that.BEST_RUN)+(that.yScale.step()/2))
-                .attr('font-size', 15)
-                .attr('fill',()=>{
-                    if(that.metric_value === 'inertia'){
-                        return '#ff0090'
-                    }
-                    if (that.metric_value === that.METRICA_LABELING){
-                        return '#0094db'
-                    }
-                })
-                .text('\uf091' ); */ 
                 
                     d3.select('.y.axisTimeline')
                     .selectAll("rect.status-partition")
@@ -349,27 +331,6 @@ system.timelinepartitions = (function() {
                             .text('\uf110' )
                             .style("text-anchor", "end")
                             .attr('fill',(d)=> {if(d) return 'white'; else { return '#00a0a0';}})
-                            //.append("rect")
-                            //.attr('id',(d) => 'status-partition-'+d[1])
-                            //.attr('x', 0 - (this.margin.left))
-                            //.attr('y',(d,i) => that.yScale(d[1]) + (that.yScale.bandwidth()/2) -5 )
-                            //.attr('width',() => {if(that.yScale.bandwidth()<=10) return that.yScale.bandwidth(); else return 10;})
-                            //.attr('height',() => {if(that.yScale.bandwidth()<=10) return that.yScale.bandwidth(); else return 10;})
-                            
-                            //.attr('stroke-width',3)
-                            //.attr('stroke',(d)=> {if(d[2]) return '#000'; else {return'#6C757D'}})
-                            //.on('click',function(d){
-                                
-                            //    let index_checkbox = parseInt(d3.select(this).attr('id').replace('checkbox-P',''))
-                                
-                            //    if (that.partitions_status[index_checkbox][2]){
-                            //        that.partitions_status[index_checkbox][2] = false
-                                    
-                            //        d3.select(this)
-                            //        .attr('fill','#fff')
-                            //        .attr('stroke-width',3)
-                            //        .attr('stroke','#6C757D')
-                            //    }
                             ,
                         update => update
                             .attr('fill','green'),

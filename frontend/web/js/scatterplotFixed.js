@@ -13,6 +13,7 @@ system.scatterplotFixed = (function() {
 
   let stage;
   let layer;
+  this.margin = {top: 5, right: 10, bottom: 5, left: 10}
   let nodes = [];
   let tooltipLayer;
 
@@ -51,8 +52,8 @@ system.scatterplotFixed = (function() {
 
     stage = new Konva.Stage({
       container: 'id-scatterplot-2',
-      width: this.width,
-      height: this.height
+      width: this.width-this.margin.left-this.margin.right,
+      height: this.height-this.margin.top-this.margin.bottom,
     })
     layer = new Konva.Layer();
     stage.add(layer);
@@ -208,7 +209,8 @@ function plotCoordsKonva(numberPoints, col, useScale,useColor,scaleX,scaleY,labe
         y: ycoord,
         radius: opacitypoint,
         fill: colorlabel,// + colStr,
-        id: 'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel + '\nx: '+xcoord +'\ny:' + ycoord
+        id: 'i:' + i + '\nc: '+ labels[i] + '\nx: '+that.coordData[i][0] +
+          '\ny:' + that.coordData[i][1]
       });
       layer.add(node);
       nodes.push(node);

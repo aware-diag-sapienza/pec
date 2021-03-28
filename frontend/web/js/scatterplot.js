@@ -184,7 +184,9 @@ this.updateScatterplot = ()=> {
 
 this.updateScatterplotFromTimeline = (iteration, partition)=> {
   d3.select('#information-info').html("Partition P"+partition + " at iteration "+iteration)
-    
+  //system.scatterplot.updateScatterplot()
+
+  //plotCoordsKonva(that.tot_rows,'#b3b3b3',false,that.scale_y,ALL_DATA[iteration]['partitions'][partition], ALL_DATA[iteration].metrics.progressiveMetrics.entriesStability[stability_window])
   system.scatterplotFixed.updateScatterplot(false,true, that.scale_x,that.scale_y,ALL_DATA[iteration]['partitions'][partition], ALL_DATA[iteration].metrics.progressiveMetrics.entriesStability[stability_window]);//useScale,useColor, scaleX,ScaleY
 }
 
@@ -269,8 +271,8 @@ function plotCoordsKonva(numberPoints, col, useScale,labels,stability) {
           radius: opacitypoint,
           fill: colorlabel,// + colStr,
           //visible: opacitypoint,
-          id: 'i:' + i + '\nc: '+ labels[i] + ' ' + colorlabel + '\nx: '+xcoord +
-          '\ny:' + ycoord
+          id: 'i:' + i + '\nc: '+ labels[i] + '\nx: '+that.coordData[i][0] +
+          '\ny:' + that.coordData[i][1]
         });
         layer.add(node);
         nodes.push(node);    
