@@ -511,3 +511,7 @@ div.tooltipHistory {
 #select-similarity-matrix,#info-menu-scatterplot,.interactive-legend,#id-metrics,#id-scatterplot-1,#id-scatterplot-2{
   visibility:hidden;
 }
+
+#load-img {
+  visibility:hidden;
+}

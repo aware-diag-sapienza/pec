@@ -181,6 +181,7 @@ let normalJob = null
 
 
 function stopSelects(){
+    d3.select('#load-img').style('visibility','hidden');
     if(elbowJob !== null) {
         if(elbowJob.status !== 'stopped') elbowJob.stop()
     } 
@@ -192,7 +193,7 @@ function stopSelects(){
 
 async function startElbow(){
     LockUI.lock()
-        
+    
     let elbowData = []
     const dname = $( "#select-dataset" ).val()
     const kMin = parseInt($( "#select-minK-Elbow" ).val())
@@ -209,12 +210,18 @@ async function startElbow(){
 
         linechart_Elbow1 = system.linechartElbow.init('#linechart_inertia', kMin, kMax)
         elbowJob.onPartialResult(result => {
+
             if(result.k == 2){
                 LockUI.unlock()
             }
             elbowData.push({k: result.k, value: result.inertia})
             linechart_Elbow1.setData(elbowData)
             linechart_Elbow1.render()
+            if(result.isLast){
+                d3.select('#load-img').style('visibility','hidden');
+            } else {
+                d3.select('#load-img').style('visibility','visible');
+            }
         })
         elbowJob.start()
     } else {
@@ -301,6 +308,11 @@ async function startSelects(){
             }
             readResult(result)
             d3.select('#iteration-label').html("Iteration " + result.iteration)
+            if(result.isLast){
+                d3.select('#load-img').style('visibility','hidden');
+            } else {
+                d3.select('#load-img').style('visibility','visible');
+            }
         })
         normalJob.start()
         addPinHistory()
@@ -718,6 +730,7 @@ function updatePinHistory(iteration,isLast,valori_metriche){
         .attr('fill', (d) => d3.interpolateReds(SCALE_METRIC_QUALITY(d[metric_quality_selected])))
     
     if(isLast){
+        
         d3.select('#improvement-'+(CURRENT_HISTORY))
         .attr('width',width_rect*LIMIT_IT)
         let width_iteration = (width_rect*LIMIT_IT)/iteration
