@@ -41,7 +41,7 @@ class ProgressiveEnsembleClustering:
 
     """
     def __init__(self, data, n_clusters=2, n_runs=4, alg="k-means", decision="inertia", random_state=None, job_id=None, verbose=False, 
-    results_parent_folder=None, results_folder=None, results_callback=None, instance=None):
+    results_parent_folder=None, results_folder=None, results_callback=None, instance=None, early_termination=None):
         self.data = data
         self.n_entries = data.shape[0]
         self.n_clusters = n_clusters
@@ -78,6 +78,7 @@ class ProgressiveEnsembleClustering:
         self.__labelsHistory = []
         self.__partitionsHistory = []
         
+        self.__stopAtEarlyTermination = early_termination
         self.__earlyTerminationFast = None
         self.__earlyTerminationSlow = None
         
@@ -266,7 +267,6 @@ class ProgressiveEnsembleClustering:
             result = self.__partial_results_queue.get()
             result.job_id = self.job_id
             result.info.timestamp = self.__time_manager.timestamp(round_digits=4) #update timestamp of result. original timestamp is when the result was generated, but some delay can appear when is recieved here
-            self.__active = not result.info.is_last
             try:
                 result = self.__computeResultMetrics(result, self.__prevResult, self.__metricsHistory, self.__labelsHistory, self.__partitionsHistory)
             except:
@@ -281,6 +281,8 @@ class ProgressiveEnsembleClustering:
             self.__labelsHistory.append(result.labels)
             self.__partitionsHistory.append(result.partitions)
 
+            if result.info.is_last or result.info.is_last_et:
+                self.__active = False
             
             self.on_partial_result(result)
             self.__time_manager.resume()
@@ -294,6 +296,8 @@ class ProgressiveEnsembleClustering:
 
     def __computeResultMetrics(self, currentResult, prevResult, metricsHistory, labelsHistory, partitionsHistory):
         firstIteration = prevResult is None
+        lastIteration = currentResult.info.is_last
+        
         hystoryLen = len(metricsHistory)
         getSinglePartitionHistory = lambda i: [partitionsHistory[j][i] for j in range(hystoryLen)]
 
@@ -397,9 +401,11 @@ class ProgressiveEnsembleClustering:
         if not firstIteration:
             if progressiveMetrics["inertia_improvementGradient"] < 1e-4 and self.__earlyTerminationFast is None:
                 earlyTermination.fast = True
+                if self.__stopAtEarlyTermination == "fast": currentResult.info.is_last_et = True
                 self.__earlyTerminationFast = currentResult.info.iteration
             if progressiveMetrics["inertia_improvementGradient"] < 1e-5 and self.__earlyTerminationSlow is None:
                 earlyTermination.slow = True
+                if self.__stopAtEarlyTermination == "slow": currentResult.info.is_last_et = True
                 self.__earlyTerminationSlow = currentResult.info.iteration
    
    

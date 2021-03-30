@@ -30,6 +30,7 @@ class ProgressiveResultInfo(Bunch):
         timestamp=None,
         iteration=None,
         is_last=False,
+        is_last_et=False,
         n_clusters=None,
         n_runs = None,
 
@@ -50,6 +51,7 @@ class ProgressiveResultInfo(Bunch):
             timestamp=round(timestamp,_ROUND_TIME),
             iteration=iteration,
             is_last=is_last,
+            is_last_et=is_last_et,
             n_clusters=n_clusters,
             n_runs=n_runs,
 
