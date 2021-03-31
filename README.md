@@ -2,7 +2,8 @@
 
 ## Backend
 ### Requirements
-Backend is in python. Install dependencies with: `pip3 install backend/requirements.txt`
+Backend is in python >= 3.9. 
+Install dependencies with: `pip3 install backend/requirements.txt`
 
 Start server with: `python server.py`
 
