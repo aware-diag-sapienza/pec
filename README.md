@@ -2,8 +2,10 @@
 
 ## Backend
 ### Requirements
+Backend is in python. Install dependencies with: `pip3 install backend/requirements.txt`
 
-TODO !!!
+Start server with: `python server.py`
 
 ## Frontend
-TODO !!!
+
+Start client with: `python client.py`
